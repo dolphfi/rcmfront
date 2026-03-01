@@ -29,10 +29,12 @@ import { cn } from "../../lib/utils";
 
 import { useSidebar } from "../layout/SidebarContext";
 import Language from "./Language";
+import { useTranslation } from "react-i18next";
 
 export function Topbar() {
     const { isSidebarOpen, toggleSidebar } = useSidebar();
     const [open, setOpen] = useState(false);
+    const { t } = useTranslation();
 
     useEffect(() => {
         const down = (e: KeyboardEvent) => {
@@ -46,7 +48,7 @@ export function Topbar() {
     }, [])
 
     return (
-        <div className="bg-black/40 backdrop-blur-xl border-b border-white/10 text-white">
+        <div className="topbar-container no-print bg-black/40 backdrop-blur-xl border-b border-white/10 text-white">
             <div className="flex h-16 items-center px-4 justify-between">
                 <div className="flex-1 flex items-center gap-4">
                     <Button variant="ghost" size="icon" onClick={toggleSidebar} className="hover:bg-white/10 hover:text-white">
@@ -61,8 +63,7 @@ export function Topbar() {
                                 className={cn(
                                     "relative w-full max-w-lg justify-start text-sm text-slate-400 bg-white/5 border-white/10 sm:pr-12 md:w-40 lg:w-[500px] hover:bg-white/10 hover:text-white"
                                 )}>
-                                <span className="hidden lg:inline-flex">Rechercher...</span>
-                                <span className="inline-flex lg:hidden">Search...</span>
+                                <span className="inline-flex">{t('topbar.rechercher')}</span>
                                 <kbd className="pointer-events-none absolute right-1.5 top-1/2 -translate-y-1/2 hidden h-5 select-none items-center gap-1 rounded border border-white/10 bg-white/5 px-1.5 font-mono text-[10px] font-medium opacity-100 sm:flex">
                                     <span className="text-xs">Ctrl</span>K
                                 </kbd>
@@ -70,38 +71,38 @@ export function Topbar() {
                         </PopoverTrigger>
                         <PopoverContent className="w-[500px] p-0 bg-black/80 backdrop-blur-xl border-white/10" align="start">
                             <Command className="bg-transparent text-slate-400 [&_[cmdk-group-heading]]:text-slate-500 [&_[cmdk-group]:not([hidden])_~[cmdk-group]]:pt-0 [&_[cmdk-group]]:text-slate-400 [&_[cmdk-item]]:text-slate-400 [&_[cmdk-item][data-selected='true']]:bg-white/10 [&_[cmdk-item][data-selected='true']]:text-white">
-                                <CommandInput placeholder="Type a command or search..." className="text-white placeholder:text-slate-400 border-white/10" />
+                                <CommandInput placeholder={t('topbar.search_placeholder')} className="text-white placeholder:text-slate-400 border-white/10" />
                                 <CommandList className="max-h-[300px] overflow-y-auto overflow-x-hidden scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
-                                    <CommandEmpty>No results found.</CommandEmpty>
-                                    <CommandGroup heading="Suggestions">
+                                    <CommandEmpty>{t('topbar.no_results')}</CommandEmpty>
+                                    <CommandGroup heading={t('common.suggestions')}>
                                         <CommandItem>
                                             <Calendar className="mr-2 h-4 w-4" />
-                                            <span>Calendar</span>
+                                            <span>{t('common.calendar')}</span>
                                         </CommandItem>
                                         <CommandItem>
                                             <Smile className="mr-2 h-4 w-4" />
-                                            <span>Search Emoji</span>
+                                            <span>{t('common.search_emoji')}</span>
                                         </CommandItem>
                                         <CommandItem>
                                             <Calculator className="mr-2 h-4 w-4" />
-                                            <span>Calculator</span>
+                                            <span>{t('common.calculator')}</span>
                                         </CommandItem>
                                     </CommandGroup>
                                     <CommandSeparator />
-                                    <CommandGroup heading="Settings">
+                                    <CommandGroup heading={t('common.settings')}>
                                         <CommandItem>
                                             <User className="mr-2 h-4 w-4" />
-                                            <span>Profile</span>
+                                            <span>{t('common.profile')}</span>
                                             <span className="ml-auto text-xs tracking-widest text-muted-foreground">⌘P</span>
                                         </CommandItem>
                                         <CommandItem>
                                             <CreditCard className="mr-2 h-4 w-4" />
-                                            <span>Billing</span>
+                                            <span>{t('common.billing')}</span>
                                             <span className="ml-auto text-xs tracking-widest text-muted-foreground">⌘B</span>
                                         </CommandItem>
                                         <CommandItem>
                                             <Settings className="mr-2 h-4 w-4" />
-                                            <span>Settings</span>
+                                            <span>{t('common.settings')}</span>
                                             <span className="ml-auto text-xs tracking-widest text-slate-400">⌘S</span>
                                         </CommandItem>
                                     </CommandGroup>

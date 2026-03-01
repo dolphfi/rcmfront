@@ -46,24 +46,47 @@ import { Switch } from "../../components/ui/switch";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../../components/ui/table';
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '../../components/ui/pagination';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../components/ui/select';
-import { brand } from '../../context/data/dataBrand';
+import { useTranslation } from 'react-i18next';
+import { toast } from 'sonner';
+import brandService from '../../context/api/brandservice';
 
 const Brand = () => {
+    const { t } = useTranslation();
+    const [brands, setBrands] = React.useState<any[]>([]);
+    const [isLoading, setIsLoading] = React.useState(true);
     const [currentPage, setCurrentPage] = React.useState(1);
     const [itemsPerPage, setItemsPerPage] = React.useState(10);
     const [searchTerm, setSearchTerm] = React.useState('');
     const [selectedStatus, setSelectedStatus] = React.useState('All');
     const [isAddOpen, setIsAddOpen] = React.useState(false);
     const [images, setImages] = React.useState<string[]>([]);
+    const [selectedFile, setSelectedFile] = React.useState<File | null>(null);
+
+    const fetchBrands = async () => {
+        try {
+            setIsLoading(true);
+            const data = await brandService.getAll();
+            setBrands(data);
+        } catch (error) {
+            console.error('Failed to fetch brands:', error);
+            toast.error(t('brands.error_fetch', 'Failed to load brands'));
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    React.useEffect(() => {
+        fetchBrands();
+    }, []);
 
     // Extract unique status
-    const brandStatus = ['All', ...Array.from(new Set(brand.map(p => p.status)))];
+    const brandStatus = ['All', 'Active', 'Inactive'];
 
     // Filter Brand
-    const filteredBrand = brand.filter(brand => {
-        const matchesSearch = brand.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            brand.name.toLowerCase().includes(searchTerm.toLowerCase());
-        const matchesBrand = selectedStatus === 'All' || brand.status === selectedStatus;
+    const filteredBrand = brands.filter((brand: any) => {
+        const matchesSearch = brand.name.toLowerCase().includes(searchTerm.toLowerCase());
+        const mappedStatus = brand.isActive ? 'Active' : 'Inactive';
+        const matchesBrand = selectedStatus === 'All' || mappedStatus === selectedStatus;
         return matchesSearch && matchesBrand;
     });
 
@@ -85,35 +108,90 @@ const Brand = () => {
     }
 
     const [newBrand, setNewBrand] = React.useState({
-        image: '',
+        logoUrl: '',
         name: '',
         description: '',
-        status: true // default active
+        isActive: true // default active
     });
     const fileInputRef = React.useRef<HTMLInputElement>(null);
 
     const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
         const files = e.target.files;
-        if (files) {
-            const newImages = Array.from(files).map(file => URL.createObjectURL(file));
-            setImages([...images, ...newImages]);
+        if (files && files.length > 0) {
+            const file = files[0];
+            setSelectedFile(file);
+            // Take only the first image for now since brand only has 1 logoUrl
+            const imageUrl = URL.createObjectURL(file);
+            setImages([imageUrl]);
+            // Stop setting blob URL in data object!
         }
     };
+
     const [isEditOpen, setIsEditOpen] = React.useState(false);
-    const [editingBrand, setEditingBrand] = React.useState<any>(null); // Using any for now to avoid import issues, or infer from data
+    const [editingBrand, setEditingBrand] = React.useState<any>(null);
 
     const handleEditClick = (brand: any) => {
-        setEditingBrand(brand);
-        setImages(brand.image ? [brand.image] : []);
+        setEditingBrand({
+            id: brand.id,
+            name: brand.name,
+            description: brand.description || '',
+            isActive: brand.isActive,
+            logoUrl: brand.logoUrl || ''
+        });
+        setImages(brand.logoUrl ? [brand.logoUrl] : []);
         setIsEditOpen(true);
+    };
+
+    const handleAddBrand = async () => {
+        try {
+            if (!newBrand.name) {
+                toast.error(t('brands.error_name_required', 'Brand name is required'));
+                return;
+            }
+            await brandService.create(newBrand, selectedFile || undefined);
+            toast.success(t('brands.success_create', 'Brand created successfully'));
+            setIsAddOpen(false);
+            setNewBrand({ logoUrl: '', name: '', description: '', isActive: true });
+            setImages([]);
+            setSelectedFile(null);
+            fetchBrands();
+        } catch (error: any) {
+            toast.error(error.response?.data?.message || t('brands.error_create', 'Failed to create brand'));
+        }
+    };
+
+    const handleUpdateBrand = async () => {
+        try {
+            if (!editingBrand.name) {
+                toast.error(t('brands.error_name_required', 'Brand name is required'));
+                return;
+            }
+            await brandService.update(editingBrand.id, editingBrand, selectedFile || undefined);
+            toast.success(t('brands.success_update', 'Brand updated successfully'));
+            setIsEditOpen(false);
+            setSelectedFile(null);
+            fetchBrands();
+        } catch (error: any) {
+            toast.error(error.response?.data?.message || t('brands.error_update', 'Failed to update brand'));
+        }
+    };
+
+    const handleDeleteBrand = async (id: string) => {
+        try {
+            await brandService.delete(id);
+            toast.success(t('brands.success_delete', 'Brand deleted successfully'));
+            fetchBrands();
+        } catch (error: any) {
+            toast.error(error.response?.data?.message || t('brands.error_delete', 'Failed to delete brand'));
+        }
     };
     return (
         <div className="flex flex-col h-full gap-6">
             {/* Page Header */}
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div>
-                    <h1 className="text-2xl font-bold text-white tracking-tight">Brand List</h1>
-                    <p className="text-sm text-slate-400">Manage your brands</p>
+                    <h1 className="text-2xl font-bold text-white tracking-tight">{t('brands.title', 'Brand List')}</h1>
+                    <p className="text-sm text-slate-400">{t('brands.subtitle', 'Manage your brands')}</p>
                 </div>
 
                 <div className="flex flex-wrap items-center gap-2">
@@ -139,14 +217,14 @@ const Brand = () => {
                         <DialogTrigger asChild>
                             <Button className="bg-orange-500 hover:bg-orange-600 text-white gap-2">
                                 <Plus className="h-4 w-4" />
-                                <span className="hidden sm:inline">Add Brand</span>
+                                <span className="hidden sm:inline">{t('brands.add_brand', 'Add Brand')}</span>
                             </Button>
                         </DialogTrigger>
                         <DialogContent className="bg-slate-900 border-white/10 text-white sm:max-w-[425px]">
                             <DialogHeader>
-                                <DialogTitle>Add Brand</DialogTitle>
+                                <DialogTitle>{t('brands.add_brand', 'Add Brand')}</DialogTitle>
                                 <DialogDescription>
-                                    Add a new brand
+                                    {t('brands.add_desc', 'Add a new brand')}
                                 </DialogDescription>
                             </DialogHeader>
                             <div className="p-4">
@@ -165,7 +243,7 @@ const Brand = () => {
                                             className="h-24 w-24 rounded-lg border border-dashed border-white/20 hover:border-orange-500/50 hover:bg-white/5 flex flex-col items-center justify-center cursor-pointer transition-all group"
                                         >
                                             <CirclePlus className="h-4 w-4 text-slate-400 group-hover:text-orange-500 transition-colors" />
-                                            <span className="text-[10px] font-semibold text-slate-500 group-hover:text-orange-500 mt-2">Add Images</span>
+                                            <span className="text-[10px] font-semibold text-slate-500 group-hover:text-orange-500 mt-2">{t('brands.add_images', 'Add Images')}</span>
                                         </div>
                                         {images.map((image, index) => (
                                             <div key={index} className="h-24 w-24 rounded-lg border border-white/10 p-1 relative group">
@@ -178,6 +256,7 @@ const Brand = () => {
                                                         const newImages = [...images];
                                                         newImages.splice(index, 1);
                                                         setImages(newImages);
+                                                        setSelectedFile(null);
                                                     }}
                                                 >
                                                     <X className="h-3 w-3" />
@@ -206,10 +285,11 @@ const Brand = () => {
                                         </div>
                                         <div className="flex items-center justify-between pt-2">
                                             <Label htmlFor="sub-status" className="text-white">Status</Label>
+                                            <Label htmlFor="sub-status" className="text-white">Status</Label>
                                             <Switch
                                                 id="sub-status"
-                                                checked={newBrand.status}
-                                                onCheckedChange={(checked) => setNewBrand({ ...newBrand, status: checked })}
+                                                checked={newBrand.isActive}
+                                                onCheckedChange={(checked) => setNewBrand({ ...newBrand, isActive: checked })}
                                                 className="bg-white/5 border border-white/10 backdrop-blur-sm data-[state=checked]:bg-emerald-500 data-[state=unchecked]:bg-white/5"
                                             />
                                         </div>
@@ -217,8 +297,12 @@ const Brand = () => {
                                 </div>
                             </div>
                             <DialogFooter>
-                                <Button variant="outline" className="bg-slate-800 border-white/10 text-white hover:bg-slate-700 hover:text-white" onClick={() => setIsAddOpen(false)}>Cancel</Button>
-                                <Button className="bg-orange-500 hover:bg-orange-600 text-white">Add Brand</Button>
+                                <Button variant="outline" className="bg-slate-800 border-white/10 text-white hover:bg-slate-700 hover:text-white" onClick={() => setIsAddOpen(false)}>
+                                    {t('common.cancel', 'Cancel')}
+                                </Button>
+                                <Button className="bg-orange-500 hover:bg-orange-600 text-white" onClick={handleAddBrand}>
+                                    {t('brands.add_brand', 'Add Brand')}
+                                </Button>
                             </DialogFooter>
                         </DialogContent>
                     </Dialog>
@@ -228,9 +312,9 @@ const Brand = () => {
                 <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
                     <DialogContent className="bg-slate-900 border-white/10 text-white sm:max-w-[425px]">
                         <DialogHeader>
-                            <DialogTitle>Edit Brand</DialogTitle>
+                            <DialogTitle>{t('brands.edit_brand', 'Edit Brand')}</DialogTitle>
                             <DialogDescription>
-                                Update brand details
+                                {t('brands.update_brand', 'Update brand details')}
                             </DialogDescription>
                         </DialogHeader>
                         <div className="p-4">
@@ -250,19 +334,18 @@ const Brand = () => {
                                             className="h-24 w-24 rounded-lg border border-dashed border-white/20 hover:border-orange-500/50 hover:bg-white/5 flex flex-col items-center justify-center cursor-pointer transition-all group"
                                         >
                                             <CirclePlus className="h-4 w-4 text-slate-400 group-hover:text-orange-500 transition-colors" />
-                                            <span className="text-[10px] font-semibold text-slate-500 group-hover:text-orange-500 mt-2">Change Image</span>
+                                            <span className="text-[10px] font-semibold text-slate-500 group-hover:text-orange-500 mt-2">{t('brands.change_image', 'Change Image')}</span>
                                         </div>
-                                        {images.map((image, index) => (
-                                            <div key={index} className="h-24 w-24 rounded-lg border border-white/10 p-1 relative group">
+                                        {images.length > 0 && images.map((image, index) => (
+                                            <div key={index} className="h-24 w-24 rounded-lg border border-white/10 p-1 relative group bg-white/5 flex items-center justify-center">
                                                 <img src={image} alt={`Brand ${index + 1}`} className="h-full w-full object-contain rounded-md" />
                                                 <Button
                                                     variant="destructive"
                                                     size="icon"
                                                     className="absolute top-1 right-1 h-4 w-4 rounded shadow-lg opacity-0 group-hover:opacity-100 scale-90 group-hover:scale-100 transition-all"
                                                     onClick={() => {
-                                                        const newImages = [...images];
-                                                        newImages.splice(index, 1);
-                                                        setImages(newImages);
+                                                        setImages([]);
+                                                        setEditingBrand({ ...editingBrand, logoUrl: '' });
                                                     }}
                                                 >
                                                     <X className="h-3 w-3" />
@@ -272,7 +355,7 @@ const Brand = () => {
                                     </div>
                                     <div className="grid gap-4">
                                         <div>
-                                            <Label htmlFor="edit-name" className="text-white">Name <span className="text-rose-500">*</span></Label>
+                                            <Label htmlFor="edit-name" className="text-white">{t('brands.name', 'Name')} <span className="text-rose-500">*</span></Label>
                                             <Input
                                                 id="edit-name"
                                                 value={editingBrand.name}
@@ -281,7 +364,7 @@ const Brand = () => {
                                             />
                                         </div>
                                         <div>
-                                            <Label htmlFor="edit-description" className="text-white">Description</Label>
+                                            <Label htmlFor="edit-description" className="text-white">{t('brands.description', 'Description')}</Label>
                                             <Input
                                                 id="edit-description"
                                                 value={editingBrand.description}
@@ -290,11 +373,11 @@ const Brand = () => {
                                             />
                                         </div>
                                         <div className="flex items-center justify-between pt-2">
-                                            <Label htmlFor="edit-status" className="text-white">Status</Label>
+                                            <Label htmlFor="edit-status" className="text-white">{t('brands.status', 'Status')}</Label>
                                             <Switch
                                                 id="edit-status"
-                                                checked={editingBrand.status === 'Active'}
-                                                onCheckedChange={(checked) => setEditingBrand({ ...editingBrand, status: checked ? 'Active' : 'Inactive' })}
+                                                checked={editingBrand.isActive}
+                                                onCheckedChange={(checked) => setEditingBrand({ ...editingBrand, isActive: checked })}
                                                 className="bg-white/5 border border-white/10 backdrop-blur-sm data-[state=checked]:bg-emerald-500 data-[state=unchecked]:bg-white/5"
                                             />
                                         </div>
@@ -303,8 +386,12 @@ const Brand = () => {
                             )}
                         </div>
                         <DialogFooter>
-                            <Button variant="outline" className="bg-slate-800 border-white/10 text-white hover:bg-slate-700 hover:text-white" onClick={() => setIsEditOpen(false)}>Cancel</Button>
-                            <Button className="bg-emerald-500 hover:bg-emerald-600 text-white">Save Changes</Button>
+                            <Button variant="outline" className="bg-slate-800 border-white/10 text-white hover:bg-slate-700 hover:text-white" onClick={() => setIsEditOpen(false)}>
+                                {t('common.cancel', 'Cancel')}
+                            </Button>
+                            <Button className="bg-emerald-500 hover:bg-emerald-600 text-white" onClick={handleUpdateBrand}>
+                                {t('common.save_button', 'Save Changes')}
+                            </Button>
                         </DialogFooter>
                     </DialogContent>
                 </Dialog>
@@ -318,7 +405,7 @@ const Brand = () => {
                         <div className="relative w-full sm:w-72">
                             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                             <Input
-                                placeholder="Search..."
+                                placeholder={t('common.search', 'Search...')}
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
                                 className="pl-9 bg-white/5 border-white/10 text-white placeholder:text-slate-500 focus-visible:ring-orange-500/50 focus-visible:border-orange-500"
@@ -329,7 +416,7 @@ const Brand = () => {
                             <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
                                     <Button variant="outline" className="bg-white/5 border-white/10 text-slate-300 hover:bg-white/10 hover:text-white w-full sm:w-32 justify-between">
-                                        {selectedStatus === 'All' ? 'Status' : selectedStatus}
+                                        {selectedStatus === 'All' ? t('common.status', 'Status') : (selectedStatus === 'Active' ? t('category.active', 'Active') : t('category.inactive', 'Inactive'))}
                                         <ChevronDown className="h-4 w-4 opacity-50" />
                                     </Button>
                                 </DropdownMenuTrigger>
@@ -340,7 +427,7 @@ const Brand = () => {
                                             onClick={() => setSelectedStatus(status)}
                                             className="focus:bg-white/10 focus:text-white cursor-pointer"
                                         >
-                                            {status}
+                                            {status === 'All' ? 'All' : (status === 'Active' ? t('category.active', 'Active') : t('category.inactive', 'Inactive'))}
                                         </DropdownMenuItem>
                                     ))}
                                 </DropdownMenuContent>
@@ -352,31 +439,41 @@ const Brand = () => {
                         <Table>
                             <TableHeader className="bg-slate-900 border-b border-white/10">
                                 <TableRow className="hover:bg-transparent border-white/10">
-                                    <TableHead className="text-white">Brand</TableHead>
-                                    <TableHead className="text-white">Created Date</TableHead>
-                                    <TableHead className="text-white">Status</TableHead>
-                                    <TableHead className="text-right text-white">Action</TableHead>
+                                    <TableHead className="text-white">{t('brands.table_brand', 'Brand')}</TableHead>
+                                    <TableHead className="text-white">{t('brands.table_created', 'Created Date')}</TableHead>
+                                    <TableHead className="text-white">{t('brands.table_status', 'Status')}</TableHead>
+                                    <TableHead className="text-right text-white">{t('brands.table_action', 'Action')}</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                                {currentBrand.length > 0 ? (
-                                    currentBrand.map((brand) => (
+                                {isLoading ? (
+                                    <TableRow>
+                                        <TableCell colSpan={4} className="text-center py-8 text-slate-400">Loading...</TableCell>
+                                    </TableRow>
+                                ) : currentBrand.length > 0 ? (
+                                    currentBrand.map((brand: any) => (
                                         <TableRow key={brand.id} className="hover:bg-white/10 border-white/10">
                                             <TableCell>
                                                 <div className="flex items-center gap-3">
-                                                    <div className="h-10 w-10 rounded-lg overflow-hidden border border-white/10">
-                                                        <img src={brand.image} alt={brand.name} className="h-full w-full object-cover" />
+                                                    <div className="h-10 w-10 rounded-lg overflow-hidden border border-white/10 flex items-center justify-center bg-white/5">
+                                                        {brand.logoUrl ? (
+                                                            <img src={brand.logoUrl} alt={brand.name} className="h-full w-full object-cover" />
+                                                        ) : (
+                                                            <span className="text-slate-400 font-bold">{brand.name.charAt(0).toUpperCase()}</span>
+                                                        )}
                                                     </div>
                                                     <span className="font-medium text-white group-hover:text-orange-400 transition-colors">{brand.name}</span>
                                                 </div>
                                             </TableCell>
-                                            <TableCell className="text-white">{brand.created_at}</TableCell>
+                                            <TableCell className="text-white">
+                                                {brand.createdAt ? new Date(brand.createdAt).toLocaleDateString() : '-'}
+                                            </TableCell>
                                             <TableCell className='font-medium text-slate-300'>
-                                                <span className={`px-2 py-1 rounded-md text-xs font-medium border ${brand.status === 'Active'
+                                                <span className={`px-2 py-1 rounded-md text-xs font-medium border ${brand.isActive
                                                     ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20'
                                                     : 'bg-orange-500/10 text-orange-500 border-orange-500/20'
                                                     }`}>
-                                                    {brand.status}
+                                                    {brand.isActive ? t('category.active', 'Active') : t('category.inactive', 'Inactive')}
                                                 </span>
                                             </TableCell>
                                             <TableCell className="text-right">
@@ -392,16 +489,18 @@ const Brand = () => {
                                                         </AlertDialogTrigger>
                                                         <AlertDialogContent className="bg-slate-900 border-white/10">
                                                             <AlertDialogHeader>
-                                                                <AlertDialogTitle className="text-white">Are you absolutely sure?</AlertDialogTitle>
-                                                                <AlertDialogDescription className="text-slate-400">
-                                                                    This action cannot be undone. This will permanently delete the brand
-                                                                    <span className="font-medium text-white"> "{brand.name}" </span>
-                                                                    and remove it from our servers.
+                                                                <AlertDialogTitle className="text-white">{t('brands.delete_confirm_title', 'Are you absolutely sure?')}</AlertDialogTitle>
+                                                                <AlertDialogDescription className="text-slate-400 whitespace-pre-line">
+                                                                    {t('brands.delete_confirm_desc', 'This action cannot be undone. This will permanently delete the brand "{{name}}" and remove it from our servers.', { name: brand.name })}
                                                                 </AlertDialogDescription>
                                                             </AlertDialogHeader>
                                                             <AlertDialogFooter>
-                                                                <AlertDialogCancel className="bg-transparent border-white/10 text-white hover:bg-white/10 hover:text-white">Cancel</AlertDialogCancel>
-                                                                <AlertDialogAction className="bg-rose-500 hover:bg-rose-600 text-white border-0">Delete</AlertDialogAction>
+                                                                <AlertDialogCancel className="bg-transparent border-white/10 text-white hover:bg-white/10 hover:text-white">
+                                                                    {t('common.cancel', 'Cancel')}
+                                                                </AlertDialogCancel>
+                                                                <AlertDialogAction className="bg-rose-500 hover:bg-rose-600 text-white border-0" onClick={() => handleDeleteBrand(brand.id)}>
+                                                                    {t('common.delete', 'Delete')}
+                                                                </AlertDialogAction>
                                                             </AlertDialogFooter>
                                                         </AlertDialogContent>
                                                     </AlertDialog>
@@ -413,7 +512,7 @@ const Brand = () => {
                                 ) : (
                                     <TableRow>
                                         <TableCell colSpan={10} className="text-center py-8 text-slate-400">
-                                            No brand found matching your filters.
+                                            {t('brands.no_brands_found', 'No brand found matching your filters.')}
                                         </TableCell>
                                     </TableRow>
                                 )}
@@ -423,7 +522,7 @@ const Brand = () => {
                     {/* Pagination */}
                     <div className="p-4 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-slate-400">
                         <div className="flex items-center gap-2">
-                            <span>Row Per Page</span>
+                            <span>{t('category.row_per_page', 'Row Per Page')}</span>
                             <Select defaultValue="10" onValueChange={(value) => { setItemsPerPage(Number(value)); setCurrentPage(1); }}>
                                 <SelectTrigger className="w-[70px] h-8 bg-white/5 border-white/10 text-white focus:ring-orange-500/50">
                                     <SelectValue placeholder="10" />
@@ -435,7 +534,7 @@ const Brand = () => {
                                     <SelectItem value="50" className="focus:bg-white/10 focus:text-white">50</SelectItem>
                                 </SelectContent>
                             </Select>
-                            <span>Entries</span>
+                            <span>{t('category.entries', 'Entries')}</span>
                         </div>
 
                         <div className="flex items-center gap-2">

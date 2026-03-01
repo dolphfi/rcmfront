@@ -1,4 +1,3 @@
-import { useState } from "react"
 import { Button } from "../ui/button"
 import {
     DropdownMenu,
@@ -7,23 +6,30 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from "../../components/ui/dropdown-menu"
+import { useTranslation } from "react-i18next"
 
 const languages = [
-    { name: "Creole", code: "ht", flag: "https://flagcdn.com/ht.svg" },
+    { name: "Kreyòl", code: "ht", flag: "https://flagcdn.com/ht.svg" },
     { name: "English", code: "en", flag: "https://flagcdn.com/us.svg" },
-    { name: "French", code: "fr", flag: "https://flagcdn.com/fr.svg" },
+    { name: "Français", code: "fr", flag: "https://flagcdn.com/fr.svg" },
 ]
 
 const Language = () => {
-    const [selectedLanguage, setSelectedLanguage] = useState(languages[0])
+    const { i18n } = useTranslation()
+
+    const currentLanguage = languages.find(l => l.code === i18n.language) || languages[0]
+
+    const changeLanguage = (lng: string) => {
+        i18n.changeLanguage(lng)
+    }
 
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="relative h-4 w-4 rounded-full overflow-hidden p-0">
+                <Button variant="ghost" className="relative h-4 w-4 rounded-full overflow-hidden p-0 hover:bg-white/10">
                     <img
-                        src={selectedLanguage.flag}
-                        alt={selectedLanguage.name}
+                        src={currentLanguage.flag}
+                        alt={currentLanguage.name}
                         className="h-full w-full object-cover"
                     />
                 </Button>
@@ -33,7 +39,7 @@ const Language = () => {
                     {languages.map((lang) => (
                         <DropdownMenuItem
                             key={lang.code}
-                            onClick={() => setSelectedLanguage(lang)}
+                            onClick={() => changeLanguage(lang.code)}
                             className="flex items-center gap-2 cursor-pointer focus:bg-white/10 focus:text-white"
                         >
                             <img
@@ -41,7 +47,9 @@ const Language = () => {
                                 alt={lang.name}
                                 className="h-4 w-6 object-cover rounded-sm"
                             />
-                            <span>{lang.name}</span>
+                            <span className={i18n.language === lang.code ? "text-white font-medium" : ""}>
+                                {lang.name}
+                            </span>
                         </DropdownMenuItem>
                     ))}
                 </DropdownMenuGroup>

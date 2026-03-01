@@ -1,72 +1,190 @@
 import React, { useEffect, useState } from 'react';
 import { Button } from '../../components/ui/button';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../../components/ui/accordion';
-import { ArrowLeft, RefreshCw, ChevronUp, Image as ImageIcon, Plus, Info, LifeBuoy, List, Bold, Italic, Underline, Link as LinkIcon, ListOrdered, Type, ChevronsUpDown, CirclePlus, Trash2, Minus, X } from 'lucide-react';
-import { Link, useParams } from 'react-router-dom';
-import { RadioGroup, RadioGroupItem } from '../../components/ui/radio-group';
+import {
+    ArrowLeft, RefreshCw, ChevronUp, Info, List, Bold, Italic, Underline,
+    Link as LinkIcon, ListOrdered, Type, ChevronsUpDown,
+    CirclePlus,
+    RotateCw, Check, ChevronDown
+} from 'lucide-react';
+import { useNavigate, useParams } from 'react-router-dom';
 import { Input } from '../../components/ui/input';
 import { Textarea } from '../../components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../components/ui/select';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../../components/ui/table';
-import { Checkbox } from '../../components/ui/checkbox';
+import { Popover, PopoverContent, PopoverTrigger } from '../../components/ui/popover';
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '../../components/ui/command';
 import { Label } from '../../components/ui/label';
-import { DatePickerInput } from '../../components/custom/date-picker-input';
-import { products } from '../../context/data/dataProducts';
+import { cn } from '../../lib/utils';
+import { useTranslation } from 'react-i18next';
+import { toast } from 'sonner';
+import productService from '../../context/api/productservice';
+import categoryService from '../../context/api/categoryservice';
+import brandService from '../../context/api/brandservice';
+import posService from '../../context/api/posservice';
 
 const EditProduct: React.FC = () => {
     const { id } = useParams<{ id: string }>();
-    const [product, setProduct] = useState(products.find(p => p.id === id) || products[0]);
+    const { t } = useTranslation();
+    const navigate = useNavigate();
+    const [isLoading, setIsLoading] = useState(false);
+    const [isFetching, setIsFetching] = useState(true);
+
+    // Dynamic Data
+    const [categories, setCategories] = useState<any[]>([]);
+    const [brands, setBrands] = useState<any[]>([]);
+    const [pointsOfSale, setPointsOfSale] = useState<any[]>([]);
+    const [openPos, setOpenPos] = useState(false);
+    const [openBrand, setOpenBrand] = useState(false);
 
     // Form State
-    const [description, setDescription] = useState(product?.description || '');
-    const [productType, setProductType] = useState('single');
-    const [manufacturedDate, setManufacturedDate] = useState<Date | undefined>(new Date());
-    const [expiryDate, setExpiryDate] = useState<Date | undefined>(new Date(new Date().setFullYear(new Date().getFullYear() + 1)));
-    const [images, setImages] = useState<string[]>(product?.images || []);
+    const [formData, setFormData] = useState({
+        name: '',
+        slug: '',
+        sku: '',
+        barcode: '',
+        sellingType: 'retail',
+        categoryId: '',
+        brandId: '',
+        barcodeSymbology: 'code128',
+        unit: 'pc',
+        description: '',
+        productType: 'single',
+        price: 0,
+        costPrice: 0,
+        taxType: 'inclusive',
+        tax: 0,
+        discountType: 'percentage',
+        discountValue: 0,
+        quantityAlert: 0,
+        manufacturer: '',
+        subCategoryId: '',
+        warranties: '',
+        warrantyId: '',
+        isActive: true,
+        primaryPosId: '',
+        posStocks: [] as { posId: string, stock: number, minStock: number }[],
+    });
 
-    const fileInputRef = React.useRef<HTMLInputElement>(null);
+    const [description, setDescription] = useState('');
 
-    // Update state when ID changes or product is found
     useEffect(() => {
-        const foundProduct = products.find(p => p.id === id);
-        if (foundProduct) {
-            setProduct(foundProduct);
-            setDescription(foundProduct.description || '');
-            setImages(foundProduct.images || []);
-            // In a real app, we would parse other fields here too
-        }
-    }, [id]);
+        const fetchData = async () => {
+            if (!id) return;
+            try {
+                setIsFetching(true);
+                const [product, cats, brs, posResponse] = await Promise.all([
+                    productService.getById(id),
+                    categoryService.getAll('product'),
+                    brandService.getAll(),
+                    posService.getAll(1, 100)
+                ]);
 
-    const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const files = e.target.files;
-        if (files) {
-            const newImages = Array.from(files).map(file => URL.createObjectURL(file));
-            setImages([...images, ...newImages]);
+                const poss = posResponse.data || [];
+                setCategories(cats);
+                setBrands(brs);
+                setPointsOfSale(poss);
+
+                // Populate form
+                const productPosList = product.pricingStocks?.[0]?.posStocks || [];
+                const firstPos = productPosList[0];
+
+                setFormData(prev => ({
+                    ...prev,
+                    name: product.name,
+                    slug: product.slug || '',
+                    sku: product.pricingStocks?.[0]?.sku || '',
+                    barcode: product.barcode || '',
+                    sellingType: product.sellingType || 'retail',
+                    categoryId: product.categoryId || '',
+                    brandId: product.brandId || '',
+                    price: Number(product.pricingStocks?.[0]?.price || 0),
+                    costPrice: Number(product.pricingStocks?.[0]?.costPrice || 0),
+                    isActive: product.isActive,
+                    primaryPosId: firstPos?.posId || '',
+                    posStocks: poss.map((pos: any) => {
+                        const existing = productPosList.find((pp: any) => pp.posId === pos.id);
+                        return {
+                            posId: pos.id,
+                            stock: existing?.stock || 0,
+                            minStock: existing?.minStock || 5
+                        };
+                    }),
+                }));
+                setDescription(product.description || '');
+
+            } catch (error) {
+                toast.error(t('products.load_error') || 'Erè pandan chajman done yo');
+                navigate('/products');
+            } finally {
+                setIsFetching(false);
+            }
+        };
+        fetchData();
+    }, [id, navigate]);
+
+
+    const handleSKUGenerate = () => {
+        const randomStr = Math.random().toString(36).substring(2, 8).toUpperCase();
+        setFormData(prev => ({ ...prev, sku: `PROD-${randomStr}` }));
+    };
+
+    const handleSlugGenerate = () => {
+        const slug = formData.name.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]+/g, '');
+        setFormData(prev => ({ ...prev, slug }));
+    };
+
+    const handleSubmit = async () => {
+        if (!id) return;
+        if (!formData.name || !formData.sku || !formData.price) {
+            toast.error('Tanpri ranpli tout chan ki obligatwa yo');
+            return;
+        }
+
+        try {
+            setIsLoading(true);
+
+            // Clean payload to only include allowed fields for base product update
+            const updatePayload = {
+                name: formData.name,
+                slug: formData.slug,
+                barcode: formData.barcode,
+                sellingType: formData.sellingType,
+                categoryId: formData.categoryId,
+                brandId: formData.brandId,
+                barcodeSymbology: formData.barcodeSymbology,
+                unit: formData.unit,
+                productType: formData.productType,
+                description: description,
+                manufacturer: formData.manufacturer,
+                subCategoryId: formData.subCategoryId,
+                isActive: formData.isActive,
+                warrantyId: formData.warrantyId && formData.warrantyId.trim() !== '' ? formData.warrantyId : null,
+            };
+
+            await productService.update(id, updatePayload);
+            toast.success(t('products.update_success') || 'Pwodwi modifye avèk siksè');
+            navigate('/products');
+        } catch (error: any) {
+            toast.error(error.response?.data?.message || 'Erè pandan modifikasyon pwodwi a');
+        } finally {
+            setIsLoading(false);
         }
     };
 
-    const removeImage = (index: number) => {
-        const newImages = [...images];
-        newImages.splice(index, 1);
-        setImages(newImages);
-    };
-
-    const handleDescriptionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-        const newText = e.target.value;
-        if (newText.length <= 100) {
-            setDescription(newText);
-        }
-    };
-
-    if (!product) return <div>Product not found</div>;
+    if (isFetching) {
+        return (
+            <div className="flex items-center justify-center h-full">
+                <RotateCw className="h-8 w-8 animate-spin text-orange-500" />
+            </div>
+        );
+    }
 
     return (
         <div className="flex flex-col h-full gap-6">
-            {/* Page Header */}
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div>
-                    <h1 className="text-2xl font-bold text-white tracking-tight">Edit Product</h1>
-                    <p className="text-sm text-slate-400">Edit {product.name}</p>
+                    <h1 className="text-2xl font-bold text-white tracking-tight">{t('products.edit_product')}</h1>
+                    <p className="text-sm text-slate-400">{formData.name}</p>
                 </div>
 
                 <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
@@ -76,81 +194,144 @@ const EditProduct: React.FC = () => {
                     <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:bg-white/10 hover:text-white" title="Collapse">
                         <ChevronUp className="h-4 w-4" />
                     </Button>
-                    <Link to="/products">
-                        <Button className="bg-slate-900 border border-white/10 text-white hover:bg-slate-800 gap-2">
-                            <ArrowLeft className="h-4 w-4" />
-                            Back to Product
-                        </Button>
-                    </Link>
+                    <Button className="bg-slate-900 border border-white/10 text-white hover:bg-slate-800 gap-2" onClick={() => navigate('/products')}>
+                        <ArrowLeft className="h-4 w-4" />
+                        {t('common.back')}
+                    </Button>
                 </div>
             </div>
 
-            {/* Accordion Sections */}
             <div className="flex-1 overflow-auto space-y-4">
-                <Accordion type="multiple" defaultValue={["item-1", "item-2", "item-3", "item-4"]} className="space-y-4">
-
+                <Accordion type="single" defaultValue="item-1" className="space-y-4">
                     {/* Product Information */}
                     <AccordionItem value="item-1" className="bg-slate-900 backdrop-blur-sm border border-white/10 rounded-lg overflow-hidden data-[state=open]:pb-0">
                         <AccordionTrigger className="px-6 py-4 hover:no-underline hover:bg-white/5 pb-4 border-b border-white/10">
                             <div className="flex items-center gap-2 text-white font-medium">
                                 <Info className="h-4 w-4 text-orange-500" />
-                                Product Information
+                                {t('products.product_info')}
                             </div>
                         </AccordionTrigger>
-                        <AccordionContent className="px-6 pb-6 pt-2 text-slate-400">
-                            {/* Placeholder for form fields */}
+                        <AccordionContent className="px-6 pb-6 pt-6 text-slate-400">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                {/* Store & Warehouse */}
-                                <div className="space-y-2">
-                                    <Label className="text-white">Store <span className="text-red-500">*</span></Label>
-                                    <Select defaultValue="store1">
-                                        <SelectTrigger className="w-full bg-slate-900 border-white/10 text-white focus:ring-2 focus:ring-orange-500/50 focus:ring-offset-0">
-                                            <SelectValue placeholder="Select" />
-                                        </SelectTrigger>
-                                        <SelectContent className="bg-slate-900 border-white/10 text-white">
-                                            <SelectItem value="store1" className="focus:bg-white/10 focus:text-white">Store 1</SelectItem>
-                                            <SelectItem value="store2" className="focus:bg-white/10 focus:text-white">Store 2</SelectItem>
-                                        </SelectContent>
-                                    </Select>
-                                </div>
-                                <div className="space-y-2">
-                                    <Label className="text-white">Warehouse <span className="text-red-500">*</span></Label>
-                                    <Select defaultValue="warehouse1">
-                                        <SelectTrigger className="w-full bg-slate-900 border-white/10 text-white focus:ring-2 focus:ring-orange-500/50 focus:ring-offset-0">
-                                            <SelectValue placeholder="Select" />
-                                        </SelectTrigger>
-                                        <SelectContent className="bg-slate-900 border-white/10 text-white">
-                                            <SelectItem value="warehouse1" className="focus:bg-white/10 focus:text-white">Warehouse 1</SelectItem>
-                                            <SelectItem value="warehouse2" className="focus:bg-white/10 focus:text-white">Warehouse 2</SelectItem>
-                                        </SelectContent>
-                                    </Select>
+                                {/* Primary Location */}
+                                <div className="space-y-2 md:col-span-2">
+                                    <Label className="text-white">{t('products.location_label')} <span className="text-red-500">*</span></Label>
+                                    <Popover open={openPos} onOpenChange={setOpenPos}>
+                                        <PopoverTrigger asChild>
+                                            <Button
+                                                variant="outline"
+                                                role="combobox"
+                                                aria-expanded={openPos}
+                                                className="w-full justify-between bg-slate-900 border-white/10 text-white hover:bg-slate-800 hover:text-white"
+                                            >
+                                                {formData.primaryPosId
+                                                    ? pointsOfSale.find((pos) => formData.primaryPosId === pos.id)?.name || t('products.location_placeholder')
+                                                    : t('products.location_placeholder')}
+                                                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                                            </Button>
+                                        </PopoverTrigger>
+                                        <PopoverContent className="w-full p-0 bg-slate-900 border-white/10" align="start">
+                                            <Command className="bg-slate-900 text-white">
+                                                <CommandInput placeholder={t('products.search_location')} className="text-white border-none focus:ring-0" />
+                                                <CommandList>
+                                                    <CommandEmpty>{t('products.no_locations_found')}</CommandEmpty>
+                                                    <CommandGroup heading={<span className="text-orange-500">{t('products.stores_group')}</span>}>
+                                                        {pointsOfSale.filter(pos => pos.type === 'store').map((store) => (
+                                                            <CommandItem
+                                                                key={store.id}
+                                                                value={store.name}
+                                                                onSelect={() => {
+                                                                    setFormData(prev => ({ ...prev, primaryPosId: store.id }));
+                                                                    setOpenPos(false);
+                                                                }}
+                                                                className="text-white data-[selected='true']:bg-transparent data-[selected=true]:bg-transparent data-[selected='true']:text-white data-[selected=true]:text-white cursor-pointer"
+                                                            >
+                                                                <Check
+                                                                    className={cn(
+                                                                        "mr-2 h-4 w-4",
+                                                                        formData.primaryPosId === store.id ? "opacity-100" : "opacity-0"
+                                                                    )}
+                                                                />
+                                                                {store.name}
+                                                            </CommandItem>
+                                                        ))}
+                                                    </CommandGroup>
+                                                    <CommandGroup heading={<span className="text-blue-500">{t('products.warehouses_group')}</span>}>
+                                                        {pointsOfSale.filter(pos => pos.type === 'warehouse').map((wh) => (
+                                                            <CommandItem
+                                                                key={wh.id}
+                                                                value={wh.name}
+                                                                onSelect={() => {
+                                                                    setFormData(prev => ({ ...prev, primaryPosId: wh.id }));
+                                                                    setOpenPos(false);
+                                                                }}
+                                                                className="text-white data-[selected='true']:bg-transparent data-[selected=true]:bg-transparent data-[selected='true']:text-white data-[selected=true]:text-white cursor-pointer"
+                                                            >
+                                                                <Check
+                                                                    className={cn(
+                                                                        "mr-2 h-4 w-4",
+                                                                        formData.primaryPosId === wh.id ? "opacity-100" : "opacity-0"
+                                                                    )}
+                                                                />
+                                                                {wh.name}
+                                                            </CommandItem>
+                                                        ))}
+                                                    </CommandGroup>
+                                                </CommandList>
+                                            </Command>
+                                        </PopoverContent>
+                                    </Popover>
                                 </div>
 
-                                {/* Product Name & Slug */}
                                 <div className="space-y-2">
-                                    <Label className="text-white">Product Name <span className="text-red-500">*</span></Label>
-                                    <Input key={product.id} type="text" defaultValue={product.name} className="bg-slate-900 border-white/10 text-white placeholder:text-slate-500 focus-visible:ring-2 focus-visible:ring-orange-500/50 focus-visible:ring-offset-0" />
+                                    <Label className="text-white">{t('products.name')} <span className="text-red-500">*</span></Label>
+                                    <Input
+                                        type="text"
+                                        value={formData.name}
+                                        onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                                        className="bg-slate-900 border-white/10 text-white focus-visible:ring-2 focus-visible:ring-orange-500/50"
+                                    />
                                 </div>
                                 <div className="space-y-2">
-                                    <Label className="text-white">Slug <span className="text-red-500">*</span></Label>
-                                    <Input key={product.id} type="text" defaultValue={product.name.toLowerCase().replace(/ /g, '-')} className="bg-slate-900 border-white/10 text-white placeholder:text-slate-500 focus-visible:ring-2 focus-visible:ring-orange-500/50 focus-visible:ring-offset-0" />
-                                </div>
-
-                                {/* SKU & Selling Type */}
-                                <div className="space-y-2">
-                                    <Label className="text-white">SKU <span className="text-red-500">*</span></Label>
+                                    <Label className="text-white">{t('products.slug')} <span className="text-red-500">*</span></Label>
                                     <div className="relative">
-                                        <Input key={product.id} type="text" defaultValue={product.sku} className="bg-slate-900 border-white/10 text-white placeholder:text-slate-500 focus-visible:ring-2 focus-visible:ring-orange-500/50 focus-visible:ring-offset-0 pr-24" />
-                                        <Button className="absolute right-1 top-1 h-8 px-3 bg-orange-500 hover:bg-orange-600 text-white text-xs font-medium rounded transition-colors">
-                                            Generate
+                                        <Input
+                                            type="text"
+                                            value={formData.slug}
+                                            onChange={(e) => setFormData(prev => ({ ...prev, slug: e.target.value }))}
+                                            className="bg-slate-900 border-white/10 text-white focus-visible:ring-2 focus-visible:ring-orange-500/50 pr-24"
+                                        />
+                                        <Button
+                                            onClick={handleSlugGenerate}
+                                            className="absolute right-1 top-1 h-8 px-3 bg-orange-500 hover:bg-orange-600 text-white text-xs font-medium rounded transition-colors"
+                                        >
+                                            {t('products.generate')}
+                                        </Button>
+                                    </div>
+                                </div>
+
+                                <div className="space-y-2">
+                                    <Label className="text-white">{t('products.sku')} <span className="text-red-500">*</span></Label>
+                                    <div className="relative">
+                                        <Input
+                                            type="text"
+                                            value={formData.sku}
+                                            onChange={(e) => setFormData(prev => ({ ...prev, sku: e.target.value }))}
+                                            className="bg-slate-900 border-white/10 text-white focus-visible:ring-2 focus-visible:ring-orange-500/50 pr-24"
+                                        />
+                                        <Button
+                                            onClick={handleSKUGenerate}
+                                            className="absolute right-1 top-1 h-8 px-3 bg-orange-500 hover:bg-orange-600 text-white text-xs font-medium rounded transition-colors"
+                                        >
+                                            {t('products.generate')}
                                         </Button>
                                     </div>
                                 </div>
                                 <div className="space-y-2">
-                                    <Label className="text-white">Selling Type <span className="text-red-500">*</span></Label>
-                                    <Select defaultValue="retail">
-                                        <SelectTrigger className="w-full bg-slate-900 border-white/10 text-white focus:ring-2 focus:ring-orange-500/50 focus:ring-offset-0">
-                                            <SelectValue placeholder="Select" />
+                                    <Label className="text-white">{t('products.selling_type')} <span className="text-red-500">*</span></Label>
+                                    <Select value={formData.sellingType} onValueChange={(v) => setFormData(prev => ({ ...prev, sellingType: v }))}>
+                                        <SelectTrigger className="w-full bg-slate-900 border-white/10 text-white focus:ring-2 focus:ring-orange-500/50">
+                                            <SelectValue placeholder={t('products.selling_type')} />
                                         </SelectTrigger>
                                         <SelectContent className="bg-slate-900 border-white/10 text-white">
                                             <SelectItem value="retail" className="focus:bg-white/10 focus:text-white">Retail</SelectItem>
@@ -159,67 +340,92 @@ const EditProduct: React.FC = () => {
                                     </Select>
                                 </div>
 
-                                {/* Category & Sub Category */}
                                 <div className="space-y-2">
                                     <div className="flex items-center justify-between">
-                                        <Label className="text-white">Category <span className="text-red-500">*</span></Label>
+                                        <Label className="text-white">{t('products.category')} <span className="text-red-500">*</span></Label>
                                         <span className="text-xs text-orange-500 cursor-pointer hover:underline flex items-center gap-1">
                                             <CirclePlus className="h-3 w-3" /> Add New
                                         </span>
                                     </div>
-                                    <Select key={product.category} defaultValue={product.category.toLowerCase()}>
-                                        <SelectTrigger className="w-full bg-slate-900 border-white/10 text-white focus:ring-2 focus:ring-orange-500/50 focus:ring-offset-0">
-                                            <SelectValue placeholder="Select" />
+                                    <Select value={formData.categoryId} onValueChange={(v) => setFormData(prev => ({ ...prev, categoryId: v }))}>
+                                        <SelectTrigger className="w-full bg-slate-900 border-white/10 text-white focus:ring-2 focus:ring-orange-500/50">
+                                            <SelectValue placeholder={t('products.category')} />
                                         </SelectTrigger>
                                         <SelectContent className="bg-slate-900 border-white/10 text-white">
-                                            <SelectItem value="computers" className="focus:bg-white/10 focus:text-white">Computers</SelectItem>
-                                            <SelectItem value="electronics" className="focus:bg-white/10 focus:text-white">Electronics</SelectItem>
-                                            <SelectItem value="clothing" className="focus:bg-white/10 focus:text-white">Clothing</SelectItem>
-                                            <SelectItem value="shoe" className="focus:bg-white/10 focus:text-white">Shoe</SelectItem>
-                                            <SelectItem value="furnitures" className="focus:bg-white/10 focus:text-white">Furnitures</SelectItem>
-                                            <SelectItem value="bags" className="focus:bg-white/10 focus:text-white">Bags</SelectItem>
-
+                                            {categories.map((cat: any) => (
+                                                <SelectItem key={cat.id} value={cat.id} className="focus:bg-white/10 focus:text-white">{cat.name}</SelectItem>
+                                            ))}
                                         </SelectContent>
                                     </Select>
                                 </div>
                                 <div className="space-y-2">
-                                    <Label className="text-white">Sub Category <span className="text-red-500">*</span></Label>
-                                    <Select key={product.subCategory} defaultValue={product.subCategory?.toLowerCase() || "none"}>
-                                        <SelectTrigger className="w-full bg-slate-900 border-white/10 text-white focus:ring-2 focus:ring-orange-500/50 focus:ring-offset-0">
-                                            <SelectValue placeholder="Select" />
+                                    <Label className="text-white">{t('products.sub_category')}</Label>
+                                    <Select value={formData.subCategoryId} onValueChange={(v) => setFormData(prev => ({ ...prev, subCategoryId: v }))}>
+                                        <SelectTrigger className="w-full bg-slate-900 border-white/10 text-white focus:ring-2 focus:ring-orange-500/50">
+                                            <SelectValue placeholder={t('products.sub_category')} />
                                         </SelectTrigger>
                                         <SelectContent className="bg-slate-900 border-white/10 text-white">
-                                            <SelectItem value="none" className="focus:bg-white/10 focus:text-white">None</SelectItem>
-                                            <SelectItem value="laptops" className="focus:bg-white/10 focus:text-white">Laptops</SelectItem>
-                                            <SelectItem value="headphones" className="focus:bg-white/10 focus:text-white">Headphones</SelectItem>
-                                            <SelectItem value="sneakers" className="focus:bg-white/10 focus:text-white">Sneakers</SelectItem>
-                                            <SelectItem value="watches" className="focus:bg-white/10 focus:text-white">Watches</SelectItem>
+                                            {categories.find((c: any) => c.id === formData.categoryId)?.subCategories?.map((sub: any) => (
+                                                <SelectItem key={sub.id} value={sub.id} className="focus:bg-white/10 focus:text-white">{sub.name}</SelectItem>
+                                            ))}
                                         </SelectContent>
                                     </Select>
                                 </div>
 
-                                {/* Brand & Unit */}
                                 <div className="space-y-2">
-                                    <Label className="text-white">Brand <span className="text-red-500">*</span></Label>
-                                    <Select key={product.brand} defaultValue={product.brand.toLowerCase()}>
-                                        <SelectTrigger className="w-full bg-slate-900 border-white/10 text-white focus:ring-2 focus:ring-orange-500/50 focus:ring-offset-0">
-                                            <SelectValue placeholder="Select" />
-                                        </SelectTrigger>
-                                        <SelectContent className="bg-slate-900 border-white/10 text-white">
-                                            <SelectItem value="lenovo" className="focus:bg-white/10 focus:text-white">Lenovo</SelectItem>
-                                            <SelectItem value="apple" className="focus:bg-white/10 focus:text-white">Apple</SelectItem>
-                                            <SelectItem value="nike" className="focus:bg-white/10 focus:text-white">Nike</SelectItem>
-                                            <SelectItem value="amazon" className="focus:bg-white/10 focus:text-white">Amazon</SelectItem>
-                                            <SelectItem value="dior" className="focus:bg-white/10 focus:text-white">Dior</SelectItem>
-                                            <SelectItem value="beats" className="focus:bg-white/10 focus:text-white">Beats</SelectItem>
-                                        </SelectContent>
-                                    </Select>
+                                    <Label className="text-white">{t('products.brand')} <span className="text-red-500">*</span></Label>
+                                    <Popover open={openBrand} onOpenChange={setOpenBrand}>
+                                        <PopoverTrigger asChild>
+                                            <Button
+                                                variant="outline"
+                                                role="combobox"
+                                                className={cn(
+                                                    "w-full justify-between bg-slate-900 border-white/10 text-white hover:bg-slate-800 hover:text-white",
+                                                    !formData.brandId && "text-muted-foreground"
+                                                )}
+                                            >
+                                                {formData.brandId
+                                                    ? brands.find((brand) => brand.id === formData.brandId)?.name
+                                                    : t('products.brand')}
+                                                <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                                            </Button>
+                                        </PopoverTrigger>
+                                        <PopoverContent className="w-full p-0 bg-slate-900 border-white/10 text-white" align="start">
+                                            <Command className="bg-transparent">
+                                                <CommandInput placeholder={`${t('products.brand')}...`} className="text-white" />
+                                                <CommandList>
+                                                    <CommandEmpty>{t('common.no_results') || 'Pa jwenn anyen'}</CommandEmpty>
+                                                    <CommandGroup>
+                                                        {brands.map((brand: any) => (
+                                                            <CommandItem
+                                                                key={brand.id}
+                                                                value={brand.name}
+                                                                onSelect={() => {
+                                                                    setFormData(prev => ({ ...prev, brandId: brand.id }));
+                                                                    setOpenBrand(false);
+                                                                }}
+                                                                className="text-white data-[selected='true']:bg-transparent data-[selected=true]:bg-transparent data-[selected='true']:text-white data-[selected=true]:text-white cursor-pointer"
+                                                            >
+                                                                <Check
+                                                                    className={cn(
+                                                                        "mr-2 h-4 w-4",
+                                                                        formData.brandId === brand.id ? "opacity-100" : "opacity-0"
+                                                                    )}
+                                                                />
+                                                                {brand.name}
+                                                            </CommandItem>
+                                                        ))}
+                                                    </CommandGroup>
+                                                </CommandList>
+                                            </Command>
+                                        </PopoverContent>
+                                    </Popover>
                                 </div>
                                 <div className="space-y-2">
-                                    <Label className="text-white">Unit <span className="text-red-500">*</span></Label>
-                                    <Select key={product.unit} defaultValue={product.unit.toLowerCase()}>
-                                        <SelectTrigger className="w-full bg-slate-900 border-white/10 text-white focus:ring-2 focus:ring-orange-500/50 focus:ring-offset-0">
-                                            <SelectValue placeholder="Select" />
+                                    <Label className="text-white">{t('products.unit')} <span className="text-red-500">*</span></Label>
+                                    <Select value={formData.unit} onValueChange={(v) => setFormData(prev => ({ ...prev, unit: v }))}>
+                                        <SelectTrigger className="w-full bg-slate-900 border-white/10 text-white focus:ring-2 focus:ring-orange-500/50">
+                                            <SelectValue placeholder={t('products.unit')} />
                                         </SelectTrigger>
                                         <SelectContent className="bg-slate-900 border-white/10 text-white">
                                             <SelectItem value="pc" className="focus:bg-white/10 focus:text-white">Piece</SelectItem>
@@ -228,12 +434,11 @@ const EditProduct: React.FC = () => {
                                     </Select>
                                 </div>
 
-                                {/* Barcode Symbology & Item Barcode */}
                                 <div className="space-y-2">
-                                    <Label className="text-white">Barcode Symbology <span className="text-red-500">*</span></Label>
-                                    <Select defaultValue="code128">
-                                        <SelectTrigger className="w-full bg-slate-900 border-white/10 text-white focus:ring-2 focus:ring-orange-500/50 focus:ring-offset-0">
-                                            <SelectValue placeholder="Select" />
+                                    <Label className="text-white">{t('products.barcode_symbology')} <span className="text-red-500">*</span></Label>
+                                    <Select value={formData.barcodeSymbology} onValueChange={(v) => setFormData(prev => ({ ...prev, barcodeSymbology: v }))}>
+                                        <SelectTrigger className="w-full bg-slate-900 border-white/10 text-white focus:ring-2 focus:ring-orange-500/50">
+                                            <SelectValue placeholder={t('products.barcode_symbology')} />
                                         </SelectTrigger>
                                         <SelectContent className="bg-slate-900 border-white/10 text-white">
                                             <SelectItem value="code128" className="focus:bg-white/10 focus:text-white">Code 128</SelectItem>
@@ -242,18 +447,25 @@ const EditProduct: React.FC = () => {
                                     </Select>
                                 </div>
                                 <div className="space-y-2">
-                                    <Label className="text-white">Item Barcode <span className="text-red-500">*</span></Label>
+                                    <Label className="text-white">{t('products.item_barcode')} <span className="text-red-500">*</span></Label>
                                     <div className="relative">
-                                        <Input type="text" defaultValue="123456789" className="bg-slate-900 border-white/10 text-white placeholder:text-slate-500 focus-visible:ring-2 focus-visible:ring-orange-500/50 focus-visible:ring-offset-0 pr-24" />
-                                        <Button className="absolute right-1 top-1 h-8 px-3 bg-orange-500 hover:bg-orange-600 text-white text-xs font-medium rounded transition-colors">
-                                            Generate
+                                        <Input
+                                            type="text"
+                                            value={formData.barcode}
+                                            onChange={(e) => setFormData(prev => ({ ...prev, barcode: e.target.value }))}
+                                            className="bg-slate-900 border-white/10 text-white focus-visible:ring-2 focus-visible:ring-orange-500/50 pr-24"
+                                        />
+                                        <Button
+                                            onClick={() => setFormData(prev => ({ ...prev, barcode: Math.floor(Math.random() * 1000000000000).toString() }))}
+                                            className="absolute right-1 top-1 h-8 px-3 bg-orange-500 hover:bg-orange-600 text-white text-xs font-medium rounded transition-colors"
+                                        >
+                                            {t('products.generate')}
                                         </Button>
                                     </div>
                                 </div>
 
-                                {/* Description */}
                                 <div className="col-span-1 md:col-span-2 space-y-2">
-                                    <Label className="text-white">Description</Label>
+                                    <Label className="text-white">{t('products.product_description')}</Label>
                                     <div className="rounded-md border border-white/10 bg-slate-900 overflow-hidden">
                                         {/* Toolbar Mockup */}
                                         <div className="flex items-center gap-1 p-2 border-b border-white/10 bg-white/5 flex-wrap">
@@ -286,351 +498,13 @@ const EditProduct: React.FC = () => {
                                         </div>
                                         <Textarea
                                             value={description}
-                                            onChange={handleDescriptionChange}
-                                            className="flex min-h-[120px] w-full bg-slate-900 px-3 py-2 text-sm text-white placeholder:text-slate-500 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-orange-500/50 focus-visible:ring-offset-0 border-none focus-visible:outline-none"
-                                            placeholder="Product Description..."
+                                            onChange={(e) => setDescription(e.target.value.substring(0, 100))}
+                                            className="flex min-h-[120px] w-full bg-slate-900 px-3 py-2 text-sm text-white border-none focus-visible:ring-0"
+                                            placeholder={t('products.product_description')}
                                         />
                                         <div className={`px-3 py-1 text-xs border-t border-white/10 text-right ${description.length >= 100 ? 'text-red-500 font-medium' : 'text-slate-500'}`}>
-                                            {description.length} / 100 Characters
+                                            {description.length} / 100 {t('products.characters')}
                                         </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </AccordionContent>
-                    </AccordionItem>
-
-                    {/* Pricing & Stocks */}
-                    <AccordionItem value="item-2" className="bg-slate-900 backdrop-blur-sm border border-white/10 rounded-lg overflow-hidden">
-                        <AccordionTrigger className="px-6 py-4 hover:no-underline hover:bg-white/5 pb-4 border-b border-white/10">
-                            <div className="flex items-center gap-2 text-white font-medium">
-                                <LifeBuoy className="h-4 w-4 text-orange-500" />
-                                Pricing & Stocks
-                            </div>
-                        </AccordionTrigger>
-                        <AccordionContent className="px-6 pb-6 pt-2 text-slate-400">
-                            <div className="space-y-6">
-                                {/* Product Type */}
-                                <div className="space-y-2">
-                                    <Label className="text-white">Product Type <span className="text-red-500">*</span></Label>
-                                    <RadioGroup value={productType} onValueChange={setProductType} className="flex items-center gap-6">
-                                        <div className="flex items-center space-x-2">
-                                            <RadioGroupItem value="single" id="single" />
-                                            <Label htmlFor="single" className={`cursor-pointer font-medium ${productType === 'single' ? 'text-white' : 'text-slate-400'}`}>Single Product</Label>
-                                        </div>
-                                        <div className="flex items-center space-x-2">
-                                            <RadioGroupItem value="variable" id="variable" />
-                                            <Label htmlFor="variable" className={`cursor-pointer font-medium ${productType === 'variable' ? 'text-white' : 'text-slate-400'}`}>Variable Product</Label>
-                                        </div>
-                                    </RadioGroup>
-                                </div>
-
-                                {productType === 'single' ? (
-                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                                        {/* Quantity */}
-                                        <div className="space-y-2">
-                                            <Label className="text-white">Quantity <span className="text-red-500">*</span></Label>
-                                            <Input key={product.id} type="text" defaultValue={product.qty} className="bg-slate-900 border-white/10 text-white placeholder:text-slate-500 focus-visible:ring-2 focus-visible:ring-orange-500/50 focus-visible:ring-offset-0" />
-                                        </div>
-
-                                        {/* Price */}
-                                        <div className="space-y-2">
-                                            <Label className="text-white">Price <span className="text-red-500">*</span></Label>
-                                            <Input key={product.id} type="text" defaultValue={product.price} className="bg-slate-900 border-white/10 text-white placeholder:text-slate-500 focus-visible:ring-2 focus-visible:ring-orange-500/50 focus-visible:ring-offset-0" />
-                                        </div>
-
-                                        {/* Tax Type */}
-                                        <div className="space-y-2">
-                                            <Label className="text-white">Tax Type <span className="text-red-500">*</span></Label>
-                                            <Select defaultValue="exclusive">
-                                                <SelectTrigger className="w-full bg-slate-900 border-white/10 text-white focus:ring-2 focus:ring-orange-500/50 focus:ring-offset-0">
-                                                    <SelectValue placeholder="Select" />
-                                                </SelectTrigger>
-                                                <SelectContent className="bg-slate-900 border-white/10 text-white">
-                                                    <SelectItem value="inclusive" className="focus:bg-white/10 focus:text-white">Inclusive</SelectItem>
-                                                    <SelectItem value="exclusive" className="focus:bg-white/10 focus:text-white">Exclusive</SelectItem>
-                                                </SelectContent>
-                                            </Select>
-                                        </div>
-
-                                        {/* Tax */}
-                                        <div className="space-y-2">
-                                            <Label className="text-white">Tax <span className="text-red-500">*</span></Label>
-                                            <Select key={product.tax} defaultValue={product.tax || "0"}>
-                                                <SelectTrigger className="w-full bg-slate-900 border-white/10 text-white focus:ring-2 focus:ring-orange-500/50 focus:ring-offset-0">
-                                                    <SelectValue placeholder="Select" />
-                                                </SelectTrigger>
-                                                <SelectContent className="bg-slate-900 border-white/10 text-white">
-                                                    <SelectItem value="0" className="focus:bg-white/10 focus:text-white">0%</SelectItem>
-                                                    <SelectItem value="10" className="focus:bg-white/10 focus:text-white">10%</SelectItem>
-                                                    <SelectItem value="15" className="focus:bg-white/10 focus:text-white">15%</SelectItem>
-                                                </SelectContent>
-                                            </Select>
-                                        </div>
-
-                                        {/* Discount Type */}
-                                        <div className="space-y-2">
-                                            <Label className="text-white">Discount Type <span className="text-red-500">*</span></Label>
-                                            <Select key={product.discountType} defaultValue={product.discountType?.toLowerCase() || "percentage"}>
-                                                <SelectTrigger className="w-full bg-slate-900 border-white/10 text-white focus:ring-2 focus:ring-orange-500/50 focus:ring-offset-0">
-                                                    <SelectValue placeholder="Select" />
-                                                </SelectTrigger>
-                                                <SelectContent className="bg-slate-900 border-white/10 text-white">
-                                                    <SelectItem value="percentage" className="focus:bg-white/10 focus:text-white">Percentage</SelectItem>
-                                                    <SelectItem value="fixed" className="focus:bg-white/10 focus:text-white">Fixed</SelectItem>
-                                                </SelectContent>
-                                            </Select>
-                                        </div>
-
-                                        {/* Discount Value */}
-                                        <div className="space-y-2">
-                                            <Label className="text-white">Discount Value <span className="text-red-500">*</span></Label>
-                                            <Input key={product.id} type="text" defaultValue={product.discountValue || "0"} className="bg-slate-900 border-white/10 text-white placeholder:text-slate-500 focus-visible:ring-2 focus-visible:ring-orange-500/50 focus-visible:ring-offset-0" />
-                                        </div>
-
-                                        {/* Quantity Alert */}
-                                        <div className="space-y-2">
-                                            <Label className="text-white">Quantity Alert <span className="text-red-500">*</span></Label>
-                                            <Input key={product.id} type="text" defaultValue={product.minQty || "5"} className="bg-slate-900 border-white/10 text-white placeholder:text-slate-500 focus-visible:ring-2 focus-visible:ring-orange-500/50 focus-visible:ring-offset-0" />
-                                        </div>
-                                    </div>
-                                ) : (
-                                    <div className="space-y-6">
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                            <div className="space-y-2">
-                                                <Label className="text-white">Variant Attribute <span className="text-red-500">*</span></Label>
-                                                <div className="flex gap-2">
-                                                    <Select>
-                                                        <SelectTrigger className="w-full bg-slate-900 border-white/10 text-white focus:ring-2 focus:ring-orange-500/50 focus:ring-offset-0">
-                                                            <SelectValue placeholder="Choose" />
-                                                        </SelectTrigger>
-                                                        <SelectContent className="bg-slate-900 border-white/10 text-white">
-                                                            <SelectItem value="color" className="focus:bg-white/10 focus:text-white">Color</SelectItem>
-                                                            <SelectItem value="size" className="focus:bg-white/10 focus:text-white">Size</SelectItem>
-                                                        </SelectContent>
-                                                    </Select>
-                                                    <Button className="bg-slate-800 border border-white/10 hover:bg-slate-700 px-3">
-                                                        <CirclePlus className="h-5 w-5 text-white" />
-                                                    </Button>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div className="rounded-lg border border-white/10 overflow-x-auto bg-slate-900/50">
-                                            <Table>
-                                                <TableHeader className="bg-slate-900 border-b border-white/10">
-                                                    <TableRow className="hover:bg-transparent border-white/10">
-                                                        <TableHead className="text-white w-[15%]">Variantion</TableHead>
-                                                        <TableHead className="text-white w-[20%]">Variant Value</TableHead>
-                                                        <TableHead className="text-white w-[15%]">SKU</TableHead>
-                                                        <TableHead className="text-white w-[20%]">Quantity</TableHead>
-                                                        <TableHead className="text-white w-[15%]">Price</TableHead>
-                                                        <TableHead className="text-white w-[15%]">Action</TableHead>
-                                                    </TableRow>
-                                                </TableHeader>
-                                                <TableBody>
-                                                    {/* Row 1 */}
-                                                    <TableRow className="hover:bg-transparent border-white/10">
-                                                        <TableCell>
-                                                            <Input value="color" readOnly className="h-9 bg-slate-900 border-white/10 text-white focus-visible:ring-2 focus-visible:ring-orange-500/50 focus-visible:ring-offset-0" />
-                                                        </TableCell>
-                                                        <TableCell>
-                                                            <Input value="red" readOnly className="h-9 bg-slate-900 border-white/10 text-white focus-visible:ring-2 focus-visible:ring-orange-500/50 focus-visible:ring-offset-0" />
-                                                        </TableCell>
-                                                        <TableCell>
-                                                            <Input value="1234" className="h-9 bg-slate-900 border-white/10 text-white focus-visible:ring-2 focus-visible:ring-orange-500/50 focus-visible:ring-offset-0" />
-                                                        </TableCell>
-                                                        <TableCell>
-                                                            <div className="flex items-center border border-white/10 rounded-md overflow-hidden bg-slate-900">
-                                                                <Button variant="ghost" size="icon" className="h-9 w-9 rounded-none hover:bg-white/10 text-slate-400 hover:text-white"><Minus className="h-3 w-3" /></Button>
-                                                                <Input type="text" value="2" className="w-full h-9 bg-transparent text-center text-sm text-white border-none focus-visible:ring-2 focus-visible:ring-orange-500/50 focus-visible:ring-offset-0 rounded-none shadow-none" />
-                                                                <Button variant="ghost" size="icon" className="h-9 w-9 rounded-none hover:bg-white/10 text-slate-400 hover:text-white"><Plus className="h-3 w-3" /></Button>
-                                                            </div>
-                                                        </TableCell>
-                                                        <TableCell>
-                                                            <Input value="50000" className="h-9 bg-slate-900 border-white/10 text-white focus-visible:ring-2 focus-visible:ring-orange-500/50 focus-visible:ring-offset-0" />
-                                                        </TableCell>
-                                                        <TableCell>
-                                                            <div className="flex items-center gap-2">
-                                                                <div className="h-8 w-8 flex items-center justify-center">
-                                                                    <Checkbox defaultChecked className="h-5 w-5 border-white/20 data-[state=checked]:bg-orange-500 data-[state=checked]:border-orange-500" />
-                                                                </div>
-                                                                <div className="h-8 w-8 flex items-center justify-center rounded border border-white/10 hover:bg-white/10 text-white cursor-pointer transition-colors">
-                                                                    <Plus className="h-4 w-4" />
-                                                                </div>
-                                                                <div className="h-8 w-8 flex items-center justify-center rounded border border-white/10 hover:bg-red-500/20 text-red-500 cursor-pointer transition-colors">
-                                                                    <Trash2 className="h-4 w-4" />
-                                                                </div>
-                                                            </div>
-                                                        </TableCell>
-                                                    </TableRow>
-
-                                                    {/* Row 2 */}
-                                                    <TableRow className="hover:bg-transparent border-white/10">
-                                                        <TableCell>
-                                                            <Input value="color" readOnly className="h-9 bg-slate-900 border-white/10 text-white focus-visible:ring-2 focus-visible:ring-orange-500/50 focus-visible:ring-offset-0" />
-                                                        </TableCell>
-                                                        <TableCell>
-                                                            <Input value="black" readOnly className="h-9 bg-slate-900 border-white/10 text-white focus-visible:ring-2 focus-visible:ring-orange-500/50 focus-visible:ring-offset-0" />
-                                                        </TableCell>
-                                                        <TableCell>
-                                                            <Input value="2345" className="h-9 bg-slate-900 border-white/10 text-white focus-visible:ring-2 focus-visible:ring-orange-500/50 focus-visible:ring-offset-0" />
-                                                        </TableCell>
-                                                        <TableCell>
-                                                            <div className="flex items-center border border-white/10 rounded-md overflow-hidden bg-slate-900">
-                                                                <Button variant="ghost" size="icon" className="h-9 w-9 rounded-none hover:bg-white/10 text-slate-400 hover:text-white"><Minus className="h-3 w-3" /></Button>
-                                                                <Input type="text" value="3" className="w-full h-9 bg-transparent text-center text-sm text-white border-none focus-visible:ring-2 focus-visible:ring-orange-500/50 focus-visible:ring-offset-0 rounded-none shadow-none" />
-                                                                <Button variant="ghost" size="icon" className="h-9 w-9 rounded-none hover:bg-white/10 text-slate-400 hover:text-white"><Plus className="h-3 w-3" /></Button>
-                                                            </div>
-                                                        </TableCell>
-                                                        <TableCell>
-                                                            <Input value="50000" className="h-9 bg-slate-900 border-white/10 text-white focus-visible:ring-2 focus-visible:ring-orange-500/50 focus-visible:ring-offset-0" />
-                                                        </TableCell>
-                                                        <TableCell>
-                                                            <div className="flex items-center gap-2">
-                                                                <div className="h-8 w-8 flex items-center justify-center">
-                                                                    <Checkbox defaultChecked className="h-5 w-5 border-white/20 data-[state=checked]:bg-orange-500 data-[state=checked]:border-orange-500" />
-                                                                </div>
-                                                                <div className="h-8 w-8 flex items-center justify-center rounded border border-white/10 hover:bg-white/10 text-white cursor-pointer transition-colors">
-                                                                    <Plus className="h-4 w-4" />
-                                                                </div>
-                                                                <div className="h-8 w-8 flex items-center justify-center rounded border border-white/10 hover:bg-red-500/20 text-red-500 cursor-pointer transition-colors">
-                                                                    <Trash2 className="h-4 w-4" />
-                                                                </div>
-                                                            </div>
-                                                        </TableCell>
-                                                    </TableRow>
-                                                </TableBody>
-                                            </Table>
-                                        </div>
-                                    </div>
-                                )}
-                            </div>
-                        </AccordionContent>
-                    </AccordionItem>
-
-                    {/* Images */}
-                    <AccordionItem value="item-3" className="bg-slate-900 backdrop-blur-sm border border-white/10 rounded-lg overflow-hidden">
-                        <AccordionTrigger className="px-6 py-4 hover:no-underline hover:bg-white/5 pb-4 border-b border-white/10">
-                            <div className="flex items-center gap-2 text-white font-medium">
-                                <ImageIcon className="h-4 w-4 text-orange-500" />
-                                Images
-                            </div>
-                        </AccordionTrigger>
-                        <AccordionContent className="px-6 pb-6 pt-2 text-slate-400">
-                            <div className="flex flex-wrap gap-4">
-                                <Input
-                                    type="file"
-                                    multiple
-                                    accept="image/*"
-                                    className="hidden"
-                                    ref={fileInputRef}
-                                    onChange={handleImageUpload}
-                                />
-                                <div
-                                    onClick={() => fileInputRef.current?.click()}
-                                    className="h-24 w-24 rounded-lg border border-dashed border-white/20 hover:border-orange-500/50 hover:bg-white/5 flex flex-col items-center justify-center cursor-pointer transition-all group"
-                                >
-                                    <CirclePlus className="h-4 w-4 text-slate-400 group-hover:text-orange-500 transition-colors" />
-                                    <span className="text-[10px] font-semibold text-slate-500 group-hover:text-orange-500 mt-2">Add Images</span>
-                                </div>
-
-                                {images.map((image, index) => (
-                                    <div key={index} className="h-24 w-24 rounded-lg border border-white/10 p-1 relative group">
-                                        <img src={image} alt={`Product ${index + 1}`} className="h-full w-full object-contain rounded-md" />
-                                        <Button
-                                            variant="destructive"
-                                            size="icon"
-                                            className="absolute top-1 right-1 h-4 w-4 rounded shadow-lg opacity-0 group-hover:opacity-100 scale-90 group-hover:scale-100 transition-all"
-                                            onClick={() => removeImage(index)}
-                                        >
-                                            <X className="h-3 w-3" />
-                                        </Button>
-                                    </div>
-                                ))}
-                            </div>
-                        </AccordionContent>
-                    </AccordionItem>
-
-                    {/* Custom Fields */}
-                    <AccordionItem value="item-4" className="bg-slate-900 backdrop-blur-sm border border-white/10 rounded-lg overflow-hidden">
-                        <AccordionTrigger className="px-6 py-4 hover:no-underline hover:bg-white/5 pb-4 border-b border-white/10">
-                            <div className="flex items-center gap-2 text-white font-medium">
-                                <List className="h-4 w-4 text-orange-500" />
-                                Custom Fields
-                            </div>
-                        </AccordionTrigger>
-                        <AccordionContent className="px-6 pb-6 pt-6 text-slate-400">
-                            <div className="space-y-6">
-                                {/* Checkboxes Row */}
-                                <div className="flex items-center gap-6 p-4 border border-white/10 rounded-lg bg-white/5">
-                                    <div className="flex items-center space-x-2">
-                                        <Checkbox id="warranties" checked className="border-white/20 data-[state=checked]:bg-orange-500 data-[state=checked]:border-orange-500" />
-                                        <Label
-                                            htmlFor="warranties"
-                                            className="text-slate-400"
-                                        >
-                                            Warranties
-                                        </Label>
-                                    </div>
-                                    <div className="flex items-center space-x-2">
-                                        <Checkbox id="manufacturer" checked className="border-white/20 data-[state=checked]:bg-orange-500 data-[state=checked]:border-orange-500" />
-                                        <Label
-                                            htmlFor="manufacturer"
-                                            className="text-slate-400"
-                                        >
-                                            Manufacturer
-                                        </Label>
-                                    </div>
-                                    <div className="flex items-center space-x-2">
-                                        <Checkbox id="expiry" checked className="border-white/20 data-[state=checked]:bg-orange-500 data-[state=checked]:border-orange-500" />
-                                        <Label
-                                            htmlFor="expiry"
-                                            className="text-slate-400"
-                                        >
-                                            Expiry
-                                        </Label>
-                                    </div>
-                                </div>
-
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    {/* Warranty */}
-                                    <div className="space-y-2">
-                                        <Label className="text-white">Warranty <span className="text-red-500">*</span></Label>
-                                        <Select defaultValue="basic">
-                                            <SelectTrigger className="w-full bg-slate-900 border-white/10 text-white focus:ring-2 focus:ring-orange-500/50 focus:ring-offset-0">
-                                                <SelectValue placeholder="Select Warranty Plan" />
-                                            </SelectTrigger>
-                                            <SelectContent className="bg-slate-900 border-white/10 text-white">
-                                                <SelectItem value="basic" className="focus:bg-white/10 focus:text-white">Basic Warranty</SelectItem>
-                                                <SelectItem value="extended" className="focus:bg-white/10 focus:text-white">Extended Warranty</SelectItem>
-                                                <SelectItem value="accidental" className="focus:bg-white/10 focus:text-white">Accidental Protection Plan</SelectItem>
-                                            </SelectContent>
-                                        </Select>
-                                    </div>
-
-                                    {/* Manufacturer */}
-                                    <div className="space-y-2">
-                                        <Label className="text-white">Manufacturer <span className="text-red-500">*</span></Label>
-                                        <Input type="text" defaultValue="Apple Inc." className="bg-slate-900 border-white/10 text-white placeholder:text-slate-500 focus-visible:ring-2 focus-visible:ring-orange-500/50 focus-visible:ring-offset-0" />
-                                    </div>
-
-                                    {/* Manufactured Date */}
-                                    <div className="space-y-2">
-                                        <DatePickerInput
-                                            id="manufactured-date"
-                                            label="Manufactured Date"
-                                            date={manufacturedDate}
-                                            onDateChange={setManufacturedDate}
-                                        />
-                                    </div>
-                                    {/* Expiry On */}
-                                    <div className="space-y-2">
-                                        <DatePickerInput
-                                            id="expiry-on"
-                                            label="Expiry On"
-                                            date={expiryDate}
-                                            onDateChange={setExpiryDate}
-                                        />
                                     </div>
                                 </div>
                             </div>
@@ -638,13 +512,17 @@ const EditProduct: React.FC = () => {
                     </AccordionItem>
                 </Accordion>
 
-                {/* Footer Actions */}
                 <div className="flex items-center justify-end gap-3 mt-8 pb-4">
-                    <Button variant="outline" className="bg-slate-900 border-white/10 text-white hover:bg-slate-800">
-                        Cancel
+                    <Button variant="outline" onClick={() => navigate('/products')} className="bg-slate-900 border-white/10 text-white hover:bg-slate-800">
+                        {t('common.cancel')}
                     </Button>
-                    <Button className="bg-orange-500 hover:bg-orange-600 text-white">
-                        Save Changes
+                    <Button
+                        onClick={handleSubmit}
+                        disabled={isLoading}
+                        className="bg-orange-500 hover:bg-orange-600 text-white gap-2"
+                    >
+                        {isLoading && <RefreshCw className="h-4 w-4 animate-spin" />}
+                        {t('common.save')}
                     </Button>
                 </div>
             </div>

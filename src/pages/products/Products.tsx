@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Card, CardContent } from '../../components/ui/card';
 import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
@@ -36,34 +36,63 @@ import { Link } from "react-router-dom";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../../components/ui/table';
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '../../components/ui/pagination';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../components/ui/select';
-import { Avatar, AvatarFallback, AvatarImage } from '../../components/ui/avatar';
-
-import { products } from '../../context/data/dataProducts';
+import { Avatar, AvatarFallback } from '../../components/ui/avatar';
+import { useTranslation } from 'react-i18next';
+import productService from '../../context/api/productservice';
+import { Product } from '../../context/types/interface';
+import { toast } from 'sonner';
 
 const Products: React.FC = () => {
+    const { t } = useTranslation();
+    const [products, setProducts] = useState<Product[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [itemsPerPage, setItemsPerPage] = useState(10);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [selectedCategory, setSelectedCategory] = useState('All');
+    const [selectedBrand, setSelectedBrand] = useState('All');
 
+    const fetchProducts = async () => {
+        try {
+            setIsLoading(true);
+            const data = await productService.getAll();
+            setProducts(data);
+        } catch (error) {
+            toast.error('Erè pandan chajman pwodwi yo');
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
-    const [currentPage, setCurrentPage] = React.useState(1);
-    const [itemsPerPage, setItemsPerPage] = React.useState(10);
-    const [searchTerm, setSearchTerm] = React.useState('');
-    const [selectedCategory, setSelectedCategory] = React.useState('All');
-    const [selectedBrand, setSelectedBrand] = React.useState('All');
+    useEffect(() => {
+        fetchProducts();
+    }, []);
+
+    const handleDelete = async (id: string) => {
+        try {
+            await productService.remove(id);
+            toast.success('Pwodwi efase avèk siksè');
+            fetchProducts();
+        } catch (error) {
+            toast.error('Erè pandan sipresyon pwodwi a');
+        }
+    };
 
     // Extract unique categories and brands
-    const categories = ['All', ...Array.from(new Set(products.map(p => p.category)))];
-    const brands = ['All', ...Array.from(new Set(products.map(p => p.brand)))];
+    const categories = ['All', ...Array.from(new Set(products.filter(p => p.category?.name).map(p => p.category!.name)))];
+    const brands = ['All', ...Array.from(new Set(products.filter(p => p.brand?.name).map(p => p.brand!.name)))];
 
     // Filter products
     const filteredProducts = products.filter(product => {
         const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            product.sku.toLowerCase().includes(searchTerm.toLowerCase());
-        const matchesCategory = selectedCategory === 'All' || product.category === selectedCategory;
-        const matchesBrand = selectedBrand === 'All' || product.brand === selectedBrand;
+            (product.pricingStocks?.[0]?.sku || '').toLowerCase().includes(searchTerm.toLowerCase());
+        const matchesCategory = selectedCategory === 'All' || product.category?.name === selectedCategory;
+        const matchesBrand = selectedBrand === 'All' || product.brand?.name === selectedBrand;
         return matchesSearch && matchesCategory && matchesBrand;
     });
 
     // Reset page when filters change
-    React.useEffect(() => {
+    useEffect(() => {
         setCurrentPage(1);
     }, [searchTerm, selectedCategory, selectedBrand]);
 
@@ -83,8 +112,8 @@ const Products: React.FC = () => {
             {/* Page Header */}
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div>
-                    <h1 className="text-2xl font-bold text-white tracking-tight">Product List</h1>
-                    <p className="text-sm text-slate-400">Manage your products</p>
+                    <h1 className="text-2xl font-bold text-white tracking-tight">{t('products.title')}</h1>
+                    <p className="text-sm text-slate-400">{t('products.description')}</p>
                 </div>
 
                 <div className="flex flex-wrap items-center gap-2">
@@ -99,23 +128,20 @@ const Products: React.FC = () => {
                         <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:bg-white/10 hover:text-white" title="Print">
                             <Printer className="h-4 w-4" />
                         </Button>
-                        <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:bg-white/10 hover:text-white" title="Refresh">
-                            <RotateCw className="h-4 w-4" />
-                        </Button>
-                        <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:bg-white/10 hover:text-white" title="Toggle">
-                            <ChevronDown className="h-4 w-4" />
+                        <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:bg-white/10 hover:text-white" title="Refresh" onClick={fetchProducts}>
+                            <RotateCw className={`h-4 w-4 ${isLoading ? 'animate-spin text-orange-500' : ''}`} />
                         </Button>
                     </div>
 
                     <Link to="/products/add">
                         <Button className="bg-orange-500 hover:bg-orange-600 text-white gap-2">
                             <Plus className="h-4 w-4" />
-                            <span className="hidden sm:inline">Add Product</span>
+                            <span className="hidden sm:inline">{t('products.add_product')}</span>
                         </Button>
                     </Link>
                     <Button variant="outline" className="bg-slate-900 border-white/10 text-white hover:bg-slate-800 gap-2">
                         <Download className="h-4 w-4" />
-                        <span className="hidden sm:inline">Import Product</span>
+                        <span className="hidden sm:inline">{t('products.import_product')}</span>
                     </Button>
                 </div>
             </div>
@@ -128,7 +154,7 @@ const Products: React.FC = () => {
                         <div className="relative w-full sm:w-72">
                             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                             <Input
-                                placeholder="Search..."
+                                placeholder={t('products.search_placeholder')}
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
                                 className="pl-9 bg-white/5 border-white/10 text-white placeholder:text-slate-500 focus-visible:ring-orange-500/50 focus-visible:border-orange-500"
@@ -139,7 +165,7 @@ const Products: React.FC = () => {
                             <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
                                     <Button variant="outline" className="bg-white/5 border-white/10 text-slate-300 hover:bg-white/10 hover:text-white w-full sm:w-32 justify-between">
-                                        {selectedCategory === 'All' ? 'Category' : selectedCategory}
+                                        {selectedCategory === 'All' ? t('products.category') : selectedCategory}
                                         <ChevronDown className="h-4 w-4 opacity-50" />
                                     </Button>
                                 </DropdownMenuTrigger>
@@ -159,7 +185,7 @@ const Products: React.FC = () => {
                             <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
                                     <Button variant="outline" className="bg-white/5 border-white/10 text-slate-300 hover:bg-white/10 hover:text-white w-full sm:w-32 justify-between">
-                                        {selectedBrand === 'All' ? 'Brand' : selectedBrand}
+                                        {selectedBrand === 'All' ? t('products.brand') : selectedBrand}
                                         <ChevronDown className="h-4 w-4 opacity-50" />
                                     </Button>
                                 </DropdownMenuTrigger>
@@ -183,43 +209,48 @@ const Products: React.FC = () => {
                         <Table>
                             <TableHeader className="bg-slate-900 border-b border-white/10">
                                 <TableRow className="hover:bg-transparent border-white/10">
-                                    <TableHead className="text-white">SKU</TableHead>
-                                    <TableHead className="text-white">Product Name</TableHead>
-                                    <TableHead className="text-white">Category</TableHead>
-                                    <TableHead className="text-white">Brand</TableHead>
-                                    <TableHead className="text-white">Price</TableHead>
-                                    <TableHead className="text-white">Unit</TableHead>
-                                    <TableHead className="text-white">Qty</TableHead>
-                                    <TableHead className="text-white">Created By</TableHead>
-                                    <TableHead className="text-right text-white">Action</TableHead>
+                                    <TableHead className="text-white">{t('products.sku')}</TableHead>
+                                    <TableHead className="text-white">{t('products.name')}</TableHead>
+                                    <TableHead className="text-white">{t('products.category')}</TableHead>
+                                    <TableHead className="text-white">{t('products.brand')}</TableHead>
+                                    <TableHead className="text-white">{t('products.price')}</TableHead>
+                                    <TableHead className="text-white">{t('products.qty')}</TableHead>
+                                    <TableHead className="text-right text-white">{t('products.action')}</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                                {currentProducts.length > 0 ? (
+                                {isLoading ? (
+                                    <TableRow>
+                                        <TableCell colSpan={7} className="text-center py-8 text-slate-400">
+                                            <div className="flex items-center justify-center gap-2">
+                                                <RotateCw className="h-5 w-5 animate-spin text-orange-500" />
+                                                <span>{t('common.loading')}</span>
+                                            </div>
+                                        </TableCell>
+                                    </TableRow>
+                                ) : currentProducts.length > 0 ? (
                                     currentProducts.map((product) => (
                                         <TableRow key={product.id} className="hover:bg-white/5 transition-colors border-white/5 group">
-                                            <TableCell className="font-medium text-slate-300">{product.sku}</TableCell>
+                                            <TableCell className="font-medium text-slate-300">{product.pricingStocks?.[0]?.sku || '-'}</TableCell>
                                             <TableCell>
                                                 <div className="flex items-center gap-3">
-                                                    <div className="h-9 w-9  rounded-lg border border-white/10flex items-center justify-center p-1 shrink-0 overflow-hidden">
-                                                        <img src={product.image} alt={product.name} className="h-full w-full object-contain mix-blend-multiply" />
+                                                    <div className="h-9 w-9 rounded-lg border border-white/10 flex items-center justify-center p-1 shrink-0 overflow-hidden bg-white/5">
+                                                        {product.images && product.images.length > 0 ? (
+                                                            <img src={product.images[0].url} alt={product.name} className="h-full w-full object-cover" />
+                                                        ) : (
+                                                            <Avatar className="h-full w-full">
+                                                                <AvatarFallback>{product.name.charAt(0)}</AvatarFallback>
+                                                            </Avatar>
+                                                        )}
                                                     </div>
                                                     <span className="font-medium text-white group-hover:text-orange-400 transition-colors">{product.name}</span>
                                                 </div>
                                             </TableCell>
-                                            <TableCell className="text-slate-300">{product.category}</TableCell>
-                                            <TableCell className="text-slate-300">{product.brand}</TableCell>
-                                            <TableCell className="font-medium text-white">{product.price}</TableCell>
-                                            <TableCell className="text-slate-300">{product.unit}</TableCell>
-                                            <TableCell className="text-slate-300">{product.qty}</TableCell>
-                                            <TableCell>
-                                                <div className="flex items-center gap-2">
-                                                    <Avatar className="h-6 w-6">
-                                                        <AvatarImage src={product.createdBy.avatar} alt={product.createdBy.name} className="object-cover" />
-                                                        <AvatarFallback>{product.createdBy.name.charAt(0)}</AvatarFallback>
-                                                    </Avatar>
-                                                    <span className="text-slate-300 truncate max-w-[100px]">{product.createdBy.name}</span>
-                                                </div>
+                                            <TableCell className="text-slate-300">{product.category?.name || '-'}</TableCell>
+                                            <TableCell className="text-slate-300">{product.brand?.name || '-'}</TableCell>
+                                            <TableCell className="font-medium text-white">${product.pricingStocks?.[0]?.price || '0'}</TableCell>
+                                            <TableCell className="text-slate-300">
+                                                {product.pricingStocks?.[0]?.posStocks?.reduce((acc, pos) => acc + pos.stock, 0) || 0}
                                             </TableCell>
                                             <TableCell className="text-right">
                                                 <div className="flex items-center justify-end gap-1">
@@ -241,16 +272,19 @@ const Products: React.FC = () => {
                                                         </AlertDialogTrigger>
                                                         <AlertDialogContent className="bg-slate-900 border-white/10">
                                                             <AlertDialogHeader>
-                                                                <AlertDialogTitle className="text-white">Are you absolutely sure?</AlertDialogTitle>
+                                                                <AlertDialogTitle className="text-white">{t('products.delete_confirm_title')}</AlertDialogTitle>
                                                                 <AlertDialogDescription className="text-slate-400">
-                                                                    This action cannot be undone. This will permanently delete the product
-                                                                    <span className="font-medium text-white"> "{product.name}" </span>
-                                                                    and remove it from our servers.
+                                                                    {t('products.delete_confirm_desc', { name: product.name })}
                                                                 </AlertDialogDescription>
                                                             </AlertDialogHeader>
                                                             <AlertDialogFooter>
-                                                                <AlertDialogCancel className="bg-transparent border-white/10 text-white hover:bg-white/10 hover:text-white">Cancel</AlertDialogCancel>
-                                                                <AlertDialogAction className="bg-rose-500 hover:bg-rose-600 text-white border-0">Delete</AlertDialogAction>
+                                                                <AlertDialogCancel className="bg-transparent border-white/10 text-white hover:bg-white/10 hover:text-white">{t('common.cancel')}</AlertDialogCancel>
+                                                                <AlertDialogAction
+                                                                    onClick={() => handleDelete(product.id)}
+                                                                    className="bg-rose-500 hover:bg-rose-600 text-white border-0"
+                                                                >
+                                                                    {t('common.delete')}
+                                                                </AlertDialogAction>
                                                             </AlertDialogFooter>
                                                         </AlertDialogContent>
                                                     </AlertDialog>
@@ -260,8 +294,8 @@ const Products: React.FC = () => {
                                     ))
                                 ) : (
                                     <TableRow>
-                                        <TableCell colSpan={10} className="text-center py-8 text-slate-400">
-                                            No products found matching your filters.
+                                        <TableCell colSpan={7} className="text-center py-8 text-slate-400">
+                                            {t('products.no_products_found')}
                                         </TableCell>
                                     </TableRow>
                                 )}

@@ -11,9 +11,7 @@ import {
     ChevronDown,
     Trash2,
     RotateCw,
-    Edit,
-    CirclePlus,
-    X
+    Edit
 } from 'lucide-react';
 import {
     AlertDialog,
@@ -46,47 +44,183 @@ import { Switch } from "../../components/ui/switch";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../../components/ui/table';
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '../../components/ui/pagination';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../components/ui/select';
-import { category, subCategory } from '../../context/data/dataCategory';
+import { Badge } from '../../components/ui/badge';
+import { useTranslation } from 'react-i18next';
+import { toast } from 'sonner';
+import categoryService from '../../context/api/categoryservice';
 
 const Category: React.FC = () => {
+    const { t } = useTranslation();
+    const [categoriesList, setCategoriesList] = React.useState<any[]>([]);
+    const [isLoading, setIsLoading] = React.useState(true);
     const [currentPage, setCurrentPage] = React.useState(1);
     const [itemsPerPage, setItemsPerPage] = React.useState(10);
     const [searchTerm, setSearchTerm] = React.useState('');
     const [selectedStatus, setSelectedStatus] = React.useState('All');
+    const [selectedType, setSelectedType] = React.useState('All');
     const [searchTermSub, setSearchTermSub] = React.useState('');
     const [selectedStatusSub, setSelectedStatusSub] = React.useState('All');
     const [selectedCategory, setSelectedCategory] = React.useState('All');
     const [currentPageSub, setCurrentPageSub] = React.useState(1);
     const [itemsPerPageSub, setItemsPerPageSub] = React.useState(10);
 
-    // Extract unique status
-    const categories = ['All', ...Array.from(new Set(category.map(p => p.status)))];
-    const subCategories = ['All', ...Array.from(new Set(subCategory.map(p => p.status)))];
+    const fetchCategories = async () => {
+        try {
+            setIsLoading(true);
+            const data = await categoryService.getAll();
+            setCategoriesList(data);
+        } catch (error) {
+            toast.error(t('common.error_fetching_data'));
+            console.error(error);
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
+    React.useEffect(() => {
+        fetchCategories();
+    }, []);
+
+    const categoryData = categoriesList;
+    const subCategoryData = categoriesList.flatMap((cat: any) =>
+        (cat.subCategories || []).map((sub: any) => ({ ...sub, parent: cat }))
+    );
+
+    const uniqueStatuses = ['All', ...Array.from(new Set(categoryData.map(p => p.isActive ? 'Active' : 'Inactive')))];
+    const uniqueSubStatuses = ['All', ...Array.from(new Set(subCategoryData.map(p => p.isActive ? 'Active' : 'Inactive')))];
 
     // Filter Category
-    const filteredCategory = category.filter(category => {
-        const matchesSearch = category.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            category.category_slug.toLowerCase().includes(searchTerm.toLowerCase());
-        const matchesCategory = selectedStatus === 'All' || category.status === selectedStatus;
-        return matchesSearch && matchesCategory;
+    const filteredCategory = categoryData.filter(cat => {
+        const matchesSearch = cat.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            cat.slug.toLowerCase().includes(searchTerm.toLowerCase());
+        const statusStr = cat.isActive ? 'Active' : 'Inactive';
+        const matchesStatus = selectedStatus === 'All' || statusStr === selectedStatus;
+        const matchesType = selectedType === 'All' || cat.type === selectedType.toLowerCase();
+        return matchesSearch && matchesStatus && matchesType;
     });
 
     // Filter SubCategory
-    const filteredSubCategory = subCategory.filter(subCategory => {
-        const matchesSearch = subCategory.name.toLowerCase().includes(searchTermSub.toLowerCase()) ||
-            subCategory.description.toLowerCase().includes(searchTermSub.toLowerCase());
-        const matchesCategory = selectedCategory === 'All' || category.find(c => c.id === subCategory.category_id)?.name === selectedCategory;
-        const matchesStatusSub = selectedStatusSub === 'All' || subCategory.status === selectedStatusSub;
+    const filteredSubCategory = subCategoryData.filter(sub => {
+        const matchesSearch = sub.name.toLowerCase().includes(searchTermSub.toLowerCase()) ||
+            (sub.description && sub.description.toLowerCase().includes(searchTermSub.toLowerCase()));
+        const parentName = sub.parent?.name || '';
+        const matchesCategory = selectedCategory === 'All' || parentName === selectedCategory;
+        const statusStr = sub.isActive ? 'Active' : 'Inactive';
+        const matchesStatusSub = selectedStatusSub === 'All' || statusStr === selectedStatusSub;
         return matchesSearch && matchesCategory && matchesStatusSub;
     });
+
+    const [newCategory, setNewCategory] = React.useState({
+        name: '',
+        slug: '',
+        status: true, // default active
+        type: 'product' as 'product' | 'service'
+    });
+
+    const [newSubCategory, setNewSubCategory] = React.useState({
+        name: '',
+        category_id: '',
+        description: '',
+        status: true // default active
+    });
+
+    const genSlug = (name: string) => {
+        return name
+            .toLowerCase()
+            .trim()
+            .replace(/[^\w\s-]/g, '') // Remove special chars
+            .replace(/\s+/g, '-'); // Replace spaces with -
+    }
+
+    const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const name = e.target.value;
+        setNewCategory({
+            ...newCategory,
+            name,
+            slug: genSlug(name)
+        });
+    }
+
+    const handleAddCategory = async () => {
+        if (!newCategory.name) {
+            toast.error(t('products.error_name_required'));
+            return;
+        }
+        try {
+            await categoryService.create({
+                name: newCategory.name,
+                description: '',
+                isActive: newCategory.status,
+                type: newCategory.type
+            });
+            toast.success(t('products.category_added'));
+            setIsAddOpen(false);
+            setNewCategory({ name: '', slug: '', status: true, type: 'product' });
+            fetchCategories();
+        } catch (error: any) {
+            toast.error(error.response?.data?.message || t('common.error_saving'));
+        }
+    };
+
+    const handleUpdateCategory = async () => {
+        if (!editingCategory || !editingCategory.name) return;
+        try {
+            await categoryService.update(editingCategory.id, {
+                name: editingCategory.name,
+                isActive: editingCategory.status,
+                type: editingCategory.type
+            });
+            toast.success(t('products.category_updated'));
+            setEditingCategory(null);
+            fetchCategories();
+        } catch (error: any) {
+            toast.error(error.response?.data?.message || t('common.error_saving'));
+        }
+    };
+
+    const handleAddSubCategory = async () => {
+        if (!newSubCategory.name || !newSubCategory.category_id) {
+            toast.error(t('common.fill_required_fields'));
+            return;
+        }
+        try {
+            await categoryService.create({
+                name: newSubCategory.name,
+                description: newSubCategory.description,
+                isActive: newSubCategory.status,
+                parentId: newSubCategory.category_id
+            });
+            toast.success(t('products.subcategory_added'));
+            setIsAddSubOpen(false);
+            setNewSubCategory({ name: '', category_id: '', description: '', status: true });
+            fetchCategories();
+        } catch (error: any) {
+            toast.error(error.response?.data?.message || t('common.error_saving'));
+        }
+    };
+
+    const handleUpdateSubCategory = async () => {
+        if (!editingSubCategory || !editingSubCategory.name) return;
+        try {
+            await categoryService.update(editingSubCategory.id, {
+                name: editingSubCategory.name,
+                description: editingSubCategory.description,
+                isActive: editingSubCategory.status,
+                parentId: editingSubCategory.category_id
+            });
+            toast.success(t('products.subcategory_updated'));
+            setIsEditSubOpen(false);
+            setEditingSubCategory(null);
+            fetchCategories();
+        } catch (error: any) {
+            toast.error(error.response?.data?.message || t('common.error_saving'));
+        }
+    };
 
     // Reset page when filters change
     React.useEffect(() => {
         setCurrentPage(1);
     }, [searchTerm, selectedStatus]);
-
-
 
     const startIndex = (currentPage - 1) * itemsPerPage;
     const endIndex = startIndex + itemsPerPage;
@@ -114,84 +248,39 @@ const Category: React.FC = () => {
         }
     };
 
-    const [newCategory, setNewCategory] = React.useState({
-        name: '',
-        slug: '',
-        status: true // default active
-    });
-
-    const [newSubCategory, setNewSubCategory] = React.useState({
-        image: '',
-        name: '',
-        category_id: '',
-        description: '',
-        status: true // default active
-    });
-
-    const genSlug = (name: string) => {
-        return name
-            .toLowerCase()
-            .trim()
-            .replace(/[^\w\s-]/g, '') // Remove special chars
-            .replace(/\s+/g, '-'); // Replace spaces with -
-    }
-
-    const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const name = e.target.value;
-        setNewCategory({
-            ...newCategory,
-            name,
-            slug: genSlug(name)
-        });
-    }
-
-    const [editingCategory, setEditingCategory] = React.useState<{ id: string, name: string, slug: string, status: boolean } | null>(null);
-    const [editingSubCategory, setEditingSubCategory] = React.useState<{ id: string, image: string, name: string, status: boolean, category_id: string, description: string } | null>(null);
+    const [editingCategory, setEditingCategory] = React.useState<{ id: string, name: string, slug: string, status: boolean, type: 'product' | 'service' } | null>(null);
+    const [editingSubCategory, setEditingSubCategory] = React.useState<{ id: string, name: string, status: boolean, category_id: string, description: string } | null>(null);
     const [isAddOpen, setIsAddOpen] = React.useState(false);
     const [isAddSubOpen, setIsAddSubOpen] = React.useState(false);
     const [isEditSubOpen, setIsEditSubOpen] = React.useState(false);
-    const [images, setImages] = React.useState<string[]>([]);
 
-    const handleEditClick = (category: any) => {
+    const handleEditClick = (cat: any) => {
         setEditingCategory({
-            id: category.id,
-            name: category.name,
-            slug: category.category_slug,
-            status: category.status === 'Active'
+            id: cat.id,
+            name: cat.name,
+            slug: cat.slug,
+            status: cat.isActive,
+            type: cat.type || 'product'
         });
     }
 
     const handleEditNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (editingCategory) {
-            const name = e.target.value;
-            setEditingCategory({
-                ...editingCategory,
-                name,
-                slug: genSlug(name)
-            });
-        }
+        const name = e.target.value;
+        setEditingCategory(prev => prev ? {
+            ...prev,
+            name,
+            slug: genSlug(name)
+        } : null);
     }
-
-    const fileInputRef = React.useRef<HTMLInputElement>(null);
-
-    const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const files = e.target.files;
-        if (files) {
-            const newImages = Array.from(files).map(file => URL.createObjectURL(file));
-            setImages([...images, ...newImages]);
-        }
-    };
 
     const handleEditSubClick = (sub: any) => {
         setEditingSubCategory({
             id: sub.id,
             name: sub.name,
-            status: sub.status === 'Active',
-            image: sub.image,
-            category_id: sub.category_id,
+            status: sub.isActive,
+            category_id: sub.parent?.id,
             description: sub.description
         });
-        setImages(sub.image ? [sub.image] : []);
         setIsEditSubOpen(true);
     };
 
@@ -200,8 +289,8 @@ const Category: React.FC = () => {
             {/* Page Header */}
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div>
-                    <h1 className="text-2xl font-bold text-white tracking-tight">Category and Sub Category List</h1>
-                    <p className="text-sm text-slate-400">Manage your categories and sub categories</p>
+                    <h1 className="text-2xl font-bold text-white tracking-tight">{t('category.title')}</h1>
+                    <p className="text-sm text-slate-400">{t('category.subtitle_cat')}</p>
                 </div>
 
                 <div className="flex flex-wrap items-center gap-2">
@@ -227,39 +316,55 @@ const Category: React.FC = () => {
                         <DialogTrigger asChild>
                             <Button className="bg-orange-500 hover:bg-orange-600 text-white gap-2">
                                 <Plus className="h-4 w-4" />
-                                <span className="hidden sm:inline">Add Category</span>
+                                <span className="hidden sm:inline">{t('category.add_cat')}</span>
                             </Button>
                         </DialogTrigger>
                         <DialogContent className="bg-slate-900 border-white/10 text-white sm:max-w-[425px]">
                             <DialogHeader>
-                                <DialogTitle>Add Category</DialogTitle>
+                                <DialogTitle>{t('category.add_cat')}</DialogTitle>
                                 <DialogDescription className="text-slate-400">
-                                    Fill in the details to create a new category.
+                                    {t('category.add_cat_desc')}
                                 </DialogDescription>
                             </DialogHeader>
+
                             <div className="grid gap-4 py-4">
                                 <div className="space-y-2">
-                                    <Label htmlFor="category" className="text-white">Category <span className="text-rose-500">*</span></Label>
+                                    <Label htmlFor="category" className="text-white">{t('products.category')} <span className="text-rose-500">*</span></Label>
                                     <Input
                                         id="category"
                                         value={newCategory.name}
                                         onChange={handleNameChange}
                                         className="bg-white/5 border-white/10 text-white focus-visible:ring-orange-500/50"
-                                        placeholder="e.g. Electronics"
+                                        placeholder={t('category.cat_name_placeholder')}
                                     />
                                 </div>
                                 <div className="space-y-2">
-                                    <Label htmlFor="slug" className="text-white">Category Slug <span className="text-rose-500">*</span></Label>
+                                    <Label htmlFor="slug" className="text-white">{t('category.table_slug')} <span className="text-rose-500">*</span></Label>
                                     <Input
                                         id="slug"
                                         value={newCategory.slug}
                                         readOnly
                                         className="bg-white/5 border-white/10 text-slate-400 cursor-not-allowed focus-visible:ring-0"
-                                        placeholder="Auto-generated"
+                                        placeholder={t('category.slug_placeholder')}
                                     />
                                 </div>
+                                <div className="space-y-2">
+                                    <Label className="text-white">{t('category.table_type')} <span className="text-rose-500">*</span></Label>
+                                    <Select
+                                        value={newCategory.type}
+                                        onValueChange={(value) => setNewCategory({ ...newCategory, type: value as 'product' | 'service' })}
+                                    >
+                                        <SelectTrigger className="bg-white/5 border border-white/10 text-white focus:ring-orange-500">
+                                            <SelectValue placeholder="Select type" />
+                                        </SelectTrigger>
+                                        <SelectContent className="bg-slate-900 border-white/10 text-white">
+                                            <SelectItem value="product">Product</SelectItem>
+                                            <SelectItem value="service">Service</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </div>
                                 <div className="flex items-center justify-between pt-2">
-                                    <Label htmlFor="status" className="text-white">Status <span className="text-rose-500">*</span></Label>
+                                    <Label htmlFor="status" className="text-white">{t('category.table_status')} <span className="text-rose-500">*</span></Label>
                                     <Switch
                                         id="status"
                                         checked={newCategory.status}
@@ -269,8 +374,8 @@ const Category: React.FC = () => {
                                 </div>
                             </div>
                             <DialogFooter>
-                                <Button variant="outline" className="bg-slate-800 border-white/10 text-white hover:bg-slate-700 hover:text-white" onClick={() => setIsAddOpen(false)}>Cancel</Button>
-                                <Button className="bg-orange-500 hover:bg-orange-600 text-white">Add Category</Button>
+                                <Button variant="outline" className="bg-slate-800 border-white/10 text-white hover:bg-slate-700 hover:text-white" onClick={() => setIsAddOpen(false)}>{t('common.cancel')}</Button>
+                                <Button className="bg-orange-500 hover:bg-orange-600 text-white" onClick={handleAddCategory}>{t('common.save_button')}</Button>
                             </DialogFooter>
                         </DialogContent>
                     </Dialog>
@@ -278,64 +383,30 @@ const Category: React.FC = () => {
                         <DialogTrigger asChild>
                             <Button className="bg-orange-500 hover:bg-orange-600 text-white gap-2">
                                 <Plus className="h-4 w-4" />
-                                <span className="hidden sm:inline">Add Sub Category</span>
+                                <span className="hidden sm:inline">{t('category.add_sub')}</span>
                             </Button>
                         </DialogTrigger>
                         <DialogContent className="max-w-2xl bg-slate-900 border-white/10 text-white">
                             <DialogHeader>
-                                <DialogTitle>Add Sub Category</DialogTitle>
+                                <DialogTitle>{t('category.add_sub')}</DialogTitle>
                                 <DialogDescription>
-                                    Add a new sub category
+                                    {t('category.add_sub_desc')}
                                 </DialogDescription>
                             </DialogHeader>
                             <div className="p-4">
                                 <div>
-                                    <div className="flex flex-wrap gap-4 mb-6">
-                                        <Input
-                                            type="file"
-                                            multiple
-                                            accept="image/*"
-                                            className="hidden"
-                                            ref={fileInputRef}
-                                            onChange={handleImageUpload}
-                                        />
-                                        <div
-                                            onClick={() => fileInputRef.current?.click()}
-                                            className="h-24 w-24 rounded-lg border border-dashed border-white/20 hover:border-orange-500/50 hover:bg-white/5 flex flex-col items-center justify-center cursor-pointer transition-all group"
-                                        >
-                                            <CirclePlus className="h-4 w-4 text-slate-400 group-hover:text-orange-500 transition-colors" />
-                                            <span className="text-[10px] font-semibold text-slate-500 group-hover:text-orange-500 mt-2">Add Images</span>
-                                        </div>
-                                        {images.map((image, index) => (
-                                            <div key={index} className="h-24 w-24 rounded-lg border border-white/10 p-1 relative group">
-                                                <img src={image} alt={`Sub Category ${index + 1}`} className="h-full w-full object-contain rounded-md" />
-                                                <Button
-                                                    variant="destructive"
-                                                    size="icon"
-                                                    className="absolute top-1 right-1 h-4 w-4 rounded shadow-lg opacity-0 group-hover:opacity-100 scale-90 group-hover:scale-100 transition-all"
-                                                    onClick={() => {
-                                                        const newImages = [...images];
-                                                        newImages.splice(index, 1);
-                                                        setImages(newImages);
-                                                    }}
-                                                >
-                                                    <X className="h-3 w-3" />
-                                                </Button>
-                                            </div>
-                                        ))}
-                                    </div>
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         <div>
-                                            <Label htmlFor="category" className="text-white">Category <span className="text-rose-500">*</span></Label>
+                                            <Label htmlFor="category" className="text-white">{t('products.category')} <span className="text-rose-500">*</span></Label>
                                             <Select
                                                 value={newSubCategory.category_id}
                                                 onValueChange={(value) => setNewSubCategory({ ...newSubCategory, category_id: value })}
                                             >
                                                 <SelectTrigger className="bg-white/5 border border-white/10 backdrop-blur-sm text-white focus:ring-orange-500 mt-2">
-                                                    <SelectValue placeholder="Select Category" />
+                                                    <SelectValue placeholder={t('category.select_cat')} />
                                                 </SelectTrigger>
                                                 <SelectContent className="bg-slate-900 border-white/10 text-white">
-                                                    {category.map((cat) => (
+                                                    {categoryData.map((cat) => (
                                                         <SelectItem key={cat.id} value={cat.id} className="focus:bg-white/10 focus:text-white cursor-pointer">
                                                             {cat.name}
                                                         </SelectItem>
@@ -344,7 +415,7 @@ const Category: React.FC = () => {
                                             </Select>
                                         </div>
                                         <div>
-                                            <Label htmlFor="name" className="text-white">Name <span className="text-rose-500">*</span></Label>
+                                            <Label htmlFor="name" className="text-white">{t('category.table_name')} <span className="text-rose-500">*</span></Label>
                                             <Input
                                                 id="name"
                                                 value={newSubCategory.name}
@@ -353,7 +424,7 @@ const Category: React.FC = () => {
                                             />
                                         </div>
                                         <div>
-                                            <Label htmlFor="description" className="text-white">Description</Label>
+                                            <Label htmlFor="description" className="text-white">{t('category.table_description')}</Label>
                                             <Input
                                                 id="description"
                                                 value={newSubCategory.description}
@@ -362,7 +433,7 @@ const Category: React.FC = () => {
                                             />
                                         </div>
                                         <div className="flex items-center justify-between pt-2">
-                                            <Label htmlFor="sub-status" className="text-white">Status</Label>
+                                            <Label htmlFor="sub-status" className="text-white">{t('category.table_status')}</Label>
                                             <Switch
                                                 id="sub-status"
                                                 checked={newSubCategory.status}
@@ -374,8 +445,8 @@ const Category: React.FC = () => {
                                 </div>
                             </div>
                             <DialogFooter>
-                                <Button variant="outline" className="bg-slate-800 border-white/10 text-white hover:bg-slate-700 hover:text-white" onClick={() => setIsAddSubOpen(false)}>Cancel</Button>
-                                <Button className="bg-orange-500 hover:bg-orange-600 text-white">Add Sub Category</Button>
+                                <Button variant="outline" className="bg-slate-800 border-white/10 text-white hover:bg-slate-700 hover:text-white" onClick={() => setIsAddSubOpen(false)}>{t('common.cancel')}</Button>
+                                <Button className="bg-orange-500 hover:bg-orange-600 text-white" onClick={handleAddSubCategory}>{t('common.save_button')}</Button>
                             </DialogFooter>
                         </DialogContent>
                     </Dialog>
@@ -401,12 +472,25 @@ const Category: React.FC = () => {
                                 <DropdownMenu>
                                     <DropdownMenuTrigger asChild>
                                         <Button variant="outline" className="bg-white/5 border-white/10 text-slate-300 hover:bg-white/10 hover:text-white w-full sm:w-32 justify-between">
-                                            {selectedStatus === 'All' ? 'Status' : selectedStatus}
+                                            {selectedType === 'All' ? t('category.table_type') : selectedType}
                                             <ChevronDown className="h-4 w-4 opacity-50" />
                                         </Button>
                                     </DropdownMenuTrigger>
                                     <DropdownMenuContent className="bg-slate-900 border-white/10 text-white">
-                                        {categories.map((status) => (
+                                        <DropdownMenuItem onClick={() => setSelectedType('All')}>All</DropdownMenuItem>
+                                        <DropdownMenuItem onClick={() => setSelectedType('Product')}>Product</DropdownMenuItem>
+                                        <DropdownMenuItem onClick={() => setSelectedType('Service')}>Service</DropdownMenuItem>
+                                    </DropdownMenuContent>
+                                </DropdownMenu>
+                                <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                        <Button variant="outline" className="bg-white/5 border-white/10 text-slate-300 hover:bg-white/10 hover:text-white w-full sm:w-32 justify-between">
+                                            {selectedStatus === 'All' ? t('common.status') : selectedStatus}
+                                            <ChevronDown className="h-4 w-4 opacity-50" />
+                                        </Button>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent className="bg-slate-900 border-white/10 text-white">
+                                        {uniqueStatuses.map((status) => (
                                             <DropdownMenuItem
                                                 key={status}
                                                 onClick={() => setSelectedStatus(status)}
@@ -424,10 +508,10 @@ const Category: React.FC = () => {
                             <Table>
                                 <TableHeader className="bg-slate-900 border-b border-white/10">
                                     <TableRow className="hover:bg-transparent border-white/10">
-                                        <TableHead className="text-white">Category</TableHead>
-                                        <TableHead className="text-white">Category Slug</TableHead>
-                                        <TableHead className="text-white">Status</TableHead>
-                                        <TableHead className="text-right text-white">Action</TableHead>
+                                        <TableHead className="text-white">{t('category.table_name')}</TableHead>
+                                        <TableHead className="text-white">{t('category.table_type')}</TableHead>
+                                        <TableHead className="text-white">{t('category.table_status')}</TableHead>
+                                        <TableHead className="text-right text-white">{t('category.table_actions')}</TableHead>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
@@ -435,13 +519,17 @@ const Category: React.FC = () => {
                                         currentCategory.map((category) => (
                                             <TableRow key={category.id} className="hover:bg-white/5 transition-colors border-white/5 group">
                                                 <TableCell className='font-medium text-slate-300'>{category.name}</TableCell>
-                                                <TableCell className='font-medium text-slate-300'>{category.category_slug}</TableCell>
                                                 <TableCell className='font-medium text-slate-300'>
-                                                    <span className={`px-2 py-1 rounded-md text-xs font-medium border ${category.status === 'Active'
-                                                        ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20'
-                                                        : 'bg-orange-500/10 text-orange-500 border-orange-500/20'
+                                                    <Badge className={category.type === 'service' ? "rounded-md bg-orange-500/20 text-orange-400 border-orange-500/30" : "rounded-md bg-blue-500/20 text-blue-400 border-blue-500/30"}>
+                                                        {category.type === 'service' ? 'Service' : 'Product'}
+                                                    </Badge>
+                                                </TableCell>
+                                                <TableCell className='font-medium text-slate-300'>
+                                                    <span className={`px-2 py-1 rounded-md text-xs font-medium border ${category.isActive
+                                                        ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20 rounded-md'
+                                                        : 'bg-orange-500/10 text-orange-500 border-orange-500/20 rounded-md'
                                                         }`}>
-                                                        {category.status}
+                                                        {category.isActive ? t('category.active') : t('category.inactive')}
                                                     </span>
                                                 </TableCell>
                                                 <TableCell className="text-right">
@@ -478,7 +566,7 @@ const Category: React.FC = () => {
                                     ) : (
                                         <TableRow>
                                             <TableCell colSpan={10} className="text-center py-8 text-slate-400">
-                                                No Category found matching your filters.
+                                                {t('category.no_cat')}
                                             </TableCell>
                                         </TableRow>
                                     )}
@@ -489,7 +577,7 @@ const Category: React.FC = () => {
                         {/* Pagination */}
                         <div className="p-4 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-slate-400">
                             <div className="flex items-center gap-2">
-                                <span>Row Per Page</span>
+                                <span>{t('category.row_per_page')}</span>
                                 <Select defaultValue="10" onValueChange={(value) => { setItemsPerPage(Number(value)); setCurrentPage(1); }}>
                                     <SelectTrigger className="w-[70px] h-8 bg-white/5 border-white/10 text-white focus:ring-orange-500/50">
                                         <SelectValue placeholder="10" />
@@ -501,7 +589,7 @@ const Category: React.FC = () => {
                                         <SelectItem value="50" className="focus:bg-white/10 focus:text-white">50</SelectItem>
                                     </SelectContent>
                                 </Select>
-                                <span>Entries</span>
+                                <span>{t('category.entries')}</span>
                             </div>
 
                             <div className="flex items-center gap-2">
@@ -524,7 +612,7 @@ const Category: React.FC = () => {
                                                     href="#"
                                                     isActive={currentPage === page}
                                                     onClick={(e) => { e.preventDefault(); handlePageChange(page); }}
-                                                    className={currentPage === page ? "text-white bg-orange-500 hover:bg-orange-600 border-none" : "text-slate-400 hover:text-white hover:bg-white/10"}
+                                                    className={currentPage === page ? "text-white bg-orange-500 rounded-md hover:bg-orange-600 border-none" : "text-slate-400 rounded-md hover:text-white hover:bg-white/10"}
                                                 >
                                                     {page}
                                                 </PaginationLink>
@@ -549,7 +637,7 @@ const Category: React.FC = () => {
                 <Dialog open={!!editingCategory} onOpenChange={(open) => !open && setEditingCategory(null)}>
                     <DialogContent className="bg-slate-900 border-white/10 text-white sm:max-w-[425px]">
                         <DialogHeader>
-                            <DialogTitle>Edit Category</DialogTitle>
+                            <DialogTitle>{t('category.edit_cat')}</DialogTitle>
                             <DialogDescription className="text-slate-400">
                                 Make changes to your category here.
                             </DialogDescription>
@@ -557,7 +645,7 @@ const Category: React.FC = () => {
                         {editingCategory && (
                             <div className="grid gap-4 py-4">
                                 <div className="space-y-2">
-                                    <Label htmlFor="edit-category" className="text-white">Category <span className="text-rose-500">*</span></Label>
+                                    <Label htmlFor="edit-category" className="text-white">{t('products.category')} <span className="text-rose-500">*</span></Label>
                                     <Input
                                         id="edit-category"
                                         value={editingCategory.name}
@@ -566,7 +654,7 @@ const Category: React.FC = () => {
                                     />
                                 </div>
                                 <div className="space-y-2">
-                                    <Label htmlFor="edit-slug" className="text-white">Category Slug <span className="text-rose-500">*</span></Label>
+                                    <Label htmlFor="edit-slug" className="text-white">Slug <span className="text-rose-500">*</span></Label>
                                     <Input
                                         id="edit-slug"
                                         value={editingCategory.slug}
@@ -574,20 +662,35 @@ const Category: React.FC = () => {
                                         className="bg-white/5 border-white/10 text-slate-400 cursor-not-allowed focus-visible:ring-0"
                                     />
                                 </div>
+                                <div className="space-y-2">
+                                    <Label className="text-white">{t('category.table_type')} <span className="text-rose-500">*</span></Label>
+                                    <Select
+                                        value={editingCategory.type}
+                                        onValueChange={(value) => setEditingCategory(prev => prev ? { ...prev, type: value as 'product' | 'service' } : null)}
+                                    >
+                                        <SelectTrigger className="bg-white/5 border border-white/10 text-white focus:ring-orange-500">
+                                            <SelectValue placeholder="Select type" />
+                                        </SelectTrigger>
+                                        <SelectContent className="bg-slate-900 border-white/10 text-white">
+                                            <SelectItem value="product">Product</SelectItem>
+                                            <SelectItem value="service">Service</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </div>
                                 <div className="flex items-center justify-between pt-2">
                                     <Label htmlFor="edit-status" className="text-white">Status <span className="text-rose-500">*</span></Label>
                                     <Switch
                                         id="edit-status"
                                         checked={editingCategory.status}
-                                        onCheckedChange={(checked) => setEditingCategory({ ...editingCategory, status: checked })}
+                                        onCheckedChange={(checked) => setEditingCategory(prev => prev ? { ...prev, status: checked } : null)}
                                         className="bg-white/5 border border-white/10 backdrop-blur-sm data-[state=checked]:bg-emerald-500 data-[state=unchecked]:bg-white/5"
                                     />
                                 </div>
                             </div>
                         )}
                         <DialogFooter>
-                            <Button variant="outline" className="bg-slate-800 border-white/10 text-white hover:bg-slate-700 hover:text-white" onClick={() => setEditingCategory(null)}>Cancel</Button>
-                            <Button className="bg-emerald-500 hover:bg-emerald-600 text-white">Save Changes</Button>
+                            <Button variant="outline" className="bg-slate-800 border-white/10 text-white hover:bg-slate-700 hover:text-white" onClick={() => setEditingCategory(null)}>{t('common.cancel')}</Button>
+                            <Button className="bg-emerald-500 hover:bg-emerald-600 text-white" onClick={handleUpdateCategory}>{t('common.save_button')}</Button>
                         </DialogFooter>
                     </DialogContent>
                 </Dialog>
@@ -611,13 +714,13 @@ const Category: React.FC = () => {
                                 <DropdownMenu>
                                     <DropdownMenuTrigger asChild>
                                         <Button variant="outline" className="bg-white/5 border-white/10 text-slate-300 hover:bg-white/10 hover:text-white w-full sm:w-32 justify-between">
-                                            {selectedCategory === 'All' ? 'Category' : selectedCategory}
+                                            {selectedCategory === 'All' ? t('products.category') : selectedCategory}
                                             <ChevronDown className="h-4 w-4 opacity-50" />
                                         </Button>
                                     </DropdownMenuTrigger>
                                     <DropdownMenuContent className="bg-slate-900 border-white/10 text-white">
                                         <DropdownMenuItem onClick={() => setSelectedCategory('All')} className="focus:bg-white/10 focus:text-white cursor-pointer">All</DropdownMenuItem>
-                                        {category.map((cat) => (
+                                        {categoryData.map((cat) => (
                                             <DropdownMenuItem
                                                 key={cat.id}
                                                 onClick={() => setSelectedCategory(cat.name)}
@@ -631,12 +734,12 @@ const Category: React.FC = () => {
                                 <DropdownMenu>
                                     <DropdownMenuTrigger asChild>
                                         <Button variant="outline" className="bg-white/5 border-white/10 text-slate-300 hover:bg-white/10 hover:text-white w-full sm:w-32 justify-between">
-                                            {selectedStatusSub === 'All' ? 'Status' : selectedStatusSub}
+                                            {selectedStatusSub === 'All' ? t('common.status') : selectedStatusSub}
                                             <ChevronDown className="h-4 w-4 opacity-50" />
                                         </Button>
                                     </DropdownMenuTrigger>
                                     <DropdownMenuContent className="bg-slate-900 border-white/10 text-white">
-                                        {subCategories.map((status) => (
+                                        {uniqueSubStatuses.map((status) => (
                                             <DropdownMenuItem
                                                 key={status}
                                                 onClick={() => setSelectedStatusSub(status)}
@@ -655,11 +758,10 @@ const Category: React.FC = () => {
                             <Table>
                                 <TableHeader className="bg-slate-900 border-b border-white/10">
                                     <TableRow className="hover:bg-transparent border-white/10">
-                                        <TableHead className="text-white">Image</TableHead>
-                                        <TableHead className="text-white">Sub Category</TableHead>
-                                        <TableHead className="text-white">Category</TableHead>
-                                        <TableHead className="text-white">Status</TableHead>
-                                        <TableHead className="text-right text-white">Action</TableHead>
+                                        <TableHead className="text-white">{t('category.table_name')}</TableHead>
+                                        <TableHead className="text-white">{t('products.category')}</TableHead>
+                                        <TableHead className="text-white">{t('category.table_status')}</TableHead>
+                                        <TableHead className="text-right text-white">{t('category.table_actions')}</TableHead>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
@@ -667,25 +769,20 @@ const Category: React.FC = () => {
                                         currentSubCategory.map((sub) => (
                                             <TableRow key={sub.id} className="hover:bg-white/5 transition-colors border-white/5 group">
                                                 <TableCell>
-                                                    <div className="h-10 w-10 rounded-lg overflow-hidden border border-white/10">
-                                                        <img src={sub.image} alt={sub.name} className="h-full w-full object-cover" />
-                                                    </div>
-                                                </TableCell>
-                                                <TableCell>
                                                     <div className="flex flex-col">
                                                         <span className="font-medium text-slate-200">{sub.name}</span>
                                                         <span className="text-xs text-slate-500">{sub.description}</span>
                                                     </div>
                                                 </TableCell>
                                                 <TableCell className="text-slate-300">
-                                                    {category.find(c => c.id === sub.category_id)?.name || 'Unknown'}
+                                                    {sub.parent?.name || 'Unknown'}
                                                 </TableCell>
                                                 <TableCell>
-                                                    <span className={`px-2 py-1 rounded-md text-xs font-medium border ${sub.status === 'Active'
+                                                    <span className={`px-2 py-1 rounded-md text-xs font-medium border ${sub.isActive
                                                         ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20'
                                                         : 'bg-orange-500/10 text-orange-500 border-orange-500/20'
                                                         }`}>
-                                                        {sub.status}
+                                                        {sub.isActive ? t('category.active') : t('category.inactive')}
                                                     </span>
                                                 </TableCell>
                                                 <TableCell className="text-right">
@@ -721,7 +818,7 @@ const Category: React.FC = () => {
                                     ) : (
                                         <TableRow>
                                             <TableCell colSpan={6} className="text-center py-8 text-slate-400">
-                                                No sub-categories found matching your filters.
+                                                {t('category.no_sub')}
                                             </TableCell>
                                         </TableRow>
                                     )}
@@ -729,13 +826,10 @@ const Category: React.FC = () => {
                             </Table>
                         </div>
 
-
-
-
                         {/* Pagination sub*/}
                         <div className="p-4 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-slate-400">
                             <div className="flex items-center gap-2">
-                                <span>Row Per Page</span>
+                                <span>{t('category.row_per_page')}</span>
                                 <Select defaultValue="10" onValueChange={(value) => { setItemsPerPageSub(Number(value)); setCurrentPageSub(1); }}>
                                     <SelectTrigger className="w-[70px] h-8 bg-white/5 border-white/10 text-white focus:ring-orange-500/50">
                                         <SelectValue placeholder="10" />
@@ -747,7 +841,7 @@ const Category: React.FC = () => {
                                         <SelectItem value="50" className="focus:bg-white/10 focus:text-white">50</SelectItem>
                                     </SelectContent>
                                 </Select>
-                                <span>Entries</span>
+                                <span>{t('category.entries')}</span>
                             </div>
 
                             <div className="flex items-center gap-2">
@@ -795,7 +889,7 @@ const Category: React.FC = () => {
                 <Dialog open={isEditSubOpen} onOpenChange={setIsEditSubOpen}>
                     <DialogContent className="max-w-2xl bg-slate-900 border-white/10 text-white">
                         <DialogHeader>
-                            <DialogTitle>Edit Sub Category</DialogTitle>
+                            <DialogTitle>{t('category.edit_sub')}</DialogTitle>
                             <DialogDescription>
                                 Update sub category details
                             </DialogDescription>
@@ -803,43 +897,9 @@ const Category: React.FC = () => {
                         <div className="p-4">
                             {editingSubCategory && (
                                 <div>
-                                    <div className="flex flex-wrap gap-4 mb-6">
-                                        <Input
-                                            type="file"
-                                            multiple
-                                            accept="image/*"
-                                            className="hidden"
-                                            ref={fileInputRef}
-                                            onChange={handleImageUpload}
-                                        />
-                                        <div
-                                            onClick={() => fileInputRef.current?.click()}
-                                            className="h-24 w-24 rounded-lg border border-dashed border-white/20 hover:border-orange-500/50 hover:bg-white/5 flex flex-col items-center justify-center cursor-pointer transition-all group"
-                                        >
-                                            <CirclePlus className="h-4 w-4 text-slate-400 group-hover:text-orange-500 transition-colors" />
-                                            <span className="text-[10px] font-semibold text-slate-500 group-hover:text-orange-500 mt-2">Change Image</span>
-                                        </div>
-                                        {images.map((image, index) => (
-                                            <div key={index} className="h-24 w-24 rounded-lg border border-white/10 p-1 relative group">
-                                                <img src={image} alt={`Sub Category ${index + 1}`} className="h-full w-full object-contain rounded-md" />
-                                                <Button
-                                                    variant="destructive"
-                                                    size="icon"
-                                                    className="absolute top-1 right-1 h-4 w-4 rounded shadow-lg opacity-0 group-hover:opacity-100 scale-90 group-hover:scale-100 transition-all"
-                                                    onClick={() => {
-                                                        const newImages = [...images];
-                                                        newImages.splice(index, 1);
-                                                        setImages(newImages);
-                                                    }}
-                                                >
-                                                    <X className="h-3 w-3" />
-                                                </Button>
-                                            </div>
-                                        ))}
-                                    </div>
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         <div>
-                                            <Label htmlFor="edit-category" className="text-white">Category <span className="text-rose-500">*</span></Label>
+                                            <Label htmlFor="edit-category" className="text-white">{t('products.category')} <span className="text-rose-500">*</span></Label>
                                             <Select
                                                 value={editingSubCategory.category_id}
                                                 onValueChange={(value) => setEditingSubCategory({ ...editingSubCategory, category_id: value })}
@@ -848,7 +908,7 @@ const Category: React.FC = () => {
                                                     <SelectValue placeholder="Select Category" />
                                                 </SelectTrigger>
                                                 <SelectContent className="bg-slate-900 border-white/10 text-white">
-                                                    {category.map((cat) => (
+                                                    {categoryData.map((cat) => (
                                                         <SelectItem key={cat.id} value={cat.id} className="focus:bg-white/10 focus:text-white cursor-pointer">
                                                             {cat.name}
                                                         </SelectItem>
@@ -866,7 +926,7 @@ const Category: React.FC = () => {
                                             />
                                         </div>
                                         <div>
-                                            <Label htmlFor="edit-description" className="text-white">Description</Label>
+                                            <Label htmlFor="edit-description" className="text-white">{t('category.table_description')}</Label>
                                             <Input
                                                 id="edit-description"
                                                 value={editingSubCategory.description}
@@ -888,8 +948,8 @@ const Category: React.FC = () => {
                             )}
                         </div>
                         <DialogFooter>
-                            <Button variant="outline" className="bg-slate-800 border-white/10 text-white hover:bg-slate-700 hover:text-white" onClick={() => setIsEditSubOpen(false)}>Cancel</Button>
-                            <Button className="bg-emerald-500 hover:bg-emerald-600 text-white">Save Changes</Button>
+                            <Button variant="outline" className="bg-slate-800 border-white/10 text-white hover:bg-slate-700 hover:text-white" onClick={() => setIsEditSubOpen(false)}>{t('common.cancel')}</Button>
+                            <Button className="bg-emerald-500 hover:bg-emerald-600 text-white" onClick={handleUpdateSubCategory}>{t('common.save_button')}</Button>
                         </DialogFooter>
                     </DialogContent>
                 </Dialog>
