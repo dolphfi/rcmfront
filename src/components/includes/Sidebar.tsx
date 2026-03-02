@@ -194,7 +194,7 @@ export function Sidebar({ className }: React.HTMLAttributes<HTMLDivElement>) {
                             {<img src='/logo.jpeg' alt="Logo" className="h-full w-full object-contain" />}
                         </span>
                     </div>
-                )} || ==
+                )}
                 {isSidebarOpen && (
                     <h2 className="text-lg font-semibold tracking-tight ml-2 text-white mr-auto">
                         <span className="text-lg sm:text-xl font-bold text-white hidden md:block">
