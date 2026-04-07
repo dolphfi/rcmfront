@@ -46,7 +46,9 @@ import {
     DialogDescription,
     DialogHeader,
     DialogTitle,
+    DialogFooter,
 } from "components/ui/dialog"
+import { Label } from "components/ui/label"
 import { cn } from "lib/utils"
 import { toast } from "sonner"
 import QRCode from 'qrcode'
@@ -147,7 +149,18 @@ const CashierPOS: React.FC = () => {
         return localStorage.getItem('pos_selectedCustomer') || "walk-in";
     })
     const [realCustomers, setRealCustomers] = useState<Customer[]>([]);
-    const [clearCartDialogOpen, setClearCartDialogOpen] = useState(false)
+    const [clearCartDialogOpen, setClearCartDialogOpen] = useState(false);
+    const [isCustomerDialogOpen, setIsCustomerDialogOpen] = useState(false);
+    const [isScanCustomerDialogOpen, setIsScanCustomerDialogOpen] = useState(false);
+    const [scanCustomerQuery, setScanCustomerQuery] = useState('');
+    const [customerFormData, setCustomerFormData] = useState({
+        firstName: '',
+        lastName: '',
+        email: '',
+        phone: '',
+        address: '',
+        isActive: true
+    });
 
     // Data Hooks
     const { products, isLoading: isLoadingProducts } = useProducts(user?.posId);
@@ -157,6 +170,58 @@ const CashierPOS: React.FC = () => {
     // Filter categories by type
     const productCategories = allCategories.filter(c => c.type === 'product');
     const serviceCategories = allCategories.filter(c => c.type === 'service');
+
+    const handleSaveCustomer = async () => {
+        if (!customerFormData.firstName || !customerFormData.lastName) {
+            toast.error('O non ak siyati an obligatwa');
+            return;
+        }
+
+        try {
+            const newCustomer = await customerService.create(customerFormData);
+            toast.success('Kliyan an anrejistre avèk siksè');
+            setIsCustomerDialogOpen(false);
+            await fetchRealCustomers();
+            if (newCustomer && newCustomer.id) {
+                setValue(newCustomer.id);
+            }
+            setCustomerFormData({
+                firstName: '',
+                lastName: '',
+                email: '',
+                phone: '',
+                address: '',
+                isActive: true
+            });
+        } catch (error: any) {
+            toast.error(error.response?.data?.message || 'Erè pandan kreyasyon kliyan an');
+        }
+    };
+
+    const handleScanCustomerSubmit = (e?: React.FormEvent) => {
+        if (e) e.preventDefault();
+        const query = scanCustomerQuery.trim();
+        if (!query) return;
+
+        const customer = realCustomers.find(c =>
+            c.phone?.includes(query) ||
+            c.email?.toLowerCase() === query.toLowerCase() ||
+            c.id === query ||
+            c.firstName.toLowerCase() === query.toLowerCase() ||
+            c.lastName.toLowerCase() === query.toLowerCase()
+        );
+
+        if (customer) {
+            setValue(customer.id);
+            toast.success(`Kliyan jwenn: ${customer.firstName} ${customer.lastName}`);
+            setIsScanCustomerDialogOpen(false);
+            setScanCustomerQuery('');
+            setOpen(false);
+        } else {
+            toast.error('Pa gen okenn kliyan ki gen referans sa a');
+            setScanCustomerQuery('');
+        }
+    };
 
     const fetchRealCustomers = async () => {
         try {
@@ -701,17 +766,13 @@ const CashierPOS: React.FC = () => {
                         </Popover>
                     </div>
                     <Button
-                        onClick={() => {
-                            console.log('Add to cart'); // Functionality pending
-                        }}
+                        onClick={() => setIsCustomerDialogOpen(true)}
                         className="w-8 h-8 sm:w-10 sm:h-10 bg-emerald-600 hover:bg-emerald-700 text-white p-0 shrink-0"
                     >
                         <Plus className="h-4 w-4 sm:h-5 sm:w-5" />
                     </Button>
                     <Button
-                        onClick={() => {
-                            console.log('Scan customer') // Functionality pending
-                        }}
+                        onClick={() => setIsScanCustomerDialogOpen(true)}
                         className="w-8 h-8 sm:w-10 sm:h-10 bg-emerald-600 hover:bg-emerald-700 text-white p-0 shrink-0"
                     >
                         <Scan className="h-4 w-4 sm:h-5 sm:w-5" />
@@ -1297,6 +1358,113 @@ const CashierPOS: React.FC = () => {
                             Complete Sale
                         </Button>
                     </div>
+                </DialogContent>
+            </Dialog>
+
+            {/* Add Customer Dialog */}
+            <Dialog open={isCustomerDialogOpen} onOpenChange={setIsCustomerDialogOpen}>
+                <DialogContent className="bg-slate-900 border-white/10 text-white max-w-md">
+                    <DialogHeader>
+                        <DialogTitle className="text-xl font-bold">Ajoute yon kliyan</DialogTitle>
+                        <DialogDescription className="text-slate-400 text-sm">
+                            Antre enfòmasyon kliyan an anba la a.
+                        </DialogDescription>
+                    </DialogHeader>
+
+                    <div className="grid gap-4 py-4">
+                        <div className="space-y-2">
+                            <Label className="text-slate-300 text-sm">Siyati ak non <span className="text-rose-500">*</span></Label>
+                            <div className="flex gap-2">
+                                <Input
+                                    value={customerFormData.lastName}
+                                    onChange={(e) => setCustomerFormData({ ...customerFormData, lastName: e.target.value })}
+                                    className="bg-white/5 border-white/10 text-white focus:ring-emerald-500"
+                                    placeholder="egzanp. Dupont (Siyati)"
+                                />
+                                <Input
+                                    value={customerFormData.firstName}
+                                    onChange={(e) => setCustomerFormData({ ...customerFormData, firstName: e.target.value })}
+                                    className="bg-white/5 border-white/10 text-white focus:ring-emerald-500"
+                                    placeholder="egzanp. Jean (Non)"
+                                />
+                            </div>
+                        </div>
+                        <div className="space-y-2">
+                            <Label className="text-slate-300 text-sm">Telefòn</Label>
+                            <Input
+                                value={customerFormData.phone}
+                                onChange={(e) => setCustomerFormData({ ...customerFormData, phone: e.target.value })}
+                                className="bg-white/5 border-white/10 text-white focus:ring-emerald-500"
+                                placeholder="+509 1234 5678"
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <Label className="text-slate-300 text-sm">Imèl (Email)</Label>
+                            <Input
+                                type="email"
+                                value={customerFormData.email}
+                                onChange={(e) => setCustomerFormData({ ...customerFormData, email: e.target.value })}
+                                className="bg-white/5 border-white/10 text-white focus:ring-emerald-500"
+                                placeholder="jean.dupont@email.com"
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <Label className="text-slate-300 text-sm">Adrès</Label>
+                            <Input
+                                value={customerFormData.address}
+                                onChange={(e) => setCustomerFormData({ ...customerFormData, address: e.target.value })}
+                                className="bg-white/5 border-white/10 text-white focus:ring-emerald-500"
+                                placeholder="Pétion-Ville, Haiti"
+                            />
+                        </div>
+                    </div>
+
+                    <DialogFooter className="bg-slate-900/50 -mx-6 -mb-6 p-4 border-t border-white/10">
+                        <Button
+                            variant="outline"
+                            onClick={() => setIsCustomerDialogOpen(false)}
+                            className="bg-transparent border-white/10 text-white hover:bg-white/5"
+                        >
+                            Anile
+                        </Button>
+                        <Button
+                            onClick={handleSaveCustomer}
+                            className="bg-emerald-600 hover:bg-emerald-700 text-white"
+                        >
+                            Anrejistre
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+
+            {/* Scan Customer Dialog */}
+            <Dialog open={isScanCustomerDialogOpen} onOpenChange={setIsScanCustomerDialogOpen}>
+                <DialogContent className="bg-slate-900 border-white/10 text-white max-w-sm">
+                    <DialogHeader>
+                        <DialogTitle className="text-xl font-bold flex items-center gap-2">
+                            <Scan className="h-5 w-5 text-emerald-500" />
+                            Skane Kat Kliyan an
+                        </DialogTitle>
+                        <DialogDescription className="text-slate-400 text-sm">
+                            Pase eskanè a sou kòd la oswa tape telefòn/imèl li.
+                        </DialogDescription>
+                    </DialogHeader>
+
+                    <form onSubmit={handleScanCustomerSubmit} className="py-4 flex flex-col gap-4">
+                        <Input
+                            autoFocus
+                            value={scanCustomerQuery}
+                            onChange={(e) => setScanCustomerQuery(e.target.value)}
+                            placeholder="Tann eskanè a..."
+                            className="bg-white/5 border-emerald-500/30 focus:border-emerald-500 text-white text-center text-lg h-12"
+                        />
+                        <Button
+                            type="submit"
+                            className="w-full bg-emerald-600 hover:bg-emerald-700 text-white"
+                        >
+                            Chèche Kliyan an
+                        </Button>
+                    </form>
                 </DialogContent>
             </Dialog>
         </div>
