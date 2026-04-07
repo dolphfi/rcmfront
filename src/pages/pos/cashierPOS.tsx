@@ -148,6 +148,15 @@ const CashierPOS: React.FC = () => {
     const [value, setValue] = useState(() => {
         return localStorage.getItem('pos_selectedCustomer') || "walk-in";
     })
+
+    const [cartReference, setCartReference] = useState(() => {
+        return localStorage.getItem('pos_cartReference') || Math.floor(1000000000 + Math.random() * 9000000000).toString();
+    });
+
+    useEffect(() => {
+        localStorage.setItem('pos_cartReference', cartReference);
+    }, [cartReference]);
+
     const [realCustomers, setRealCustomers] = useState<Customer[]>([]);
     const [clearCartDialogOpen, setClearCartDialogOpen] = useState(false);
     const [isCustomerDialogOpen, setIsCustomerDialogOpen] = useState(false);
@@ -484,6 +493,7 @@ const CashierPOS: React.FC = () => {
         setAmountTendered('');
         setCompletedSaleId(null);
         setPrintPromptOpen(false);
+        setCartReference(Math.floor(1000000000 + Math.random() * 9000000000).toString());
     };
 
     const handlePrintReceipt = async () => {
@@ -832,7 +842,7 @@ const CashierPOS: React.FC = () => {
 
                                 <div className="flex items-center gap-2">
                                     <span className="text-[10px] font-mono text-slate-400 bg-slate-800/50 px-2 py-1 rounded border border-white/5">
-                                        #8902252625
+                                        #{cartReference}
                                     </span>
                                     <Button
                                         title='Clear cart'
