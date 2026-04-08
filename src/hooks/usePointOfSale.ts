@@ -14,7 +14,7 @@ export const usePointOfSale = () => {
             setIsLoading(true);
             setError(null);
             const data = await posService.getAll();
-            setPosData(data);
+            setPosData(Array.isArray(data) ? data : (Array.isArray((data as any)?.data) ? (data as any).data : []));
         } catch (err: any) {
             setError(err.response?.data?.message || 'Erè pandan chajman pwen de vant yo');
             console.error('Error fetching POS data:', err);

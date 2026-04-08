@@ -14,7 +14,7 @@ export const useCategories = () => {
             setIsLoading(true);
             setError(null);
             const data = await categoryService.getAll();
-            setCategories(data);
+            setCategories(Array.isArray(data) ? data : (Array.isArray(data?.data) ? data.data : []));
         } catch (err: any) {
             setError(err.response?.data?.message || 'Erè pandan chajman kategori yo');
             console.error('Error fetching categories:', err);

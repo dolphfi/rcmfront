@@ -14,7 +14,7 @@ export const useProducts = (posId?: string) => {
             setIsLoading(true);
             setError(null);
             const data = await productService.getAll(posId);
-            setProducts(data);
+            setProducts(Array.isArray(data) ? data : (Array.isArray(data?.data) ? data.data : []));
         } catch (err: any) {
             setError(err.response?.data?.message || 'Erè pandan chajman pwodwi yo');
             console.error('Error fetching products:', err);

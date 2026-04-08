@@ -14,7 +14,7 @@ export const useBrands = () => {
             setIsLoading(true);
             setError(null);
             const data = await brandService.getAll();
-            setBrands(data);
+            setBrands(Array.isArray(data) ? data : (Array.isArray((data as any)?.data) ? (data as any).data : []));
         } catch (err: any) {
             setError(err.response?.data?.message || 'Erè pandan chajman mak yo');
             console.error('Error fetching brands:', err);

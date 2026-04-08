@@ -15,7 +15,7 @@ export const useServices = (posId?: string) => {
             setIsLoading(true);
             setError(null);
             const data = await serviceService.getAll(posId);
-            setServices(data || []);
+            setServices(Array.isArray(data) ? data : (Array.isArray((data as any)?.data) ? (data as any).data : []));
         } catch (err: any) {
             setError(err.response?.data?.message || 'Erè pandan chajman sèvis yo');
             console.error('Error fetching services:', err);
