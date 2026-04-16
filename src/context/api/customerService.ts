@@ -1,50 +1,52 @@
 import api from './api';
 import { Customer } from '../types/interface';
 
+const extractArray = (response: any) => {
+    if (!response) return [];
+    const d = (response as any).data || response;
+    if (Array.isArray(d)) return d;
+    if (d && Array.isArray(d.data)) return d.data;
+    if (d && typeof d === 'object' && Object.keys(d).length > 0) {
+        const vals = Object.values(d);
+        const firstArray = vals.find(v => Array.isArray(v));
+        if (firstArray) return firstArray;
+    }
+    return [];
+};
+
+const extractObject = (response: any) => {
+    if (!response) return {};
+    const d = (response as any).data || response;
+    if (d && d.data && !Array.isArray(d.data)) return d.data;
+    return d;
+};
+
 const customerService = {
-    /**
-     * Get all customers
-     */
     getAll: async (): Promise<Customer[]> => {
         const response = await api.get('/customers');
-        return response.data;
+        return extractArray(response) as Customer[];
     },
 
-    /**
-     * Get customer by ID
-     */
     getById: async (id: string): Promise<Customer> => {
         const response = await api.get(`/customers/${id}`);
-        return response.data;
+        return extractObject(response) as Customer;
     },
 
-    /**
-     * Get customer by phone
-     */
     getByPhone: async (phone: string): Promise<Customer> => {
         const response = await api.get(`/customers/phone/${phone}`);
-        return response.data;
+        return extractObject(response) as Customer;
     },
 
-    /**
-     * Create new customer
-     */
     create: async (data: Partial<Customer>): Promise<Customer> => {
         const response = await api.post('/customers', data);
-        return response.data;
+        return extractObject(response) as Customer;
     },
 
-    /**
-     * Update customer
-     */
     update: async (id: string, data: Partial<Customer>): Promise<Customer> => {
         const response = await api.patch(`/customers/${id}`, data);
-        return response.data;
+        return extractObject(response) as Customer;
     },
 
-    /**
-     * Delete customer
-     */
     delete: async (id: string): Promise<void> => {
         await api.delete(`/customers/${id}`);
     }
