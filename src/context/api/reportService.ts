@@ -1,13 +1,30 @@
 import api from './api';
 
-const extract = (response: any) => {
-    const d = response.data;
-    // If the backend interceptor wraps arrays in { data: [...] }
-    if (d && typeof d === 'object' && d.data !== undefined && Array.isArray(d.data)) {
-        return d.data;
+const extractArray = (response: any) => {
+    if (!response) return [];
+    const d = response.data || response;
+    
+    if (Array.isArray(d)) return d;
+    if (d && Array.isArray(d.data)) return d.data;
+    
+    // Some backends nest the array under a named key if it's the only key
+    if (d && typeof d === 'object' && Object.keys(d).length > 0) {
+        // Maybe it's topCustomers: [...]
+        const vals = Object.values(d);
+        // If there's primarily one array, unwrap it
+        const firstArray = vals.find(v => Array.isArray(v));
+        if (firstArray) return firstArray;
     }
-    return d;
+    
+    return [];
 };
+
+const extractObject = (response: any) => {
+    if (!response) return {};
+    const d = response.data || response;
+    if (d && d.data && !Array.isArray(d.data)) return d.data;
+    return d;
+}
 
 const reportService = {
     getSummary: async (startDate?: string, endDate?: string) => {
@@ -18,9 +35,7 @@ const reportService = {
         if (params.toString()) url += `?${params.toString()}`;
         
         const response = await api.get(url);
-        // Summary is an object, so extract might just return d.
-        // If it's wrapped like { data: { overallInfo: ... } }, we should unwrap it too.
-        return response.data?.data && !Array.isArray(response.data?.data) ? response.data.data : extract(response);
+        return extractObject(response);
     },
 
     getSalesChart: async (period: string = '1W', startDate?: string, endDate?: string) => {
@@ -29,42 +44,42 @@ const reportService = {
         if (endDate) url += `&endDate=${endDate}`;
         
         const response = await api.get(url);
-        return extract(response);
+        return extractArray(response);
     },
 
     getCustomerOverview: async (period: string = 'today') => {
         const response = await api.get(`/reports/customer-overview?period=${period}`);
-        return extract(response);
+        return extractArray(response);
     },
 
     getTopSellingProducts: async (period: string = 'today') => {
         const response = await api.get(`/reports/top-selling-products?period=${period}`);
-        return extract(response);
+        return extractArray(response);
     },
 
     getMonthlyStats: async (year: number) => {
         const response = await api.get(`/reports/monthly-stats?year=${year}`);
-        return extract(response);
+        return extractArray(response);
     },
 
     getTopCustomers: async (period: string = 'today') => {
         const response = await api.get(`/reports/top-customers?period=${period}`);
-        return extract(response);
+        return extractArray(response);
     },
 
     getTopCategories: async (period: string = 'today') => {
         const response = await api.get(`/reports/top-categories?period=${period}`);
-        return extract(response);
+        return extractArray(response);
     },
 
     getOrderStats: async (period: string = '1M') => {
         const response = await api.get(`/reports/order-stats?period=${period}`);
-        return extract(response);
+        return extractArray(response);
     },
 
     getSalesDates: async () => {
         const response = await api.get('/reports/sales-dates');
-        return extract(response);
+        return extractArray(response);
     },
 
     getPosSummary: async (startDate?: string, endDate?: string) => {
@@ -72,7 +87,7 @@ const reportService = {
         if (startDate) params.append('startDate', startDate);
         if (endDate) params.append('endDate', endDate);
         const response = await api.get(`/reports/pos-summary?${params.toString()}`);
-        return extract(response);
+        return extractArray(response);
     }
 };
 
