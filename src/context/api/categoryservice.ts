@@ -1,4 +1,5 @@
 import api from './api';
+import { db } from '../db/database';
 
 const extractArray = (response: any) => {
     if (!response) return [];
@@ -28,10 +29,31 @@ const categoryService = {
      * Get all categories
      */
     getAll: async (type?: 'product' | 'service') => {
-        const response = await api.get('/categories', {
-            params: { type }
-        });
-        return extractArray(response);
+        try {
+            if (!navigator.onLine) {
+                const localData = await db.categories.toArray();
+                return localData.map(c => c.rawData);
+            }
+
+            const response = await api.get('/categories', {
+                params: { type }
+            });
+            const data = extractArray(response);
+
+            if (data && data.length > 0) {
+                await db.categories.clear();
+                const offlineFormatted = data.map((d: any) => ({
+                    id: d.id || String(Math.random()),
+                    name: d.name || d.title || '',
+                    rawData: d
+                }));
+                await db.categories.bulkAdd(offlineFormatted);
+            }
+            return data;
+        } catch (error) {
+            const localData = await db.categories.toArray();
+            return localData.map(c => c.rawData);
+        }
     },
 
     /**

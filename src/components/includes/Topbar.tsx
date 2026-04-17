@@ -30,6 +30,7 @@ import { cn } from "../../lib/utils";
 import { useSidebar } from "../layout/SidebarContext";
 import Language from "./Language";
 import { useTranslation } from "react-i18next";
+import { NetworkIndicator } from "./NetworkIndicator";
 
 export function Topbar() {
     const { isSidebarOpen, toggleSidebar } = useSidebar();
@@ -112,6 +113,7 @@ export function Topbar() {
                     </Popover>
                 </div>
                 <div className="flex items-center space-x-4 flex-1 justify-end">
+                    <NetworkIndicator />
                     <Language />
                     <UserNav />
                 </div>

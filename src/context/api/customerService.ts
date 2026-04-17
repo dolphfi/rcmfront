@@ -1,4 +1,5 @@
 import api from './api';
+import { db } from '../db/database';
 import { Customer } from '../types/interface';
 
 const extractArray = (response: any) => {
@@ -23,8 +24,31 @@ const extractObject = (response: any) => {
 
 const customerService = {
     getAll: async (): Promise<Customer[]> => {
-        const response = await api.get('/customers');
-        return extractArray(response) as Customer[];
+        try {
+            if (!navigator.onLine) {
+                const localData = await db.customers.toArray();
+                return localData.map(c => c.rawData as Customer);
+            }
+
+            const response = await api.get('/customers');
+            const data = extractArray(response) as Customer[];
+
+            if (data && data.length > 0) {
+                await db.customers.clear();
+                const offlineFormatted = data.map((d: any) => ({
+                    id: d.id || String(Math.random()),
+                    firstName: d.firstName || '',
+                    lastName: d.lastName || '',
+                    phone: d.phone || '',
+                    rawData: d
+                }));
+                await db.customers.bulkAdd(offlineFormatted);
+            }
+            return data;
+        } catch (error) {
+            const localData = await db.customers.toArray();
+            return localData.map(c => c.rawData as Customer);
+        }
     },
 
     getById: async (id: string): Promise<Customer> => {

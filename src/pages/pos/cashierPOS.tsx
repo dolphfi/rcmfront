@@ -54,6 +54,7 @@ import { toast } from "sonner"
 import QRCode from 'qrcode'
 import customerService from 'context/api/customerService';
 import { Customer } from 'context/types/interface';
+import { useNetworkStatus } from '../../hooks/useNetwork';
 
 
 
@@ -143,6 +144,7 @@ const CashierPOS: React.FC = () => {
     const { sellType } = useOutletContext<{ sellType: string }>();
     const location = useLocation();
     const { user } = useAuth();
+    const { isOnline } = useNetworkStatus();
     const [open, setOpen] = useState(false)
     const [isFinalizing, setIsFinalizing] = useState(false);
     const [value, setValue] = useState(() => {
@@ -969,14 +971,19 @@ const CashierPOS: React.FC = () => {
                                         </Button>
                                         <Button
                                             variant="outline"
+                                            disabled={!isOnline}
                                             onClick={() => {
                                                 if (cart.length === 0) {
                                                     toast.error("Cart is empty. Please add items before selecting a payment method.");
                                                     return;
                                                 }
+                                                if (!isOnline) {
+                                                    toast.error("Pèman pa kat pa posib hors ligne.");
+                                                    return;
+                                                }
                                                 toast.error("Peman pa kat poko disponib.");
                                             }}
-                                            className={`w-full justify-start gap-2 h-9 text-white hover:bg-emerald-600/20 hover:text-white ${selectedPaymentMethod === 'card'
+                                            className={`w-full justify-start gap-2 h-9 text-white hover:bg-emerald-600/20 hover:text-white ${!isOnline ? 'opacity-50 cursor-not-allowed' : ''} ${selectedPaymentMethod === 'card'
                                                 ? 'bg-emerald-600/10 border-emerald-500/30'
                                                 : 'bg-slate-800/50 border-white/10 hover:bg-slate-700/50'
                                                 }`}
@@ -986,14 +993,19 @@ const CashierPOS: React.FC = () => {
                                         </Button>
                                         <Button
                                             variant="outline"
+                                            disabled={!isOnline}
                                             onClick={() => {
                                                 if (cart.length === 0) {
                                                     toast.error("Cart is empty. Please add items before selecting a payment method.");
                                                     return;
                                                 }
+                                                if (!isOnline) {
+                                                    toast.error("Pèman par scan pa posib hors ligne.");
+                                                    return;
+                                                }
                                                 toast.error("Peman par scan poko disponib.");
                                             }}
-                                            className={`w-full justify-start gap-2 h-9 text-white hover:bg-emerald-600/20 hover:text-white ${selectedPaymentMethod === 'scan'
+                                            className={`w-full justify-start gap-2 h-9 text-white hover:bg-emerald-600/20 hover:text-white ${!isOnline ? 'opacity-50 cursor-not-allowed' : ''} ${selectedPaymentMethod === 'scan'
                                                 ? 'bg-emerald-600/10 border-emerald-500/30'
                                                 : 'bg-slate-800/50 border-white/10 hover:bg-slate-700/50'
                                                 }`}
@@ -1003,14 +1015,19 @@ const CashierPOS: React.FC = () => {
                                         </Button>
                                         <Button
                                             variant="outline"
+                                            disabled={!isOnline}
                                             onClick={() => {
                                                 if (cart.length === 0) {
                                                     toast.error("Cart is empty. Please add items before selecting a payment method.");
                                                     return;
                                                 }
+                                                if (!isOnline) {
+                                                    toast.error("Pèman pataje pa posib hors ligne.");
+                                                    return;
+                                                }
                                                 toast.error("Peman pataje (Split Bill) poko disponib.");
                                             }}
-                                            className={`w-full justify-start gap-2 h-9 text-white hover:bg-emerald-600/20 hover:text-white ${selectedPaymentMethod === 'split'
+                                            className={`w-full justify-start gap-2 h-9 text-white hover:bg-emerald-600/20 hover:text-white ${!isOnline ? 'opacity-50 cursor-not-allowed' : ''} ${selectedPaymentMethod === 'split'
                                                 ? 'bg-emerald-600/10 border-emerald-500/30'
                                                 : 'bg-slate-800/50 border-white/10 hover:bg-slate-700/50'
                                                 }`}

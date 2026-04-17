@@ -1,4 +1,5 @@
 import api from './api';
+import { db } from '../db/database';
 
 export interface CreateSaleItem {
     productId?: string;
@@ -39,8 +40,37 @@ const extractObject = (response: any) => {
 
 const salesService = {
     create: async (data: CreateSaleData) => {
-        const response = await api.post('/sales', data);
-        return extractObject(response);
+        if (!navigator.onLine) {
+            // Offline Mode: Queue the sale
+            await db.pendingSales.add({
+                payload: data,
+                createdAt: new Date(),
+                status: 'pending'
+            });
+            // Return a pseudo-success object to satisfy the UI without crashing
+            return {
+                id: 'OFFLINE_MODE_' + Math.random().toString(36).substring(7),
+                status: 'QUEUED_FOR_SYNC',
+                message: 'Vente enregistrée en local (Hors Ligne)'
+            };
+        }
+
+        try {
+            const response = await api.post('/sales', data);
+            return extractObject(response);
+        } catch (error) {
+            // If the network request fails due to sudden connection drop
+             await db.pendingSales.add({
+                payload: data,
+                createdAt: new Date(),
+                status: 'pending'
+            });
+            return {
+                id: 'OFFLINE_MODE_' + Math.random().toString(36).substring(7),
+                status: 'QUEUED_FOR_SYNC',
+                message: 'Réseau instable, vente sauvegardée en local'
+            };
+        }
     },
 
     findAll: async () => {

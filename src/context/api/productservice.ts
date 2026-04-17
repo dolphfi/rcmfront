@@ -1,4 +1,5 @@
 import api from './api';
+import { db } from '../db/database';
 
 const extractArray = (response: any) => {
     if (!response) return [];
@@ -28,10 +29,39 @@ const productService = {
      * Get all products
      */
     getAll: async (posId?: string) => {
-        const response = await api.get('/products', {
-            params: { posId }
-        });
-        return extractArray(response);
+        try {
+            // Force read from local DB if offline
+            if (!navigator.onLine) {
+                const localData = await db.products.toArray();
+                return localData.map(p => p.rawData);
+            }
+
+            const response = await api.get('/products', {
+                params: { posId }
+            });
+            const data = extractArray(response);
+
+            // Sync to Dexie
+            if (data && data.length > 0) {
+                await db.products.clear();
+                const offlineFormatted = data.map((d: any) => ({
+                    id: d.id || String(Math.random()),
+                    name: d.productName || d.name || '',
+                    sku: d.sku || '',
+                    price: d.price || d.salePrice || 0,
+                    stock: d.stock || 0,
+                    categoryId: d.categoryId || '',
+                    brandId: d.brandId || '',
+                    rawData: d
+                }));
+                await db.products.bulkAdd(offlineFormatted);
+            }
+            return data;
+        } catch (error) {
+            // Fallback if API fails
+            const localData = await db.products.toArray();
+            return localData.map(p => p.rawData);
+        }
     },
 
     /**
