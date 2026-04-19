@@ -23,6 +23,7 @@ import PosLayout from 'components/layout/posLayout/PosLayout';
 import PrivateRoute from '../components/auth/ProtectedRoute';
 import SalesLayout from 'components/layout/saleslayout/SalesLayout';
 import SalesHistory from 'pages/sales/SalesHistory';
+import CreditManagement from 'pages/credit/CreditManagement';
 import ProformaList from 'pages/proforma/ProformaList';
 import CreateProforma from 'pages/proforma/CreateProforma';
 import ProformaDetails from 'pages/proforma/ProformaDetails';
@@ -185,6 +186,10 @@ export const router = createBrowserRouter([
                     {
                         path: "returns",
                         element: <div className="text-white p-6">Paj Retou (Returns) - Byento</div>,
+                    },
+                    {
+                        path: "credits",
+                        element: <CreditManagement />,
                     },
                 ],
             },

@@ -6,6 +6,7 @@ import { Button } from 'components/ui/button';
 import { useOutletContext, useLocation } from 'react-router-dom';
 import { Plus, Scan, Check, ChevronDown, X, Trash, Minus, Wallet, CreditCard, Split, Pause, SquarePercent, TicketCheck, Loader2, Receipt } from 'lucide-react';
 import { useAuth } from 'context/AuthContext';
+import { useTranslation } from 'react-i18next';
 import salesService, { CreateSaleData } from 'context/api/salesService';
 import posService from 'context/api/posservice';
 import { ScrollArea } from 'components/ui/scroll-area';
@@ -85,6 +86,7 @@ interface QRCodeViewProps {
 }
 
 const QRCodeView: React.FC<QRCodeViewProps> = ({ paymentMethod, amount, onBack }) => {
+    const { t } = useTranslation();
     const canvasRef = useRef<HTMLCanvasElement>(null);
 
     useEffect(() => {
@@ -109,10 +111,10 @@ const QRCodeView: React.FC<QRCodeViewProps> = ({ paymentMethod, amount, onBack }
                     <button onClick={onBack} className="hover:text-emerald-400 transition-colors">
                         ←
                     </button>
-                    {paymentMethod} Payment
+                    {t('pos.qr_code.title', { method: paymentMethod })}
                 </DialogTitle>
                 <DialogDescription className="text-slate-300">
-                    Scan the QR code to complete the payment
+                    {t('pos.qr_code.description')}
                 </DialogDescription>
             </DialogHeader>
 
@@ -133,7 +135,7 @@ const QRCodeView: React.FC<QRCodeViewProps> = ({ paymentMethod, amount, onBack }
                 </div>
 
                 <p className="text-slate-400 text-xs text-center">
-                    Waiting for payment confirmation...
+                    {t('pos.qr_code.waiting')}
                 </p>
             </div>
         </>
@@ -141,6 +143,7 @@ const QRCodeView: React.FC<QRCodeViewProps> = ({ paymentMethod, amount, onBack }
 };
 
 const CashierPOS: React.FC = () => {
+    const { t } = useTranslation();
     const { sellType } = useOutletContext<{ sellType: string }>();
     const location = useLocation();
     const { user } = useAuth();
@@ -299,6 +302,8 @@ const CashierPOS: React.FC = () => {
     const [scanDialogOpen, setScanDialogOpen] = useState(false);
     const [selectedDigitalPayment, setSelectedDigitalPayment] = useState<string | null>(null);
     const [splitDialogOpen, setSplitDialogOpen] = useState(false);
+    const [creditDialogOpen, setCreditDialogOpen] = useState(false);
+    const [amountPaidCredit, setAmountPaidCredit] = useState<number | ''>('');
 
     // Receipt Printing states
     const [printPromptOpen, setPrintPromptOpen] = useState(false);
@@ -468,7 +473,8 @@ const CashierPOS: React.FC = () => {
                 price: item.price,
                 qty: item.qty
             })),
-            discount: discount
+            discount: discount,
+            amountPaid: selectedPaymentMethod === 'credit' ? (typeof amountPaidCredit === 'number' ? amountPaidCredit : 0) : (selectedPaymentMethod === 'cash' ? (typeof amountTendered === 'number' ? total : total) : total)
         };
 
         try {
@@ -1015,25 +1021,24 @@ const CashierPOS: React.FC = () => {
                                         </Button>
                                         <Button
                                             variant="outline"
-                                            disabled={!isOnline}
                                             onClick={() => {
                                                 if (cart.length === 0) {
                                                     toast.error("Cart is empty. Please add items before selecting a payment method.");
                                                     return;
                                                 }
-                                                if (!isOnline) {
-                                                    toast.error("Pèman pataje pa posib hors ligne.");
+                                                if (value === 'walk-in') {
+                                                    toast.error(t('pos.credit_dialog.requires_customer'));
                                                     return;
                                                 }
-                                                toast.error("Peman pataje (Split Bill) poko disponib.");
+                                                setSelectedPaymentMethod('credit');
                                             }}
-                                            className={`w-full justify-start gap-2 h-9 text-white hover:bg-emerald-600/20 hover:text-white ${!isOnline ? 'opacity-50 cursor-not-allowed' : ''} ${selectedPaymentMethod === 'split'
+                                            className={`w-full justify-start gap-2 h-9 text-white hover:bg-emerald-600/20 hover:text-white ${selectedPaymentMethod === 'credit'
                                                 ? 'bg-emerald-600/10 border-emerald-500/30'
                                                 : 'bg-slate-800/50 border-white/10 hover:bg-slate-700/50'
                                                 }`}
                                         >
-                                            <Split className={`h-4 w-4 ${selectedPaymentMethod === 'split' ? 'text-emerald-500' : 'text-purple-400'}`} />
-                                            <span className="text-sm">Split Bill</span>
+                                            <TicketCheck className={`h-4 w-4 ${selectedPaymentMethod === 'credit' ? 'text-emerald-500' : 'text-yellow-400'}`} />
+                                            <span className="text-sm">{t('pos.credit_dialog.title')}</span>
                                         </Button>
                                     </div>
                                 </div>
@@ -1064,6 +1069,8 @@ const CashierPOS: React.FC = () => {
                                             onClick={() => {
                                                 if (selectedPaymentMethod === 'cash') {
                                                     setCashDialogOpen(true);
+                                                } else if (selectedPaymentMethod === 'credit') {
+                                                    setCreditDialogOpen(true);
                                                 } else {
                                                     handleFinalizeSale();
                                                 }
@@ -1075,7 +1082,7 @@ const CashierPOS: React.FC = () => {
                                             ) : (
                                                 <TicketCheck className="h-4 w-4 text-blue-400" />
                                             )}
-                                            <span className="text-sm">{isFinalizing ? 'Ap voye...' : 'Finaliser'}</span>
+                                            <span className="text-sm">{isFinalizing ? t('pos.credit_dialog.processing') : t('pos.validate')}</span>
                                         </Button>
                                     </div>
                                 </div>
@@ -1156,6 +1163,76 @@ const CashierPOS: React.FC = () => {
                     </div>
                 </DialogContent>
             </Dialog>
+
+            {/* Credit Payment Dialog */}
+            <Dialog open={creditDialogOpen} onOpenChange={(open) => {
+                setCreditDialogOpen(open);
+                if (!open && !isFinalizing) setAmountPaidCredit('');
+            }}>
+                <DialogContent className="bg-slate-900/95 backdrop-blur-xl border-white/20 text-white max-w-sm">
+                    <DialogHeader>
+                        <DialogTitle className="text-white text-xl flex items-center gap-2">
+                            <TicketCheck className="h-5 w-5 text-emerald-500" />
+                            {t('pos.credit_dialog.title')}
+                        </DialogTitle>
+                        <DialogDescription className="text-slate-400">
+                            {t('pos.credit_dialog.description')}
+                        </DialogDescription>
+                    </DialogHeader>
+
+                    <div className="space-y-4 py-2">
+                        <div className="flex justify-between items-center bg-slate-800/50 p-3 rounded-lg border border-white/10">
+                            <span className="text-slate-400">{t('pos.credit_dialog.total_sale')}</span>
+                            <span className="text-xl font-bold text-emerald-400">{total.toLocaleString()} HTG</span>
+                        </div>
+
+                        <div className="space-y-2">
+                            <label className="text-sm font-medium text-slate-300">{t('pos.credit_dialog.amount_received_label')}</label>
+                            <Input
+                                type="number"
+                                value={amountPaidCredit}
+                                onChange={(e) => setAmountPaidCredit(e.target.value ? Number(e.target.value) : '')}
+                                placeholder="Egz: 500"
+                                className="bg-slate-800/50 border-white/20 text-white text-lg h-12"
+                                autoFocus
+                            />
+                        </div>
+
+                        <div className="flex justify-between items-center bg-slate-800/50 p-3 rounded-lg border border-white/10">
+                            <span className="text-slate-400">{t('pos.credit_dialog.remaining_debt')}</span>
+                            <span className="text-lg font-bold text-rose-400">
+                                {typeof amountPaidCredit === 'number'
+                                    ? (total - Number(amountPaidCredit || 0)).toLocaleString()
+                                    : total.toLocaleString()} HTG
+                            </span>
+                        </div>
+                    </div>
+
+                    <div className="flex flex-col-reverse sm:flex-row justify-end gap-2 mt-2">
+                        <Button
+                            variant="outline"
+                            onClick={() => setCreditDialogOpen(false)}
+                            className="bg-slate-800 border-white/10 text-white hover:bg-slate-700 w-full sm:w-auto"
+                        >
+                            <X className="h-4 w-4 mr-2" />
+                            {t('pos.credit_dialog.cancel')}
+                        </Button>
+                        <Button
+                            onClick={handleFinalizeSale}
+                            disabled={isFinalizing}
+                            className="bg-emerald-600 border-emerald-500 text-white hover:bg-emerald-700 w-full sm:w-auto"
+                        >
+                            {isFinalizing ? (
+                                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                            ) : (
+                                <Check className="h-4 w-4 mr-2" />
+                            )}
+                            {isFinalizing ? t('pos.credit_dialog.processing') : t('pos.credit_dialog.validate')}
+                        </Button>
+                    </div>
+                </DialogContent>
+            </Dialog>
+
 
             {/* Post-Sale Print Dialog */}
             <Dialog open={printPromptOpen} onOpenChange={(open) => {
@@ -1256,7 +1333,7 @@ const CashierPOS: React.FC = () => {
                         </>
                     ) : (
                         <QRCodeView
-                            paymentMethod={selectedDigitalPayment}
+                            paymentMethod={selectedDigitalPayment as any}
                             amount={total}
                             onBack={() => setSelectedDigitalPayment(null)}
                         />

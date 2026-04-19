@@ -101,6 +101,7 @@
         "invoices": "Fakti",
         "returns": "Retou",
         "proforma": "Devis (Proforma)",
+        "credits": "Jesyon Kredi",
         "pos": "Pwen de Vant",
         "all_points": "Tout Pwen yo",
         "marketing": "Maketing & Kliyan",
@@ -411,7 +412,20 @@
         "msg_save_error": "Erè pandan anrejistreman an",
         "msg_status_activated": "Kote a aktive avèk siksè",
         "msg_status_deactivated": "Kote a dezaktive avèk siksè",
-        "msg_status_error": "Erè pandan chanjman estati a"
+        "msg_status_error": "Erè pandan chanjman estati a",
+        "msg_offline_scan": "Pèman par scan pa posib hors ligne.",
+        "msg_scan_unavailable": "Peman par scan poko disponib.",
+        "credit_dialog": {
+            "title": "Vant a Kredi",
+            "description": "Antre kantite kòb kliyan an bay kounye a (Avans).",
+            "total_sale": "Total Vant lan:",
+            "amount_received_label": "Montan Resevwa (Avans) (HTG)",
+            "remaining_debt": "Dèt ki rete a:",
+            "cancel": "Anile",
+            "processing": "Ap trete...",
+            "validate": "Valide Vant lan",
+            "requires_customer": "Vant a kredi a mande pou w chwazi yon kliyan ki anrejistre."
+        }
     },
     "category": {
         "title": "Kategori ak Sou-Kategori",
@@ -764,5 +778,31 @@
         "perm_reports": "Gade Rapò",
         "perm_inventory": "Jere Estòk / Pwodwi",
         "perm_settings": "Chanje Paramèt Sistèm"
+    },
+    "credit": {
+        "title": "Jesyon Kredi & Dèt",
+        "subtitle": "Swiv ak jere tout kliyan ki dwe biznis lan.",
+        "table_title": "Lis Moun ki dwe yo",
+        "search_placeholder": "Chache kliyan, No reçia...",
+        "table_customer": "Kliyan",
+        "table_receipt": "Fakti #",
+        "table_date": "Dat Vant",
+        "table_total": "Total",
+        "table_advance": "Avans",
+        "table_debt": "Dèt ki rete",
+        "table_actions": "Aksyon",
+        "loading": "Ap chaje...",
+        "no_data": "Okenn dèt pa jwenn.",
+        "no_phone": "Okenn telefòn",
+        "btn_pay": "Peye",
+        "dialog_title": "Règleman Dèt",
+        "dialog_desc": "Enrejistre yon pèman pou kliyan sa a.",
+        "label_amount": "Montan w ap peye a (HTG)",
+        "payment_hint": "Pati sa ap ajoute sou {{amount}} HTG ki te gentan peye a.",
+        "btn_cancel": "Anile",
+        "btn_validate": "Valide",
+        "msg_load_error": "Pa kapab chaje dèt yo",
+        "msg_save_success": "Pèman anrejistre avèk siksè!",
+        "msg_save_error": "Erè pandan anrejistreman pèman an"
     }
 }

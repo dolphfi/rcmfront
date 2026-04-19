@@ -101,6 +101,7 @@
         "invoices": "Invoices",
         "returns": "Returns",
         "proforma": "Proforma",
+        "credits": "Credit Management",
         "pos": "Points of Sale",
         "all_points": "All Points",
         "marketing": "Marketing & Customers",
@@ -412,7 +413,25 @@
         "msg_save_error": "Error during save",
         "msg_status_activated": "Location activated successfully",
         "msg_status_deactivated": "Location deactivated successfully",
-        "msg_status_error": "Error during status change"
+        "msg_status_error": "Error during status change",
+        "msg_offline_scan": "Scan payment is not possible offline.",
+        "msg_scan_unavailable": "Scan payment is not yet available.",
+        "credit_dialog": {
+            "title": "Credit Sale",
+            "description": "Enter the amount the customer is paying now (Advance).",
+            "total_sale": "Total Sale:",
+            "amount_received_label": "Amount Received (Advance) (HTG)",
+            "remaining_debt": "Remaining Debt:",
+            "cancel": "Cancel",
+            "processing": "Processing...",
+            "validate": "Validate Sale",
+            "requires_customer": "Credit sales require selecting a registered customer."
+        },
+        "qr_code": {
+            "title": "{{method}} Payment",
+            "description": "Scan the QR code to complete the payment",
+            "waiting": "Waiting for payment confirmation..."
+        }
     },
     "category": {
         "title": "Categories & Sub Categories",
@@ -765,5 +784,31 @@
         "perm_reports": "View Reports",
         "perm_inventory": "Manage Stock / Products",
         "perm_settings": "Change System Settings"
+    },
+    "credit": {
+        "title": "Credit & Debt Management",
+        "subtitle": "Track and manage all customers who owe the business.",
+        "table_title": "List of Debtors",
+        "search_placeholder": "Search client, Receipt No...",
+        "table_customer": "Customer",
+        "table_receipt": "Invoice #",
+        "table_date": "Sale Date",
+        "table_total": "Total",
+        "table_advance": "Advance",
+        "table_debt": "Remaining Debt",
+        "table_actions": "Actions",
+        "loading": "Loading...",
+        "no_data": "No debts found.",
+        "no_phone": "No phone",
+        "btn_pay": "Pay",
+        "dialog_title": "Debt Settlement",
+        "dialog_desc": "Register a payment for this customer.",
+        "label_amount": "Amount you are paying (HTG)",
+        "payment_hint": "This portion will be added to the {{amount}} HTG already paid.",
+        "btn_cancel": "Cancel",
+        "btn_validate": "Validate",
+        "msg_load_error": "Unable to load debts",
+        "msg_save_success": "Payment recorded successfully!",
+        "msg_save_error": "Error recording payment"
     }
 }

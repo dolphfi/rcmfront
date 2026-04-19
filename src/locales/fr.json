@@ -101,6 +101,7 @@
         "invoices": "Factures",
         "returns": "Retours",
         "proforma": "Proforma",
+        "credits": "Gestion des Crédits",
         "pos": "Points de Vente",
         "all_points": "Tous les Points",
         "marketing": "Marketing & Clients",
@@ -412,11 +413,30 @@
         "msg_save_error": "Erreur lors de l'enregistrement",
         "msg_status_activated": "Lieu activé avec succès",
         "msg_status_deactivated": "Lieu désactivé avec succès",
-        "msg_status_error": "Erreur lors du changement de statut"
+        "msg_status_error": "Erreur lors du changement de statut",
+        "msg_offline_scan": "Le paiement par scan n'est pas possible hors ligne.",
+        "msg_scan_unavailable": "Le paiement par scan n'est pas encore disponible.",
+        "validate": "Valider la Vente",
+        "credit_dialog": {
+            "title": "Vente à Crédit",
+            "description": "Entrez le montant que le client paie maintenant (Avance).",
+            "total_sale": "Total de la Vente :",
+            "amount_received_label": "Montant Reçu (Avance) (HTG)",
+            "remaining_debt": "Dette Restante :",
+            "cancel": "Annuler",
+            "processing": "Traitement...",
+            "validate": "Valider la Vente",
+            "requires_customer": "Les ventes à crédit nécessitent de sélectionner un client enregistré."
+        },
+        "qr_code": {
+            "title": "{{method}} Paiement",
+            "description": "Scannez le code QR pour compléter le paiement",
+            "waiting": "En attente de confirmation de paiement..."
+        }
     },
     "category": {
         "title": "Catégories et Sous-catégories",
-        "subtitle_cat": "Gérer vos catégories de produits",
+        "subtitle_cat": "Gérez vos catégories de produits",
         "subtitle_sub": "Gérer vos sous-catégories de produits",
         "add_cat": "Ajouter une Catégorie",
         "add_cat_desc": "Remplissez les détails pour créer une nouvelle catégorie.",
@@ -765,5 +785,31 @@
         "perm_reports": "Voir les Rapports",
         "perm_inventory": "Gérer le Stock / Produits",
         "perm_settings": "Modifier les Paramètres Système"
+    },
+    "credit": {
+        "title": "Gestion des Crédits & Dettes",
+        "subtitle": "Suivez et gérez tous les clients qui doivent à l'entreprise.",
+        "table_title": "Liste des Débiteurs",
+        "search_placeholder": "Cherche client, No Reçu...",
+        "table_customer": "Client",
+        "table_receipt": "Facture #",
+        "table_date": "Date de Vente",
+        "table_total": "Total",
+        "table_advance": "Avance",
+        "table_debt": "Dette Restante",
+        "table_actions": "Actions",
+        "loading": "Chargement...",
+        "no_data": "Aucune dette trouvée.",
+        "no_phone": "Aucun téléphone",
+        "btn_pay": "Payer",
+        "dialog_title": "Règlement de Dette",
+        "dialog_desc": "Enregistrer un paiement pour ce client.",
+        "label_amount": "Montant que vous payez (HTG)",
+        "payment_hint": "Cette portion sera ajoutée aux {{amount}} HTG déjà payés.",
+        "btn_cancel": "Annuler",
+        "btn_validate": "Valider",
+        "msg_load_error": "Impossible de charger les dettes",
+        "msg_save_success": "Paiement enregistré avec succès !",
+        "msg_save_error": "Erreur lors de l'enregistrement du paiement"
     }
 }

@@ -13,9 +13,10 @@ export interface CreateSaleData {
     posId: string;
     customerId?: string;
     sellType: 'PRODUCT' | 'SERVICE';
-    paymentMethod: 'CASH' | 'CARD' | 'SCAN' | 'SPLIT';
+    paymentMethod: 'CASH' | 'CARD' | 'SCAN' | 'SPLIT' | 'CREDIT';
     items: CreateSaleItem[];
     discount?: number;
+    amountPaid?: number;
 }
 
 const extractArray = (response: any) => {
@@ -82,6 +83,16 @@ const salesService = {
         const response = await api.get(`/sales/${id}`);
         return extractObject(response);
     },
+
+    getAllCredits: async () => {
+        const response = await api.get('/sales/credits/all');
+        return extractArray(response);
+    },
+
+    payCredit: async (id: string, amount?: number) => {
+        const response = await api.patch(`/sales/${id}/pay`, { amount });
+        return extractObject(response);
+    }
 };
 
 export default salesService;

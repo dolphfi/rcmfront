@@ -51,7 +51,6 @@ import { useSidebar } from "../layout/SidebarContext";
 import { useTranslation } from "react-i18next";
 import { Settings as SettingsIcon } from "lucide-react";
 import settingsService from '../../context/api/settingsService';
-import { image } from "html2canvas/dist/types/css/types/image"
 
 
 interface SidebarItemProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
@@ -375,12 +374,18 @@ export function Sidebar({ className }: React.HTMLAttributes<HTMLDivElement>) {
                                                 {t('sidebar.invoices')}
                                             </Link>
                                         </Button>
-                                        <Button variant="ghost" size="sm" className="w-full justify-start h-8 hover:bg-white/10 hover:text-white" asChild onClick={handleLinkClick}>
-                                            <Link to="/sales/returns">
-                                                <CornerDownLeft className="mr-2 h-4 w-4" />
-                                                {t('sidebar.returns')}
-                                            </Link>
-                                        </Button>
+                                         <Button variant="ghost" size="sm" className="w-full justify-start h-8 hover:bg-white/10 hover:text-white" asChild onClick={handleLinkClick}>
+                                             <Link to="/sales/returns">
+                                                 <CornerDownLeft className="mr-2 h-4 w-4" />
+                                                 {t('sidebar.returns')}
+                                             </Link>
+                                         </Button>
+                                         <Button variant="ghost" size="sm" className="w-full justify-start h-8 hover:bg-white/10 hover:text-white" asChild onClick={handleLinkClick}>
+                                             <Link to="/sales/credits">
+                                                 <HandCoins className="mr-2 h-4 w-4" />
+                                                 {t('sidebar.credits')}
+                                             </Link>
+                                         </Button>
                                         <Button variant="ghost" size="sm" className="w-full justify-start h-8 hover:bg-white/10 hover:text-white" asChild onClick={handleLinkClick}>
                                             <Link to="/proforma/list">
                                                 <FileText className="mr-2 h-4 w-4" />
