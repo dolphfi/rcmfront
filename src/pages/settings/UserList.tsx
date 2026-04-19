@@ -164,8 +164,8 @@ const UserList: React.FC = () => {
             await userService.updateUser(user.id, { isActive: !user.isActive });
             toast.success(`Itilizatè a ${user.isActive ? 'dezaktive' : 'aktive'} avèk siksè`);
             fetchData();
-        } catch (error) {
-            toast.error('Erreur lors du changement de statut');
+        } catch (error: any) {
+            toast.error(error.response?.data?.message || 'Erreur lors du changement de statut');
         }
     };
 
@@ -174,8 +174,8 @@ const UserList: React.FC = () => {
             await userService.unlockUser(user.id);
             toast.success('Kont la debloke avèk siksè');
             fetchData();
-        } catch (error) {
-            toast.error('Erreur lors du déblocage');
+        } catch (error: any) {
+            toast.error(error.response?.data?.message || 'Erreur lors du déblocage');
         }
     };
 

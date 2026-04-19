@@ -5,7 +5,7 @@ import {
     ArrowLeft, RefreshCw, ChevronUp, Info, List, Bold, Italic, Underline,
     Link as LinkIcon, ListOrdered, Type, ChevronsUpDown,
     CirclePlus,
-    RotateCw, Check, ChevronDown
+    RotateCw, Check, ChevronDown, LifeBuoy, Box, SquarePercent
 } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Input } from '../../components/ui/input';
@@ -50,6 +50,9 @@ const EditProduct: React.FC = () => {
         description: '',
         productType: 'single',
         price: 0,
+        wholesalePrice: 0,
+        grandDealerPrice: 0,
+        smallDealerPrice: 0,
         costPrice: 0,
         taxType: 'inclusive',
         tax: 0,
@@ -98,6 +101,9 @@ const EditProduct: React.FC = () => {
                     categoryId: product.categoryId || '',
                     brandId: product.brandId || '',
                     price: Number(product.pricingStocks?.[0]?.price || 0),
+                    wholesalePrice: Number(product.pricingStocks?.[0]?.wholesalePrice || 0),
+                    grandDealerPrice: Number(product.pricingStocks?.[0]?.grandDealerPrice || 0),
+                    smallDealerPrice: Number(product.pricingStocks?.[0]?.smallDealerPrice || 0),
                     costPrice: Number(product.pricingStocks?.[0]?.costPrice || 0),
                     isActive: product.isActive,
                     primaryPosId: firstPos?.posId || '',
@@ -143,7 +149,6 @@ const EditProduct: React.FC = () => {
         try {
             setIsLoading(true);
 
-            // Clean payload to only include allowed fields for base product update
             const updatePayload = {
                 name: formData.name,
                 slug: formData.slug,
@@ -159,6 +164,25 @@ const EditProduct: React.FC = () => {
                 subCategoryId: formData.subCategoryId,
                 isActive: formData.isActive,
                 warrantyId: formData.warrantyId && formData.warrantyId.trim() !== '' ? formData.warrantyId : null,
+                pricingStocks: [
+                    {
+                        sku: formData.sku,
+                        price: Number(formData.price),
+                        wholesalePrice: Number(formData.wholesalePrice),
+                        grandDealerPrice: Number(formData.grandDealerPrice),
+                        smallDealerPrice: Number(formData.smallDealerPrice),
+                        costPrice: Number(formData.costPrice),
+                        taxType: formData.taxType,
+                        tax: Number(formData.tax),
+                        discountType: formData.discountType,
+                        discountValue: Number(formData.discountValue),
+                        quantityAlert: Number(formData.quantityAlert),
+                        posStocks: formData.posStocks.map(ps => ({
+                            posId: ps.posId,
+                            stock: Number(ps.stock)
+                        }))
+                    }
+                ]
             };
 
             await productService.update(id, updatePayload);
@@ -505,6 +529,107 @@ const EditProduct: React.FC = () => {
                                         <div className={`px-3 py-1 text-xs border-t border-white/10 text-right ${description.length >= 100 ? 'text-red-500 font-medium' : 'text-slate-500'}`}>
                                             {description.length} / 100 {t('products.characters')}
                                         </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </AccordionContent>
+                    </AccordionItem>
+                    {/* Pricing & Stocks */}
+                    <AccordionItem value="item-2" className="bg-slate-900 backdrop-blur-sm border border-white/10 rounded-lg overflow-hidden">
+                        <AccordionTrigger className="px-6 py-4 hover:no-underline hover:bg-white/5 pb-4 border-b border-white/10">
+                            <div className="flex items-center gap-2 text-white font-medium">
+                                <LifeBuoy className="h-4 w-4 text-orange-500" />
+                                {t('products.pricing_stock')}
+                            </div>
+                        </AccordionTrigger>
+                        <AccordionContent className="px-6 pb-6 pt-6 text-slate-400">
+                            <div className="space-y-6">
+                                {/* Pricing Details */}
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 animate-in fade-in slide-in-from-top-2 duration-300">
+                                    <div className="space-y-2">
+                                        <Label className="text-white">{t('products.price')} (Détail) <span className="text-red-500">*</span></Label>
+                                        <Input
+                                            type="number"
+                                            value={formData.price}
+                                            onChange={(e) => setFormData(prev => ({ ...prev, price: Number(e.target.value) }))}
+                                            className="bg-slate-900 border-white/10 text-emerald-400 font-medium"
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label className="text-white">Prix en Gros</Label>
+                                        <Input
+                                            type="number"
+                                            value={formData.wholesalePrice}
+                                            onChange={(e) => setFormData(prev => ({ ...prev, wholesalePrice: Number(e.target.value) }))}
+                                            className="bg-slate-900 border-white/10 text-white"
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label className="text-white">Prix Grand Dealer</Label>
+                                        <Input
+                                            type="number"
+                                            value={formData.grandDealerPrice}
+                                            onChange={(e) => setFormData(prev => ({ ...prev, grandDealerPrice: Number(e.target.value) }))}
+                                            className="bg-slate-900 border-white/10 text-white"
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label className="text-white">Prix Petit Dealer</Label>
+                                        <Input
+                                            type="number"
+                                            value={formData.smallDealerPrice}
+                                            onChange={(e) => setFormData(prev => ({ ...prev, smallDealerPrice: Number(e.target.value) }))}
+                                            className="bg-slate-900 border-white/10 text-white"
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label className="text-white">Pri Acha ($)</Label>
+                                        <Input
+                                            type="number"
+                                            value={formData.costPrice}
+                                            onChange={(e) => setFormData(prev => ({ ...prev, costPrice: Number(e.target.value) }))}
+                                            className="bg-slate-900 border-white/10 text-white"
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label className="text-white">Alert Kantite</Label>
+                                        <Input
+                                            type="number"
+                                            value={formData.quantityAlert}
+                                            onChange={(e) => setFormData(prev => ({ ...prev, quantityAlert: Number(e.target.value) }))}
+                                            className="bg-slate-900 border-white/10 text-white"
+                                        />
+                                    </div>
+                                </div>
+
+                                {/* Stock per Location */}
+                                <div className="pt-6 border-t border-white/5">
+                                    <div className="flex items-center gap-2 mb-4">
+                                        <Box className="h-4 w-4 text-orange-500" />
+                                        <h3 className="text-white font-medium">{t('products.stock_per_location')}</h3>
+                                    </div>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        {formData.posStocks.map((ps, idx) => {
+                                            const posName = pointsOfSale.find(p => p.id === ps.posId)?.name || 'Unknown';
+                                            return (
+                                                <div key={ps.posId} className="flex items-center justify-between p-3 rounded-lg bg-white/5 border border-white/10">
+                                                    <span className="text-slate-300 text-sm">{posName}</span>
+                                                    <div className="flex items-center gap-2">
+                                                        <Input
+                                                            type="number"
+                                                            value={ps.stock}
+                                                            onChange={(e) => {
+                                                                const val = Number(e.target.value);
+                                                                const newStocks = [...formData.posStocks];
+                                                                newStocks[idx].stock = val;
+                                                                setFormData(prev => ({ ...prev, posStocks: newStocks }));
+                                                            }}
+                                                            className="w-24 h-8 bg-slate-900 border-white/10 text-white text-right"
+                                                        />
+                                                    </div>
+                                                </div>
+                                            );
+                                        })}
                                     </div>
                                 </div>
                             </div>

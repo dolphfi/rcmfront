@@ -68,6 +68,9 @@ const AddProduct: React.FC = () => {
         description: '',
         productType: 'single',
         price: 0,
+        wholesalePrice: 0,
+        grandDealerPrice: 0,
+        smallDealerPrice: 0,
         costPrice: 0,
         taxType: 'inclusive',
         tax: 0,
@@ -90,6 +93,9 @@ const AddProduct: React.FC = () => {
     const [variantFormData, setVariantFormData] = useState({
         sku: '',
         price: 0,
+        wholesalePrice: 0,
+        grandDealerPrice: 0,
+        smallDealerPrice: 0,
         costPrice: 0,
         tempQty: 0, // Used for the primary location in the dialog
         posStocks: [] as { posId: string, stock: number }[],
@@ -234,6 +240,9 @@ const AddProduct: React.FC = () => {
             setVariantFormData({
                 sku: `VAR-${Math.random().toString(36).substring(2, 8).toUpperCase()}`,
                 price: Number(formData.price),
+                wholesalePrice: Number(formData.wholesalePrice),
+                grandDealerPrice: Number(formData.grandDealerPrice),
+                smallDealerPrice: Number(formData.smallDealerPrice),
                 costPrice: Number(formData.costPrice),
                 tempQty: 0,
                 posStocks: pointsOfSale.map(pos => ({ posId: pos.id, stock: 0 })),
@@ -305,6 +314,9 @@ const AddProduct: React.FC = () => {
                 pricingStocks = [{
                     sku: formData.sku,
                     price: Number(formData.price),
+                    wholesalePrice: Number(formData.wholesalePrice),
+                    grandDealerPrice: Number(formData.grandDealerPrice),
+                    smallDealerPrice: Number(formData.smallDealerPrice),
                     costPrice: Number(formData.costPrice),
                     taxType: formData.taxType,
                     tax: Number(formData.tax),
@@ -327,6 +339,9 @@ const AddProduct: React.FC = () => {
                 pricingStocks = variants.map(v => ({
                     sku: v.sku,
                     price: Number(v.price),
+                    wholesalePrice: Number(v.wholesalePrice),
+                    grandDealerPrice: Number(v.grandDealerPrice),
+                    smallDealerPrice: Number(v.smallDealerPrice),
                     costPrice: Number(v.costPrice),
                     taxType: formData.taxType, // Inherit from main form for now
                     tax: Number(formData.tax),
@@ -921,6 +936,34 @@ const AddProduct: React.FC = () => {
                                                 value={formData.price}
                                                 onChange={(e) => setFormData(prev => ({ ...prev, price: Number(e.target.value) }))}
                                                 className="bg-slate-900 border-white/10 text-white"
+                                                placeholder="Détail"
+                                            />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <Label className="text-white">Prix en Gros</Label>
+                                            <Input
+                                                type="text"
+                                                value={formData.wholesalePrice}
+                                                onChange={(e) => setFormData(prev => ({ ...prev, wholesalePrice: Number(e.target.value) }))}
+                                                className="bg-slate-900 border-white/10 text-white"
+                                            />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <Label className="text-white">Prix Grand Dealer</Label>
+                                            <Input
+                                                type="text"
+                                                value={formData.grandDealerPrice}
+                                                onChange={(e) => setFormData(prev => ({ ...prev, grandDealerPrice: Number(e.target.value) }))}
+                                                className="bg-slate-900 border-white/10 text-white"
+                                            />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <Label className="text-white">Prix Petit Dealer</Label>
+                                            <Input
+                                                type="text"
+                                                value={formData.smallDealerPrice}
+                                                onChange={(e) => setFormData(prev => ({ ...prev, smallDealerPrice: Number(e.target.value) }))}
+                                                className="bg-slate-900 border-white/10 text-white"
                                             />
                                         </div>
                                         <div className="space-y-2">
@@ -1295,13 +1338,43 @@ const AddProduct: React.FC = () => {
 
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="grid gap-2">
-                                    <Label htmlFor="v-price" className="text-white">Pri Vann ($) <span className="text-rose-500">*</span></Label>
+                                    <Label htmlFor="v-price" className="text-white">Pri Vann ($) (Détail) <span className="text-rose-500">*</span></Label>
                                     <Input
                                         id="v-price"
                                         type="number"
                                         value={variantFormData.price}
                                         onChange={(e) => setVariantFormData({ ...variantFormData, price: Number(e.target.value) })}
                                         className="bg-white/5 border-white/10 text-emerald-400 font-medium focus-visible:ring-emerald-500/50"
+                                    />
+                                </div>
+                                <div className="grid gap-2">
+                                    <Label htmlFor="v-wholesale-price" className="text-white">Prix en Gros</Label>
+                                    <Input
+                                        id="v-wholesale-price"
+                                        type="number"
+                                        value={variantFormData.wholesalePrice}
+                                        onChange={(e) => setVariantFormData({ ...variantFormData, wholesalePrice: Number(e.target.value) })}
+                                        className="bg-white/5 border-white/10 text-white focus-visible:ring-orange-500/50"
+                                    />
+                                </div>
+                                <div className="grid gap-2">
+                                    <Label htmlFor="v-grand-dealer-price" className="text-white">Prix Grand Dealer</Label>
+                                    <Input
+                                        id="v-grand-dealer-price"
+                                        type="number"
+                                        value={variantFormData.grandDealerPrice}
+                                        onChange={(e) => setVariantFormData({ ...variantFormData, grandDealerPrice: Number(e.target.value) })}
+                                        className="bg-white/5 border-white/10 text-white focus-visible:ring-orange-500/50"
+                                    />
+                                </div>
+                                <div className="grid gap-2">
+                                    <Label htmlFor="v-small-dealer-price" className="text-white">Prix Petit Dealer</Label>
+                                    <Input
+                                        id="v-small-dealer-price"
+                                        type="number"
+                                        value={variantFormData.smallDealerPrice}
+                                        onChange={(e) => setVariantFormData({ ...variantFormData, smallDealerPrice: Number(e.target.value) })}
+                                        className="bg-white/5 border-white/10 text-white focus-visible:ring-orange-500/50"
                                     />
                                 </div>
                                 <div className="grid gap-2">

@@ -416,6 +416,12 @@
         "msg_status_error": "Error during status change",
         "msg_offline_scan": "Scan payment is not possible offline.",
         "msg_scan_unavailable": "Scan payment is not yet available.",
+        "price_tiers": {
+            "retail": "Retail",
+            "wholesale": "Wholesale",
+            "grand_dealer": "Grand Dealer",
+            "small_dealer": "Small Dealer"
+        },
         "credit_dialog": {
             "title": "Credit Sale",
             "description": "Enter the amount the customer is paying now (Advance).",

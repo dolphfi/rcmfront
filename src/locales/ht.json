@@ -415,6 +415,12 @@
         "msg_status_error": "Erè pandan chanjman estati a",
         "msg_offline_scan": "Pèman par scan pa posib hors ligne.",
         "msg_scan_unavailable": "Peman par scan poko disponib.",
+        "price_tiers": {
+            "retail": "Détail",
+            "wholesale": "Gros",
+            "grand_dealer": "Grand Dealer",
+            "small_dealer": "Petit Dealer"
+        },
         "credit_dialog": {
             "title": "Vant a Kredi",
             "description": "Antre kantite kòb kliyan an bay kounye a (Avans).",

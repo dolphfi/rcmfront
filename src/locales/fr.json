@@ -414,8 +414,14 @@
         "msg_status_activated": "Lieu activé avec succès",
         "msg_status_deactivated": "Lieu désactivé avec succès",
         "msg_status_error": "Erreur lors du changement de statut",
-        "msg_offline_scan": "Le paiement par scan n'est pas possible hors ligne.",
+        "msg_offline_scan": "Paiement par scan impossible hors ligne.",
         "msg_scan_unavailable": "Le paiement par scan n'est pas encore disponible.",
+        "price_tiers": {
+            "retail": "Détail",
+            "wholesale": "Gros",
+            "grand_dealer": "Grand Dealer",
+            "small_dealer": "Petit Dealer"
+        },
         "validate": "Valider la Vente",
         "credit_dialog": {
             "title": "Vente à Crédit",

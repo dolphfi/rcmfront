@@ -69,6 +69,11 @@ interface CartItem {
     name: string;
     price: number;
     qty: number;
+    retailPrice: number;
+    wholesalePrice: number;
+    grandDealerPrice: number;
+    smallDealerPrice: number;
+    priceType: 'retail' | 'wholesale' | 'grand' | 'small';
 }
 
 // Split Payment Row Interface
@@ -366,7 +371,11 @@ const CashierPOS: React.FC = () => {
                 .filter(p => !p.expiryDate || new Date(p.expiryDate) > now)
                 .map(p => ({
                     ...p,
-                    price: p.pricingStocks?.[0]?.price || 0,
+                    price: Number(p.pricingStocks?.[0]?.price || 0),
+                    retailPrice: Number(p.pricingStocks?.[0]?.price || 0),
+                    wholesalePrice: Number(p.pricingStocks?.[0]?.wholesalePrice || 0),
+                    grandDealerPrice: Number(p.pricingStocks?.[0]?.grandDealerPrice || 0),
+                    smallDealerPrice: Number(p.pricingStocks?.[0]?.smallDealerPrice || 0),
                     sku: p.pricingStocks?.[0]?.sku || 'N/A',
                     imageUrl: p.images?.find((img: any) => img.isPrimary)?.url || p.images?.[0]?.url || ''
                 }));
@@ -402,6 +411,11 @@ const CashierPOS: React.FC = () => {
                     name: item.name,
                     price: item.price,
                     qty: 1,
+                    retailPrice: item.retailPrice || item.price,
+                    wholesalePrice: item.wholesalePrice || 0,
+                    grandDealerPrice: item.grandDealerPrice || 0,
+                    smallDealerPrice: item.smallDealerPrice || 0,
+                    priceType: 'retail'
                 }];
             }
         });
@@ -416,6 +430,20 @@ const CashierPOS: React.FC = () => {
             if (item.id === itemId) {
                 const newQty = item.qty + delta;
                 return newQty > 0 ? { ...item, qty: newQty } : item;
+            }
+            return item;
+        }));
+    };
+
+    const updatePriceType = (itemId: string | number, priceType: CartItem['priceType']) => {
+        setCart(prevCart => prevCart.map(item => {
+            if (item.id === itemId) {
+                let newPrice = item.retailPrice;
+                if (priceType === 'wholesale') newPrice = item.wholesalePrice;
+                else if (priceType === 'grand') newPrice = item.grandDealerPrice;
+                else if (priceType === 'small') newPrice = item.smallDealerPrice;
+
+                return { ...item, priceType, price: newPrice };
             }
             return item;
         }));
@@ -571,7 +599,13 @@ const CashierPOS: React.FC = () => {
     const cartItemCount = cart.reduce((acc, item) => acc + item.qty, 0);
 
     // Payment calculations
-    const subtotal = cart.reduce((acc, item) => acc + (item.price * item.qty), 0);
+    const subtotal = cart.reduce((acc, item) => {
+        let currentPrice = item.retailPrice;
+        if (item.priceType === 'wholesale') currentPrice = item.wholesalePrice;
+        else if (item.priceType === 'grand') currentPrice = item.grandDealerPrice;
+        else if (item.priceType === 'small') currentPrice = item.smallDealerPrice;
+        return acc + (currentPrice * item.qty);
+    }, 0);
     const tax = subtotal * 0.10; // 10% tax
     // const discount = 0; // Can be updated based on loyalty/promotions
     // fake discount
@@ -886,10 +920,26 @@ const CashierPOS: React.FC = () => {
                                                 >
                                                     <Trash className="h-3.5 w-3.5" />
                                                 </button>
-                                                <div className="truncate">
-                                                    <span className="text-sm font-medium text-slate-200 group-hover:text-orange-400 transition-colors">
+                                                <div className="flex flex-col min-w-0">
+                                                    <span className="text-sm font-medium text-white truncate group-hover:text-emerald-400 transition-colors">
                                                         {item.name}
                                                     </span>
+                                                    <div className="mt-1">
+                                                        <Select
+                                                            value={item.priceType}
+                                                            onValueChange={(val: any) => updatePriceType(item.id, val)}
+                                                        >
+                                                            <SelectTrigger className="h-6 w-fit bg-slate-800 border-white/5 text-[10px] py-0 px-2 text-slate-400 hover:text-white transition-colors">
+                                                                <SelectValue />
+                                                            </SelectTrigger>
+                                                            <SelectContent className="bg-slate-900 border-white/10 text-white min-w-[120px]">
+                                                                <SelectItem value="retail" className="text-xs">{t('pos.price_tiers.retail')} (${item.retailPrice.toLocaleString()})</SelectItem>
+                                                                <SelectItem value="wholesale" className="text-xs">{t('pos.price_tiers.wholesale')} (${item.wholesalePrice.toLocaleString()})</SelectItem>
+                                                                <SelectItem value="grand" className="text-xs">{t('pos.price_tiers.grand_dealer')} (${item.grandDealerPrice.toLocaleString()})</SelectItem>
+                                                                <SelectItem value="small" className="text-xs">{t('pos.price_tiers.small_dealer')} (${item.smallDealerPrice.toLocaleString()})</SelectItem>
+                                                            </SelectContent>
+                                                        </Select>
+                                                    </div>
                                                 </div>
                                             </div>
 
