@@ -116,12 +116,20 @@ const Client: React.FC = () => {
             return;
         }
 
+        // Sanitize optional fields: convert empty strings to null to avoid unique constraint issues in DB
+        const payload = {
+            ...formData,
+            email: formData.email.trim() || null,
+            phone: formData.phone.trim() || null,
+            address: formData.address.trim() || null
+        };
+
         try {
             if (editingCustomer) {
-                await customerService.update(editingCustomer.id, formData);
+                await customerService.update(editingCustomer.id, payload as any);
                 toast.success(t('clients.msg_update_success'));
             } else {
-                await customerService.create(formData);
+                await customerService.create(payload as any);
                 toast.success(t('clients.msg_create_success'));
             }
             setIsDialogOpen(false);
