@@ -49,10 +49,10 @@ export function Topbar() {
     }, [])
 
     return (
-        <div className="topbar-container no-print bg-black/40 backdrop-blur-xl border-b border-white/10 text-white">
+        <div className="topbar-container no-print bg-white/90 backdrop-blur-md border-b border-slate-200 text-gray-900 sticky top-0 z-30">
             <div className="flex h-16 items-center px-4 justify-between">
                 <div className="flex-1 flex items-center gap-4">
-                    <Button variant="ghost" size="icon" onClick={toggleSidebar} className="hover:bg-white/10 hover:text-white">
+                    <Button variant="ghost" size="icon" onClick={toggleSidebar} className="hover:bg-primary/10 hover:text-primary">
                         {isSidebarOpen ? <PanelLeft className="h-5 w-5" /> : <PanelRight className="h-5 w-5" />}
                     </Button>
                 </div>
@@ -62,10 +62,10 @@ export function Topbar() {
                             <Button
                                 variant="outline"
                                 className={cn(
-                                    "relative w-full max-w-lg justify-start text-sm text-slate-400 bg-white/5 border-white/10 sm:pr-12 md:w-40 lg:w-[500px] hover:bg-white/10 hover:text-white"
+                                     "relative w-full max-w-lg justify-start text-sm text-slate-400 bg-slate-50 border-slate-200 sm:pr-12 md:w-40 lg:w-[500px] hover:bg-slate-100 hover:text-slate-600 transition-colors"
                                 )}>
                                 <span className="inline-flex">{t('topbar.rechercher')}</span>
-                                <kbd className="pointer-events-none absolute right-1.5 top-1/2 -translate-y-1/2 hidden h-5 select-none items-center gap-1 rounded border border-white/10 bg-white/5 px-1.5 font-mono text-[10px] font-medium opacity-100 sm:flex">
+                                <kbd className="pointer-events-none absolute right-1.5 top-1/2 -translate-y-1/2 hidden h-5 select-none items-center gap-1 rounded border border-slate-200 bg-white px-1.5 font-mono text-[10px] font-medium opacity-100 sm:flex">
                                     <span className="text-xs">Ctrl</span>K
                                 </kbd>
                             </Button>

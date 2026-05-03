@@ -4,8 +4,9 @@ import { useCategories } from 'hooks/useCategories';
 import { useServices } from 'hooks/useServices';
 import { Button } from 'components/ui/button';
 import { useOutletContext, useLocation } from 'react-router-dom';
-import { Plus, Scan, Check, ChevronDown, X, Trash, Minus, Wallet, CreditCard, Split, Pause, SquarePercent, TicketCheck, Loader2, Receipt } from 'lucide-react';
+import { Plus, Scan, Check, ChevronDown, X, Trash, Minus, Wallet, CreditCard, Pause, SquarePercent, TicketCheck, Loader2, Receipt } from 'lucide-react';
 import { useAuth } from 'context/AuthContext';
+import { useSettings } from 'context/SettingsContext';
 import { useTranslation } from 'react-i18next';
 import salesService, { CreateSaleData } from 'context/api/salesService';
 import posService from 'context/api/posservice';
@@ -72,8 +73,7 @@ interface CartItem {
     retailPrice: number;
     wholesalePrice: number;
     grandDealerPrice: number;
-    smallDealerPrice: number;
-    priceType: 'retail' | 'wholesale' | 'grand' | 'small';
+    priceType: 'retail' | 'wholesale' | 'grand';
 }
 
 // Split Payment Row Interface
@@ -152,6 +152,7 @@ const CashierPOS: React.FC = () => {
     const { sellType } = useOutletContext<{ sellType: string }>();
     const location = useLocation();
     const { user } = useAuth();
+    const { currency, exchangeRate } = useSettings();
     const { isOnline } = useNetworkStatus();
     const [open, setOpen] = useState(false)
     const [isFinalizing, setIsFinalizing] = useState(false);
@@ -273,7 +274,11 @@ const CashierPOS: React.FC = () => {
                 id: item.productId || item.serviceId,
                 name: item.name,
                 price: parseFloat(item.price),
-                qty: item.qty
+                qty: item.qty,
+                retailPrice: parseFloat(item.price),
+                wholesalePrice: parseFloat(item.wholesalePrice || 0),
+                grandDealerPrice: parseFloat(item.grandDealerPrice || 0),
+                priceType: 'retail'
             }));
 
             setCart(mappedItems);
@@ -299,7 +304,21 @@ const CashierPOS: React.FC = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [cart, setCart] = useState<CartItem[]>(() => {
         const savedCart = localStorage.getItem('pos_cart');
-        return savedCart ? JSON.parse(savedCart) : [];
+        if (!savedCart) return [];
+        try {
+            const parsed = JSON.parse(savedCart);
+            // Ensure all items have the required multi-tier pricing fields
+            return parsed.map((item: any) => ({
+                ...item,
+                retailPrice: item.retailPrice ?? item.price ?? 0,
+                wholesalePrice: item.wholesalePrice ?? 0,
+                grandDealerPrice: item.grandDealerPrice ?? 0,
+                priceType: item.priceType ?? 'retail'
+            }));
+        } catch (e) {
+            console.error("Failed to parse cart from localStorage", e);
+            return [];
+        }
     });
     const [selectedPaymentMethod, setSelectedPaymentMethod] = useState('');
     const [amountTendered, setAmountTendered] = useState<number | ''>('');
@@ -309,6 +328,7 @@ const CashierPOS: React.FC = () => {
     const [splitDialogOpen, setSplitDialogOpen] = useState(false);
     const [creditDialogOpen, setCreditDialogOpen] = useState(false);
     const [amountPaidCredit, setAmountPaidCredit] = useState<number | ''>('');
+    const [dueDate, setDueDate] = useState<string>('');
 
     // Receipt Printing states
     const [printPromptOpen, setPrintPromptOpen] = useState(false);
@@ -375,7 +395,6 @@ const CashierPOS: React.FC = () => {
                     retailPrice: Number(p.pricingStocks?.[0]?.price || 0),
                     wholesalePrice: Number(p.pricingStocks?.[0]?.wholesalePrice || 0),
                     grandDealerPrice: Number(p.pricingStocks?.[0]?.grandDealerPrice || 0),
-                    smallDealerPrice: Number(p.pricingStocks?.[0]?.smallDealerPrice || 0),
                     sku: p.pricingStocks?.[0]?.sku || 'N/A',
                     imageUrl: p.images?.find((img: any) => img.isPrimary)?.url || p.images?.[0]?.url || ''
                 }));
@@ -414,7 +433,6 @@ const CashierPOS: React.FC = () => {
                     retailPrice: item.retailPrice || item.price,
                     wholesalePrice: item.wholesalePrice || 0,
                     grandDealerPrice: item.grandDealerPrice || 0,
-                    smallDealerPrice: item.smallDealerPrice || 0,
                     priceType: 'retail'
                 }];
             }
@@ -441,7 +459,6 @@ const CashierPOS: React.FC = () => {
                 let newPrice = item.retailPrice;
                 if (priceType === 'wholesale') newPrice = item.wholesalePrice;
                 else if (priceType === 'grand') newPrice = item.grandDealerPrice;
-                else if (priceType === 'small') newPrice = item.smallDealerPrice;
 
                 return { ...item, priceType, price: newPrice };
             }
@@ -482,7 +499,7 @@ const CashierPOS: React.FC = () => {
         if (selectedPaymentMethod === 'cash') {
             const tendered = typeof amountTendered === 'number' ? amountTendered : 0;
             if (tendered < total) {
-                toast.error(`Kòb la pa ase. Li manke ${(total - tendered).toLocaleString()} HTG.`);
+                toast.error(`Kòb la pa ase. Li manke ${(total - tendered).toLocaleString()} ${currency}.`);
                 return;
             }
         }
@@ -502,7 +519,8 @@ const CashierPOS: React.FC = () => {
                 qty: item.qty
             })),
             discount: discount,
-            amountPaid: selectedPaymentMethod === 'credit' ? (typeof amountPaidCredit === 'number' ? amountPaidCredit : 0) : (selectedPaymentMethod === 'cash' ? (typeof amountTendered === 'number' ? total : total) : total)
+            amountPaid: selectedPaymentMethod === 'credit' ? (typeof amountPaidCredit === 'number' ? amountPaidCredit : 0) : (selectedPaymentMethod === 'cash' ? (typeof amountTendered === 'number' ? total : total) : total),
+            dueDate: selectedPaymentMethod === 'credit' ? dueDate : undefined
         };
 
         try {
@@ -603,7 +621,6 @@ const CashierPOS: React.FC = () => {
         let currentPrice = item.retailPrice;
         if (item.priceType === 'wholesale') currentPrice = item.wholesalePrice;
         else if (item.priceType === 'grand') currentPrice = item.grandDealerPrice;
-        else if (item.priceType === 'small') currentPrice = item.smallDealerPrice;
         return acc + (currentPrice * item.qty);
     }, 0);
     const tax = subtotal * 0.10; // 10% tax
@@ -622,8 +639,8 @@ const CashierPOS: React.FC = () => {
                         <Button
                             onClick={() => setCurrentSelected('all')}
                             className={`h-24 w-24 rounded-lg border border-white/10 p-1 relative group ${currentSelected === 'all'
-                                ? 'bg-emerald-600 hover:bg-emerald-700 text-white'
-                                : 'bg-slate-900 hover:bg-slate-800 text-slate-300'
+                                ? 'bg-primary hover:bg-primary/90 text-white shadow-md'
+                                : 'bg-white border border-slate-200 hover:bg-slate-50 text-slate-600'
                                 }`}
                         >
                             All
@@ -671,7 +688,7 @@ const CashierPOS: React.FC = () => {
                         placeholder={`Search ${sellType === 'Service' ? 'services' : 'products'}...`}
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        className="w-full bg-slate-900/50 border-white/10 text-white placeholder:text-slate-500 focus-visible:ring-emerald-500"
+                        className="w-full bg-white border-slate-200 text-slate-900 placeholder:text-slate-400 focus-visible:ring-primary shadow-sm"
                     />
                 </div>
                 <ScrollArea className="flex-1">
@@ -690,7 +707,7 @@ const CashierPOS: React.FC = () => {
                                     <div
                                         key={item.id}
                                         onClick={() => addToCart(item)}
-                                        className="h-56 sm:h-64 w-full rounded-xl border border-emerald-500/50 bg-slate-900/50 transition-all cursor-pointer group flex flex-col overflow-hidden relative hover:border-emerald-500 active:scale-95"
+                                        className="h-56 sm:h-64 w-full rounded-xl border border-slate-200 bg-white transition-all cursor-pointer group flex flex-col overflow-hidden relative hover:border-primary active:scale-95 shadow-sm"
                                     >
 
                                         {/* Image Area */}
@@ -716,22 +733,22 @@ const CashierPOS: React.FC = () => {
                                                     </span>
                                                 )}
                                             </div>
-                                            <h3 className="text-white text-xs sm:text-sm font-medium leading-tight line-clamp-2 min-h-[2rem] sm:min-h-[2.5rem]">
+                                            <h3 className="text-slate-900 text-xs sm:text-sm font-semibold leading-tight line-clamp-2 min-h-[2rem] sm:min-h-[2.5rem]">
                                                 {item.name}
                                             </h3>
 
                                             {/* Dotted Separator */}
-                                            <div className="h-px w-full border-t border-dashed border-white/10" />
+                                            <div className="h-px w-full border-t border-dashed border-slate-200" />
 
                                             {/* Price and Actions */}
                                             <div className="flex items-center justify-between mt-auto">
-                                                <span className="text-white font-bold text-sm sm:text-base">
+                                                <span className="text-primary font-bold text-sm sm:text-base">
                                                     ${item.price}
                                                 </span>
 
                                                 {/* Add to Cart Button */}
                                                 <Button
-                                                    className="h-7 w-7 sm:h-8 sm:w-8 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white p-0 flex items-center justify-center transition-colors"
+                                                    className="h-7 w-7 sm:h-8 sm:w-8 rounded-lg bg-primary hover:bg-primary/90 text-white p-0 flex items-center justify-center transition-colors shadow-md"
                                                     onClick={(e) => {
                                                         e.stopPropagation();
                                                         addToCart(item);
@@ -759,7 +776,7 @@ const CashierPOS: React.FC = () => {
                                 <Button
                                     role="combobox"
                                     aria-expanded={open}
-                                    className="w-full h-10 justify-between bg-slate-900/50 border border-white/10 text-white hover:bg-slate-900/70 hover:text-white"
+                                    className="w-full h-10 justify-between bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 hover:text-slate-900 shadow-sm"
                                 >
                                     <span className="truncate flex-1 text-left text-xs sm:text-sm">
                                         {value === 'walk-in'
@@ -933,10 +950,9 @@ const CashierPOS: React.FC = () => {
                                                                 <SelectValue />
                                                             </SelectTrigger>
                                                             <SelectContent className="bg-slate-900 border-white/10 text-white min-w-[120px]">
-                                                                <SelectItem value="retail" className="text-xs">{t('pos.price_tiers.retail')} (${item.retailPrice.toLocaleString()})</SelectItem>
-                                                                <SelectItem value="wholesale" className="text-xs">{t('pos.price_tiers.wholesale')} (${item.wholesalePrice.toLocaleString()})</SelectItem>
-                                                                <SelectItem value="grand" className="text-xs">{t('pos.price_tiers.grand_dealer')} (${item.grandDealerPrice.toLocaleString()})</SelectItem>
-                                                                <SelectItem value="small" className="text-xs">{t('pos.price_tiers.small_dealer')} (${item.smallDealerPrice.toLocaleString()})</SelectItem>
+                                                                <SelectItem value="retail" className="text-xs">{t('pos.price_tiers.retail')} (${(item.retailPrice || 0).toLocaleString()})</SelectItem>
+                                                                <SelectItem value="wholesale" className="text-xs">{t('pos.price_tiers.wholesale')} (${(item.wholesalePrice || 0).toLocaleString()})</SelectItem>
+                                                                <SelectItem value="grand" className="text-xs">{t('pos.price_tiers.grand_dealer')} (${(item.grandDealerPrice || 0).toLocaleString()})</SelectItem>
                                                             </SelectContent>
                                                         </Select>
                                                     </div>
@@ -991,7 +1007,14 @@ const CashierPOS: React.FC = () => {
                                 {/* Total */}
                                 <div className="flex items-center justify-between pt-1">
                                     <span className="text-white font-bold text-base">Total Payable</span>
-                                    <span className="text-emerald-400 font-bold text-lg">${total.toLocaleString()}</span>
+                                    <div className="text-right">
+                                        <div className="text-emerald-400 font-bold text-lg">{total.toLocaleString()} {currency}</div>
+                                        {currency === 'HTG' && exchangeRate > 1 && (
+                                            <div className="text-slate-400 text-xs font-medium">
+                                                ≈ {(total / exchangeRate).toFixed(2)} USD
+                                            </div>
+                                        )}
+                                    </div>
                                 </div>
                             </div>
 
@@ -1156,18 +1179,18 @@ const CashierPOS: React.FC = () => {
                             Pèman Lajan Kach
                         </DialogTitle>
                         <DialogDescription className="text-slate-400">
-                            Antre kantite kòb kliyan an bay la pou finalize vant lan.
+                            Peye pa: <span className="text-white font-bold">{value === 'walk-in' ? "Walk-in Customer" : realCustomers.find((c) => c.id === value)?.firstName + ' ' + realCustomers.find((c) => c.id === value)?.lastName}</span>
                         </DialogDescription>
                     </DialogHeader>
 
                     <div className="space-y-4 py-2">
                         <div className="flex justify-between items-center bg-slate-800/50 p-3 rounded-lg border border-white/10">
                             <span className="text-slate-400">Total a Peye:</span>
-                            <span className="text-xl font-bold text-emerald-400">{total.toLocaleString()} HTG</span>
+                            <span className="text-xl font-bold text-emerald-400">{total.toLocaleString()} {currency}</span>
                         </div>
 
                         <div className="space-y-2">
-                            <label className="text-sm font-medium text-slate-300">Montant Reçu (HTG)</label>
+                            <label className="text-sm font-medium text-slate-300">Montant Reçu ({currency})</label>
                             <Input
                                 type="number"
                                 value={amountTendered}
@@ -1184,7 +1207,7 @@ const CashierPOS: React.FC = () => {
                             <span className={`text-lg font-bold ${(typeof amountTendered === 'number' && amountTendered >= total) ? 'text-emerald-400' : 'text-rose-400'}`}>
                                 {typeof amountTendered === 'number' && amountTendered >= total
                                     ? (amountTendered - total).toLocaleString()
-                                    : '0'} HTG
+                                    : '0'} {currency}
                             </span>
                         </div>
                     </div>
@@ -1226,14 +1249,14 @@ const CashierPOS: React.FC = () => {
                             {t('pos.credit_dialog.title')}
                         </DialogTitle>
                         <DialogDescription className="text-slate-400">
-                            {t('pos.credit_dialog.description')}
+                            Kliyan: <span className="text-white font-bold">{realCustomers.find((c) => c.id === value)?.firstName + ' ' + realCustomers.find((c) => c.id === value)?.lastName}</span>
                         </DialogDescription>
                     </DialogHeader>
 
                     <div className="space-y-4 py-2">
                         <div className="flex justify-between items-center bg-slate-800/50 p-3 rounded-lg border border-white/10">
                             <span className="text-slate-400">{t('pos.credit_dialog.total_sale')}</span>
-                            <span className="text-xl font-bold text-emerald-400">{total.toLocaleString()} HTG</span>
+                            <span className="text-xl font-bold text-emerald-400">{total.toLocaleString()} {currency}</span>
                         </div>
 
                         <div className="space-y-2">
@@ -1253,8 +1276,18 @@ const CashierPOS: React.FC = () => {
                             <span className="text-lg font-bold text-rose-400">
                                 {typeof amountPaidCredit === 'number'
                                     ? (total - Number(amountPaidCredit || 0)).toLocaleString()
-                                    : total.toLocaleString()} HTG
+                                    : total.toLocaleString()} {currency}
                             </span>
+                        </div>
+
+                        <div className="space-y-2">
+                            <label className="text-sm font-medium text-slate-300">Delè pou peye (Due Date)</label>
+                            <Input
+                                type="date"
+                                value={dueDate}
+                                onChange={(e) => setDueDate(e.target.value)}
+                                className="bg-slate-800/50 border-white/20 text-white text-lg h-12"
+                            />
                         </div>
                     </div>
 

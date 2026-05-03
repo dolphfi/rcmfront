@@ -8,11 +8,11 @@ import { SystemsFooter } from "../includes/SystemsFooter";
 export default function DashboardLayout() {
     return (
         <SidebarProvider>
-            <div className="layout-container flex h-screen overflow-hidden bg-gradient-to-br from-black via-gray-900 to-slate-900">
+            <div className="layout-container flex h-screen overflow-hidden bg-background text-foreground">
                 <Sidebar />
                 <div className="flex flex-col flex-1 overflow-hidden">
                     <Topbar />
-                    <main className="flex-1 overflow-y-auto p-4">
+                    <main className="flex-1 overflow-y-auto p-4 md:p-6">
                         <Outlet />
                     </main>
                     <SystemsFooter />

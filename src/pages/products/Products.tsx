@@ -112,34 +112,34 @@ const Products: React.FC = () => {
             {/* Page Header */}
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div>
-                    <h1 className="text-2xl font-bold text-white tracking-tight">{t('products.title')}</h1>
-                    <p className="text-sm text-slate-400">{t('products.description')}</p>
+                    <h1 className="text-2xl font-bold text-slate-900 tracking-tight">{t('products.title')}</h1>
+                    <p className="text-sm text-slate-500">{t('products.description')}</p>
                 </div>
 
                 <div className="flex flex-wrap items-center gap-2">
                     {/* Action Icons */}
-                    <div className="flex items-center gap-1 bg-white/5 p-1 rounded-lg border border-white/10 mr-2">
-                        <Button variant="ghost" size="icon" className="h-8 w-8 text-rose-500 hover:bg-white/10 hover:text-rose-400" title="PDF">
+                    <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-lg border border-slate-200 mr-2 shadow-sm">
+                        <Button variant="ghost" size="icon" className="h-8 w-8 text-rose-600 hover:bg-rose-50" title="PDF">
                             <FileText className="h-4 w-4" />
                         </Button>
-                        <Button variant="ghost" size="icon" className="h-8 w-8 text-emerald-500 hover:bg-white/10 hover:text-emerald-400" title="Excel">
+                        <Button variant="ghost" size="icon" className="h-8 w-8 text-emerald-600 hover:bg-emerald-50" title="Excel">
                             <FileSpreadsheet className="h-4 w-4" />
                         </Button>
-                        <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:bg-white/10 hover:text-white" title="Print">
+                        <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-500 hover:bg-slate-100 hover:text-slate-900" title="Print">
                             <Printer className="h-4 w-4" />
                         </Button>
-                        <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:bg-white/10 hover:text-white" title="Refresh" onClick={fetchProducts}>
-                            <RotateCw className={`h-4 w-4 ${isLoading ? 'animate-spin text-orange-500' : ''}`} />
+                        <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-500 hover:bg-slate-100 hover:text-slate-900" title="Refresh" onClick={fetchProducts}>
+                            <RotateCw className={`h-4 w-4 ${isLoading ? 'animate-spin text-primary' : ''}`} />
                         </Button>
                     </div>
 
                     <Link to="/products/add">
-                        <Button className="bg-orange-500 hover:bg-orange-600 text-white gap-2">
+                        <Button className="bg-primary hover:bg-primary/90 text-white gap-2 font-semibold shadow-sm">
                             <Plus className="h-4 w-4" />
                             <span className="hidden sm:inline">{t('products.add_product')}</span>
                         </Button>
                     </Link>
-                    <Button variant="outline" className="bg-slate-900 border-white/10 text-white hover:bg-slate-800 gap-2">
+                    <Button variant="outline" className="bg-white border-slate-200 text-slate-700 hover:bg-slate-50 gap-2 shadow-sm">
                         <Download className="h-4 w-4" />
                         <span className="hidden sm:inline">{t('products.import_product')}</span>
                     </Button>
@@ -147,17 +147,17 @@ const Products: React.FC = () => {
             </div>
 
             {/* Main Content Card */}
-            <Card className="flex-1 bg-white/5 backdrop-blur-sm border border-white/10 text-white overflow-hidden flex flex-col">
+            <Card className="flex-1 bg-white border border-slate-200 shadow-sm overflow-hidden flex flex-col">
                 <CardContent className="p-0 flex flex-col h-full">
                     {/* Toolbar / Filters */}
-                    <div className="p-4 flex flex-col sm:flex-row items-center justify-between gap-4 border-b border-white/10">
+                    <div className="p-4 flex flex-col sm:flex-row items-center justify-between gap-4 border-b border-slate-100 bg-slate-50/50">
                         <div className="relative w-full sm:w-72">
                             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                             <Input
                                 placeholder={t('products.search_placeholder')}
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
-                                className="pl-9 bg-white/5 border-white/10 text-white placeholder:text-slate-500 focus-visible:ring-orange-500/50 focus-visible:border-orange-500"
+                                className="pl-9 bg-white border-slate-200 text-slate-900 placeholder:text-slate-400 focus-visible:ring-primary shadow-sm"
                             />
                         </div>
 
@@ -205,17 +205,17 @@ const Products: React.FC = () => {
                     </div>
 
                     {/* Table */}
-                    <div className="flex-1 overflow-auto rounded-lg border border-white/10 bg-slate-900/50">
+                    <div className="flex-1 overflow-auto bg-white">
                         <Table>
-                            <TableHeader className="bg-slate-900 border-b border-white/10">
-                                <TableRow className="hover:bg-transparent border-white/10">
-                                    <TableHead className="text-white">{t('products.sku')}</TableHead>
-                                    <TableHead className="text-white">{t('products.name')}</TableHead>
-                                    <TableHead className="text-white">{t('products.category')}</TableHead>
-                                    <TableHead className="text-white">{t('products.brand')}</TableHead>
-                                    <TableHead className="text-white">{t('products.price')}</TableHead>
-                                    <TableHead className="text-white">{t('products.qty')}</TableHead>
-                                    <TableHead className="text-right text-white">{t('products.action')}</TableHead>
+                            <TableHeader className="bg-slate-50/80 border-b border-slate-200">
+                                <TableRow className="hover:bg-transparent border-slate-200">
+                                    <TableHead className="text-slate-900 font-bold">{t('products.sku')}</TableHead>
+                                    <TableHead className="text-slate-900 font-bold">{t('products.name')}</TableHead>
+                                    <TableHead className="text-slate-900 font-bold">{t('products.category')}</TableHead>
+                                    <TableHead className="text-slate-900 font-bold">{t('products.brand')}</TableHead>
+                                    <TableHead className="text-slate-900 font-bold">{t('products.price')}</TableHead>
+                                    <TableHead className="text-slate-900 font-bold">{t('products.qty')}</TableHead>
+                                    <TableHead className="text-right text-slate-900 font-bold">{t('products.action')}</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>

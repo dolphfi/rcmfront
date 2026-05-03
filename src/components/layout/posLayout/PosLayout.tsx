@@ -14,7 +14,7 @@ export default function PosLayout() {
 
     return (
 
-        <div className="flex h-screen overflow-hidden bg-gradient-to-br from-black via-gray-900 to-slate-900">
+        <div className="flex h-screen overflow-hidden bg-slate-50 text-slate-900">
             <div className="flex flex-col flex-1 overflow-hidden">
                 <NavbarPos sellType={sellType} setSellType={setSellType} />
                 <main className="flex-1 overflow-y-auto">

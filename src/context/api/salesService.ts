@@ -17,6 +17,7 @@ export interface CreateSaleData {
     items: CreateSaleItem[];
     discount?: number;
     amountPaid?: number;
+    dueDate?: string;
 }
 
 const extractArray = (response: any) => {
@@ -91,6 +92,11 @@ const salesService = {
 
     payCredit: async (id: string, amount?: number) => {
         const response = await api.patch(`/sales/${id}/pay`, { amount });
+        return extractObject(response);
+    },
+
+    findByReceiptNo: async (receiptNo: string) => {
+        const response = await api.get(`/sales/public/${receiptNo}`);
         return extractObject(response);
     }
 };

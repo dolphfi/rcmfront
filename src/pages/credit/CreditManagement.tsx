@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import {
     Table,
     TableBody,
@@ -29,9 +29,11 @@ import { useTranslation } from 'react-i18next';
 import { format } from 'date-fns';
 import { toast } from 'sonner';
 import { Label } from 'components/ui/label';
+import { useSettings } from 'context/SettingsContext';
 
 const CreditManagement: React.FC = () => {
     const { t } = useTranslation();
+    const { currency } = useSettings();
     const [credits, setCredits] = useState<any[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState("");
@@ -40,11 +42,7 @@ const CreditManagement: React.FC = () => {
     const [paymentAmount, setPaymentAmount] = useState<number | ''>('');
     const [isSubmitting, setIsSubmitting] = useState(false);
 
-    useEffect(() => {
-        fetchCredits();
-    }, []);
-
-    const fetchCredits = async () => {
+    const fetchCredits = useCallback(async () => {
         setIsLoading(true);
         try {
             const data = await salesService.getAllCredits();
@@ -55,7 +53,11 @@ const CreditManagement: React.FC = () => {
         } finally {
             setIsLoading(false);
         }
-    };
+    }, [t]);
+
+    useEffect(() => {
+        fetchCredits();
+    }, [fetchCredits]);
 
     const handleOpenPayment = (credit: any) => {
         setSelectedCredit(credit);
@@ -124,7 +126,8 @@ const CreditManagement: React.FC = () => {
                                 <TableRow className="border-white/10 hover:bg-transparent">
                                     <TableHead className="text-slate-300">{t('credit.table_customer')}</TableHead>
                                     <TableHead className="text-slate-300">{t('credit.table_receipt')}</TableHead>
-                                    <TableHead className="text-slate-300">{t('credit.table_date')}</TableHead>
+                                    <TableHead className="text-slate-300">Dat Lavant</TableHead>
+                                    <TableHead className="text-slate-300">Delè (Due Date)</TableHead>
                                     <TableHead className="text-right text-slate-300">{t('credit.table_total')}</TableHead>
                                     <TableHead className="text-right text-slate-300">{t('credit.table_advance')}</TableHead>
                                     <TableHead className="text-right text-slate-300">{t('credit.table_debt')}</TableHead>
@@ -134,7 +137,7 @@ const CreditManagement: React.FC = () => {
                             <TableBody>
                                 {isLoading ? (
                                     <TableRow className="border-white/10">
-                                        <TableCell colSpan={7} className="h-24 text-center text-slate-400">
+                                        <TableCell colSpan={8} className="h-24 text-center text-slate-400">
                                             <div className="flex items-center justify-center gap-2">
                                                 <Loader2 className="h-4 w-4 animate-spin" />
                                                 {t('credit.loading')}
@@ -143,7 +146,7 @@ const CreditManagement: React.FC = () => {
                                     </TableRow>
                                 ) : filteredCredits.length === 0 ? (
                                     <TableRow className="border-white/10">
-                                        <TableCell colSpan={7} className="h-24 text-center text-slate-400">
+                                        <TableCell colSpan={8} className="h-24 text-center text-slate-400">
                                             {t('credit.no_data')}
                                         </TableCell>
                                     </TableRow>
@@ -161,17 +164,29 @@ const CreditManagement: React.FC = () => {
                                                 <TableCell className="text-slate-300 font-mono text-xs">
                                                     {credit.receiptNumber}
                                                 </TableCell>
-                                                <TableCell className="text-slate-300 text-xs">
+                                                <TableCell className="text-slate-400 text-xs">
                                                     {format(new Date(credit.createdAt), 'dd/MM/yyyy HH:mm')}
                                                 </TableCell>
+                                                <TableCell className="text-slate-300 font-medium">
+                                                    {credit.dueDate ? (
+                                                        <div className="flex flex-col">
+                                                            <span>{format(new Date(credit.dueDate), 'dd/MM/yyyy')}</span>
+                                                            {new Date(credit.dueDate) < new Date() && (
+                                                                <span className="text-[10px] text-rose-500 font-bold uppercase tracking-tighter">Reta (Overdue)</span>
+                                                            )}
+                                                        </div>
+                                                    ) : (
+                                                        <span className="text-slate-500 italic text-xs">—</span>
+                                                    )}
+                                                </TableCell>
                                                 <TableCell className="text-right text-slate-300">
-                                                    {Number(credit.total).toLocaleString()} HTG
+                                                    {Number(credit.total).toLocaleString()} {currency}
                                                 </TableCell>
                                                 <TableCell className="text-right text-emerald-400">
-                                                    {Number(credit.amountPaid).toLocaleString()} HTG
+                                                    {Number(credit.amountPaid).toLocaleString()} {currency}
                                                 </TableCell>
                                                 <TableCell className="text-right text-rose-500 font-bold font-mono">
-                                                    {debt.toLocaleString()} HTG
+                                                    {debt.toLocaleString()} {currency}
                                                 </TableCell>
                                                 <TableCell className="text-right">
                                                     <Button
@@ -218,11 +233,11 @@ const CreditManagement: React.FC = () => {
                             <div className="grid grid-cols-2 gap-3">
                                 <div className="space-y-1 bg-slate-800/30 p-2 rounded-md border border-white/5">
                                     <Label className="text-[10px] text-slate-400 uppercase">{t('credit.table_total')}</Label>
-                                    <p className="text-sm text-white font-mono">{Number(selectedCredit.total).toLocaleString()}</p>
+                                    <p className="text-sm text-white font-mono">{Number(selectedCredit.total).toLocaleString()} {currency}</p>
                                 </div>
                                 <div className="space-y-1 bg-slate-800/30 p-2 rounded-md border border-white/5">
                                     <Label className="text-[10px] text-slate-400 uppercase">{t('credit.table_debt')}</Label>
-                                    <p className="text-sm text-rose-400 font-bold font-mono">{(Number(selectedCredit.total) - Number(selectedCredit.amountPaid)).toLocaleString()}</p>
+                                    <p className="text-2xl font-bold text-emerald-400">{(Number(selectedCredit.total) - Number(selectedCredit.amountPaid)).toLocaleString()} {currency}</p>
                                 </div>
                             </div>
 

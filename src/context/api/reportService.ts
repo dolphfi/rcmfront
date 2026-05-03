@@ -88,6 +88,14 @@ const reportService = {
         if (endDate) params.append('endDate', endDate);
         const response = await api.get(`/reports/pos-summary?${params.toString()}`);
         return extractArray(response);
+    },
+
+    getSalesByProductPos: async (startDate?: string, endDate?: string) => {
+        const params = new URLSearchParams();
+        if (startDate) params.append('startDate', startDate);
+        if (endDate) params.append('endDate', endDate);
+        const response = await api.get(`/reports/sales-by-product-pos?${params.toString()}`);
+        return extractArray(response);
     }
 };
 

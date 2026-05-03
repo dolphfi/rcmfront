@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
     Card,
@@ -52,7 +52,6 @@ import {
     CirclePlus,
     X,
     Edit,
-    CreditCard,
     Database,
     History,
     Zap,
@@ -62,6 +61,7 @@ import { toast } from 'sonner';
 import settingsService from 'context/api/settingsService';
 import posService from 'context/api/posservice';
 import { useTranslation } from 'react-i18next';
+import { useSettings } from 'context/SettingsContext';
 import { cn } from 'lib/utils';
 
 const Settings: React.FC = () => {
@@ -73,6 +73,7 @@ const Settings: React.FC = () => {
     const [maintenanceMode, setMaintenanceMode] = useState(false);
     const { t } = useTranslation();
     const navigate = useNavigate();
+    const { refreshSettings } = useSettings();
 
     // Form states
     const [businessName, setBusinessName] = useState("");
@@ -84,10 +85,10 @@ const Settings: React.FC = () => {
     const [businessAddress, setBusinessAddress] = useState("");
     const [businessPhone, setBusinessPhone] = useState("");
     const [businessEmail, setBusinessEmail] = useState("");
+    const [bankAccounts, setBankAccounts] = useState<any[]>([]);
+    const [exchangeRate, setExchangeRate] = useState("");
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const [isEditingGeneral, setIsEditingGeneral] = useState(false);
-    const [lastBackupDate, setLastBackupDate] = useState("");
-    const [lastBackupUrl, setLastBackupUrl] = useState("");
     const [backupHistory, setBackupHistory] = useState<any[]>([]);
 
     // Template Receipt states
@@ -97,12 +98,7 @@ const Settings: React.FC = () => {
     const [isPreviewOpen, setIsPreviewOpen] = useState(false);
     const [isAssigning, setIsAssigning] = useState(false);
 
-    useEffect(() => {
-        fetchSettings();
-        fetchTerminals();
-    }, []);
-
-    const fetchTerminals = async () => {
+    const fetchTerminals = useCallback(async () => {
         try {
             const response = await posService.getAll(1, 100); // Fetch all POS
             const rawData = response?.data || response;
@@ -114,9 +110,9 @@ const Settings: React.FC = () => {
         } catch (error) {
             console.error("Failed to fetch terminals:", error);
         }
-    };
+    }, []);
 
-    const fetchSettings = async () => {
+    const fetchSettings = useCallback(async () => {
         setIsLoading(true);
         try {
             const [settingsResponse, historyResponse] = await Promise.all([
@@ -144,19 +140,32 @@ const Settings: React.FC = () => {
             setBusinessPhone(data.find((s: any) => s.key === 'BUSINESS_PHONE')?.value || "");
             const email = data.find((s: any) => s.key === 'BUSINESS_EMAIL')?.value || "";
             setBusinessEmail(email);
-            setLastBackupDate(data.find((s: any) => s.key === 'LAST_BACKUP_DATE')?.value || "");
-            setLastBackupUrl(data.find((s: any) => s.key === 'LAST_BACKUP_URL')?.value || "");
+            
+            const bankInfoRaw = data.find((s: any) => s.key === 'BUSINESS_BANK_INFO')?.value || "[]";
+            try {
+                const parsed = JSON.parse(bankInfoRaw);
+                setBankAccounts(Array.isArray(parsed) ? parsed : []);
+            } catch {
+                setBankAccounts([]);
+            }
+            
+            setExchangeRate(data.find((s: any) => s.key === 'EXCHANGE_RATE')?.value || "1");
 
             // Auto-detect mode
             const hasData = (data.find((s: any) => s.key === 'BUSINESS_NAME')?.value || "").length > 0;
             setIsEditingGeneral(!hasData);
         } catch (error) {
-            console.error('Error fetching settings:', error);
-            toast.error(t('settings.load_error') || "Erè nan chajman");
+            console.error("Failed to fetch settings:", error);
+            toast.error("Impossible de charger les paramètres");
         } finally {
             setIsLoading(false);
         }
-    };
+    }, []);
+
+    useEffect(() => {
+        fetchSettings();
+        fetchTerminals();
+    }, [fetchSettings, fetchTerminals]);
 
     const handleSaveGeneral = async () => {
         setIsLoading(true);
@@ -170,7 +179,9 @@ const Settings: React.FC = () => {
                 BUSINESS_ADDRESS: businessAddress,
                 BUSINESS_PHONE: businessPhone,
                 BUSINESS_EMAIL: businessEmail,
-                CURRENCY_CODE: currency
+                BUSINESS_BANK_INFO: JSON.stringify(bankAccounts),
+                CURRENCY_CODE: currency,
+                EXCHANGE_RATE: exchangeRate
             };
 
             formData.append('data', JSON.stringify(profileData));
@@ -181,8 +192,9 @@ const Settings: React.FC = () => {
 
             await settingsService.updateBusinessProfile(formData);
 
-            toast.success(t('settings.save_success'));
-            setSelectedFile(null);
+            toast.success(t('settings.business_profile_updated'));
+            setIsEditingGeneral(false);
+            refreshSettings();
             setIsEditingGeneral(false); // Switch back to view mode after save
         } catch (error) {
             console.error('Error updating general settings:', error);
@@ -250,6 +262,20 @@ const Settings: React.FC = () => {
         } finally {
             setIsBackupLoading(false);
         }
+    };
+
+    const handleAddBankAccount = () => {
+        setBankAccounts([...bankAccounts, { bankName: '', accountNumber: '', accountName: '' }]);
+    };
+
+    const handleRemoveBankAccount = (index: number) => {
+        setBankAccounts(bankAccounts.filter((_, i) => i !== index));
+    };
+
+    const handleUpdateBankAccount = (index: number, field: string, value: string) => {
+        const updated = [...bankAccounts];
+        updated[index] = { ...updated[index], [field]: value };
+        setBankAccounts(updated);
     };
 
     const handleViewLogs = () => {
@@ -326,41 +352,41 @@ const Settings: React.FC = () => {
     return (
         <div className="space-y-6">
             <div>
-                <h2 className="text-3xl font-bold tracking-tight text-white flex items-center gap-2">
-                    <SettingsIcon className="h-8 w-8 text-slate-400" />
+                <h2 className="text-3xl font-bold tracking-tight text-slate-900 flex items-center gap-3">
+                    <SettingsIcon className="h-8 w-8 text-primary" />
                     {t('settings.title')}
                 </h2>
-                <p className="text-slate-400">{t('settings.description')}</p>
+                <p className="text-slate-500">{t('settings.description')}</p>
             </div>
 
             <Tabs defaultValue="general" className="space-y-4">
-                <TabsList className="bg-slate-900/50 border border-white/10 p-1">
-                    <TabsTrigger value="general" className="data-[state=active]:bg-orange-500 data-[state=active]:text-white gap-2">
+                <TabsList className="bg-slate-100 border border-slate-200 p-1">
+                    <TabsTrigger value="general" className="data-[state=active]:bg-primary data-[state=active]:text-white gap-2 transition-all">
                         <Store className="h-4 w-4" /> {t('settings.tab_general')}
                     </TabsTrigger>
-                    <TabsTrigger value="system" className="data-[state=active]:bg-orange-500 data-[state=active]:text-white gap-2">
+                    <TabsTrigger value="system" className="data-[state=active]:bg-primary data-[state=active]:text-white gap-2 transition-all">
                         <ShieldCheck className="h-4 w-4" /> {t('settings.tab_system')}
                     </TabsTrigger>
-                    <TabsTrigger value="backups" className="data-[state=active]:bg-orange-500 data-[state=active]:text-white gap-2">
+                    <TabsTrigger value="backups" className="data-[state=active]:bg-primary data-[state=active]:text-white gap-2 transition-all">
                         <Database className="h-4 w-4" /> {t('settings.tab_backups')}
                     </TabsTrigger>
-                    <TabsTrigger value="template-receipt" className="data-[state=active]:bg-orange-500 data-[state=active]:text-white gap-2">
+                    <TabsTrigger value="template-receipt" className="data-[state=active]:bg-primary data-[state=active]:text-white gap-2 transition-all">
                         <Receipt className="h-4 w-4" /> {t('settings.tab_billing')}
                     </TabsTrigger>
                 </TabsList>
                 {/* General Settings */}
                 <TabsContent value="general" className="space-y-4">
-                    <Card className="bg-slate-900/50 border-white/10 backdrop-blur-xl">
-                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-7">
+                    <Card className="bg-white border-slate-200 shadow-sm">
+                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-7 border-b border-slate-50 mb-6">
                             <div className="space-y-1">
-                                <CardTitle className="text-white">{t('settings.general_title')}</CardTitle>
-                                <CardDescription className="text-slate-400">{t('settings.general_desc')}</CardDescription>
+                                <CardTitle className="text-slate-900 font-bold">{t('settings.general_title')}</CardTitle>
+                                <CardDescription className="text-slate-500">{t('settings.general_desc')}</CardDescription>
                             </div>
                             {!isEditingGeneral && (
                                 <Button
                                     variant="outline"
                                     size="sm"
-                                    className="border-orange-500/20 text-orange-500 hover:bg-orange-500/10 gap-2"
+                                    className="border-primary/20 text-primary hover:bg-primary/10 gap-2 font-semibold"
                                     onClick={() => setIsEditingGeneral(true)}
                                 >
                                     <Edit className="h-4 w-4" /> {t('common.edit')}
@@ -372,58 +398,133 @@ const Settings: React.FC = () => {
                                 <>
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                         <div className="space-y-2">
-                                            <Label className="text-slate-300">{t('settings.business_name')}</Label>
+                                            <Label className="text-slate-700 font-medium">{t('settings.business_name')}</Label>
                                             <Input
-                                                className="bg-slate-800 border-white/10 text-white"
+                                                className="bg-slate-50 border-slate-200 text-slate-900 focus:ring-primary"
                                                 value={businessName}
                                                 onChange={(e) => setBusinessName(e.target.value)}
                                             />
                                         </div>
                                         <div className="space-y-2">
-                                            <Label className="text-slate-300">{t('settings.business_slogan')}</Label>
+                                            <Label className="text-slate-700 font-medium">{t('settings.business_slogan')}</Label>
                                             <Input
-                                                className="bg-slate-800 border-white/10 text-white"
+                                                className="bg-slate-50 border-slate-200 text-slate-900 focus:ring-primary"
                                                 value={businessSlogan}
                                                 onChange={(e) => setBusinessSlogan(e.target.value)}
                                                 placeholder="Egz: Inovasyon nan sèvis ou"
                                             />
                                         </div>
                                         <div className="space-y-2">
-                                            <Label className="text-slate-300">{t('settings.business_address')}</Label>
+                                            <Label className="text-slate-700 font-medium">{t('settings.business_address')}</Label>
                                             <Input
-                                                className="bg-slate-800 border-white/10 text-white"
+                                                className="bg-slate-50 border-slate-200 text-slate-900 focus:ring-primary"
                                                 value={businessAddress}
                                                 onChange={(e) => setBusinessAddress(e.target.value)}
                                             />
                                         </div>
                                         <div className="space-y-2">
-                                            <Label className="text-slate-300">{t('settings.business_phone')}</Label>
+                                            <Label className="text-slate-700 font-medium">{t('settings.business_phone')}</Label>
                                             <Input
-                                                className="bg-slate-800 border-white/10 text-white"
+                                                className="bg-slate-50 border-slate-200 text-slate-900 focus:ring-primary"
                                                 value={businessPhone}
                                                 onChange={(e) => setBusinessPhone(e.target.value)}
                                             />
                                         </div>
                                         <div className="space-y-2">
-                                            <Label className="text-slate-300">{t('settings.business_email')}</Label>
+                                            <Label className="text-slate-700 font-medium">{t('settings.business_email')}</Label>
                                             <Input
-                                                className="bg-slate-800 border-white/10 text-white"
+                                                className="bg-slate-50 border-slate-200 text-slate-900 focus:ring-primary"
                                                 value={businessEmail}
                                                 onChange={(e) => setBusinessEmail(e.target.value)}
                                             />
                                         </div>
                                         <div className="space-y-2">
-                                            <Label className="text-slate-300">{t('settings.currency')}</Label>
+                                            <Label className="text-slate-700 font-medium">{t('settings.currency')}</Label>
                                             <select
-                                                className="w-full bg-slate-800 border border-white/10 text-white rounded-md h-10 px-3 outline-none focus:ring-2 focus:ring-blue-500"
+                                                className="w-full bg-slate-50 border border-slate-200 text-slate-900 rounded-md h-10 px-3 outline-none focus:ring-2 focus:ring-primary transition-all"
                                                 value={currency}
                                                 onChange={(e) => setCurrency(e.target.value)}
                                             >
                                                 <option value="HTG">HTG (Gourde)</option>
+                                                <option value="$HT">$HT (Dollar Haïtien)</option>
                                                 <option value="USD">USD (Dollar)</option>
                                                 <option value="EUR">EUR (Euro)</option>
                                                 <option value="CAD">CAD (Dollar Canadien)</option>
                                             </select>
+                                        </div>
+                                        <div className="space-y-2">
+                                            <Label className="text-slate-300">Taux de Change (USD {'->'} HTG)</Label>
+                                            <Input
+                                                type="number"
+                                                className="bg-slate-800 border-white/10 text-white"
+                                                value={exchangeRate}
+                                                onChange={(e) => setExchangeRate(e.target.value)}
+                                                placeholder="Egz: 130.5"
+                                            />
+                                        </div>
+                                        <div className="space-y-4 md:col-span-2">
+                                            <div className="flex items-center justify-between">
+                                                <Label className="text-slate-300">Kont Bank (Bank Accounts)</Label>
+                                                <Button
+                                                    type="button"
+                                                    variant="outline"
+                                                    size="sm"
+                                                    className="h-7 border-emerald-500/30 text-emerald-500 hover:bg-emerald-500/10"
+                                                    onClick={handleAddBankAccount}
+                                                >
+                                                    <CirclePlus className="h-3.5 w-3.5 mr-1" /> Ajoute yon kont
+                                                </Button>
+                                            </div>
+                                            
+                                            <div className="space-y-3">
+                                                {bankAccounts.map((account, index) => (
+                                                    <div key={index} className="grid grid-cols-1 md:grid-cols-3 gap-3 p-4 bg-slate-800/30 border border-white/5 rounded-lg relative group">
+                                                        <div className="space-y-1">
+                                                            <Label className="text-[10px] text-slate-500 uppercase">Non Bank</Label>
+                                                            <Input
+                                                                className="h-8 bg-slate-800 border-white/10 text-white text-xs"
+                                                                value={account.bankName}
+                                                                onChange={(e) => handleUpdateBankAccount(index, 'bankName', e.target.value)}
+                                                                placeholder="Egz: BNC"
+                                                            />
+                                                        </div>
+                                                        <div className="space-y-1">
+                                                            <Label className="text-[10px] text-slate-500 uppercase">Nimewo Kont</Label>
+                                                            <Input
+                                                                className="h-8 bg-slate-800 border-white/10 text-white text-xs"
+                                                                value={account.accountNumber}
+                                                                onChange={(e) => handleUpdateBankAccount(index, 'accountNumber', e.target.value)}
+                                                                placeholder="123-456-789"
+                                                            />
+                                                        </div>
+                                                        <div className="space-y-1">
+                                                            <Label className="text-[10px] text-slate-500 uppercase">Nom sou Kont lan</Label>
+                                                            <div className="flex gap-2">
+                                                                <Input
+                                                                    className="h-8 bg-slate-800 border-white/10 text-white text-xs flex-1"
+                                                                    value={account.accountName}
+                                                                    onChange={(e) => handleUpdateBankAccount(index, 'accountName', e.target.value)}
+                                                                    placeholder="Nom Biznis lan"
+                                                                />
+                                                                <Button
+                                                                    type="button"
+                                                                    variant="ghost"
+                                                                    size="icon"
+                                                                    className="h-8 w-8 text-rose-500 hover:text-rose-400 hover:bg-rose-500/10"
+                                                                    onClick={() => handleRemoveBankAccount(index)}
+                                                                >
+                                                                    <X className="h-3.5 w-3.5" />
+                                                                </Button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                                {bankAccounts.length === 0 && (
+                                                    <div className="text-center py-6 border border-dashed border-white/10 rounded-lg">
+                                                        <p className="text-xs text-slate-500 italic">Pa gen okenn kont bank anrejistre.</p>
+                                                    </div>
+                                                )}
+                                            </div>
                                         </div>
                                     </div>
 
@@ -539,6 +640,10 @@ const Settings: React.FC = () => {
                                         <div className="space-y-1">
                                             <p className="text-[10px] uppercase tracking-widest text-slate-500 font-bold">{t('settings.currency')}</p>
                                             <p className="text-slate-300 font-mono">{currency}</p>
+                                        </div>
+                                        <div className="space-y-1">
+                                            <p className="text-[10px] uppercase tracking-widest text-slate-500 font-bold">Taux de Change</p>
+                                            <p className="text-slate-300 font-mono">{exchangeRate} HTG = 1 USD</p>
                                         </div>
                                     </div>
                                 </div>

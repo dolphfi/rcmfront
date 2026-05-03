@@ -36,19 +36,29 @@ import { ht, fr, enUS } from "date-fns/locale";
 import { useReports } from "../../hooks/useReports";
 import { useAuth } from "../../context/AuthContext";
 import { Skeleton } from "../../components/ui/skeleton";
+import { useSettings } from "../../context/SettingsContext";
 
 const Dashboard: React.FC = () => {
     const { t, i18n } = useTranslation();
     const navigate = useNavigate();
     const { user } = useAuth();
+    const { currency: globalCurrency } = useSettings();
     const { stats, chartData, chartPeriod, setChartPeriod, isLoading, isChartLoading, error } = useReports();
     const [showLowStockAlert, setShowLowStockAlert] = React.useState(true);
 
     const formatCurrency = (amount: number) => {
-        return new Intl.NumberFormat('en-US', {
-            style: 'currency',
-            currency: 'HTG',
-        }).format(amount);
+        try {
+            return new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: globalCurrency || 'HTG',
+            }).format(amount);
+        } catch (e) {
+            // Fallback for custom currencies like $HT
+            return `${new Intl.NumberFormat('en-US', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+            }).format(amount)} ${globalCurrency}`;
+        }
     };
 
     if (isLoading) {

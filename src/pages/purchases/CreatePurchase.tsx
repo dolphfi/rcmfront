@@ -37,10 +37,12 @@ import { toast } from 'sonner';
 import purchaseService, { CreatePurchaseData, CreatePurchaseItemData } from 'context/api/purchaseService';
 import productService from 'context/api/productservice';
 import posService from 'context/api/posservice';
+import { useSettings } from 'context/SettingsContext';
 
 const CreatePurchase: React.FC = () => {
     const navigate = useNavigate();
     const [isLoading, setIsLoading] = useState(false);
+    const { currency } = useSettings();
     const [products, setProducts] = useState<any[]>([]);
     const [pointsOfSale, setPointsOfSale] = useState<any[]>([]);
     const [searchTerm, setSearchTerm] = useState("");
@@ -184,7 +186,7 @@ const CreatePurchase: React.FC = () => {
                                         <p className="text-xs text-slate-500">{product.sku}</p>
                                     </div>
                                     <div className="text-right">
-                                        <p className="text-white font-bold">{parseFloat(product.costPrice).toFixed(2)} HTG</p>
+                                        <p className="text-white font-bold">{parseFloat(product.costPrice).toFixed(2)} {currency}</p>
                                     </div>
                                 </div>
                             ))}
@@ -296,7 +298,7 @@ const CreatePurchase: React.FC = () => {
                             <div className="flex flex-col md:flex-row items-center justify-between gap-6 pt-4 border-t border-white/10">
                                 <div className="text-center md:text-left">
                                     <p className="text-slate-500 text-sm uppercase tracking-widest">Total Acha</p>
-                                    <p className="text-4xl font-black text-white">{total.toFixed(2)} HTG</p>
+                                    <p className="text-4xl font-black text-white">{total.toFixed(2)} {currency}</p>
                                 </div>
                                 <Button
                                     className="w-full md:w-64 h-14 text-lg bg-orange-600 hover:bg-orange-700 text-white font-bold gap-2"

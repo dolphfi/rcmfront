@@ -4,12 +4,15 @@ import { router } from './routes/Routes';
 import { Toaster } from './components/ui/sonner';
 
 import { AuthProvider } from './context/AuthContext';
+import { SettingsProvider } from './context/SettingsContext';
 
 function App() {
   return (
     <AuthProvider>
-      <RouterProvider router={router} />
-      <Toaster />
+      <SettingsProvider>
+        <RouterProvider router={router} />
+        <Toaster />
+      </SettingsProvider>
     </AuthProvider>
   );
 }

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { format } from 'date-fns';
@@ -13,15 +13,15 @@ import {
     RotateCw,
     Store,
     Wrench,
-    Package
+    CreditCard
 } from 'lucide-react';
 import { Button } from 'components/ui/button';
 import { Card, CardContent } from 'components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'components/ui/table';
-import { Badge } from 'components/ui/badge';
 import proformaService from 'context/api/proformaService';
 import settingsService from 'context/api/settingsService';
 import { toast } from 'sonner';
+import { useSettings } from 'context/SettingsContext';
 import jsPDF from 'jspdf';
 
 interface BusinessSettings {
@@ -31,6 +31,7 @@ interface BusinessSettings {
     businessEmail: string;
     businessLogo: string;
     businessSlogan: string;
+    businessBankInfo: string;
 }
 
 const ProformaDetails: React.FC = () => {
@@ -38,6 +39,7 @@ const ProformaDetails: React.FC = () => {
     const { t } = useTranslation();
     const navigate = useNavigate();
     const [proforma, setProforma] = useState<any | null>(null);
+    const { currency } = useSettings();
     const [isLoading, setIsLoading] = useState(true);
     const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
     const [business, setBusiness] = useState<BusinessSettings>({
@@ -47,16 +49,10 @@ const ProformaDetails: React.FC = () => {
         businessEmail: '',
         businessLogo: '',
         businessSlogan: '',
+        businessBankInfo: '',
     });
 
-    useEffect(() => {
-        if (id) {
-            fetchProformaDetails();
-        }
-        fetchBusinessSettings();
-    }, [id]);
-
-    const fetchBusinessSettings = async () => {
+    const fetchBusinessSettings = useCallback(async () => {
         try {
             const data = await settingsService.getAll();
             // L'API retourne { data: [...] } (paginé)
@@ -70,14 +66,15 @@ const ProformaDetails: React.FC = () => {
                 businessEmail: get('BUSINESS_EMAIL'),
                 businessLogo: get('BUSINESS_LOGO_URL'),
                 businessSlogan: get('BUSINESS_SLOGAN'),
+                businessBankInfo: get('BUSINESS_BANK_INFO'),
             });
         } catch (error) {
             // Silencieux — on garde les valeurs par défaut
             console.warn('Could not load business settings:', error);
         }
-    };
+    }, []);
 
-    const fetchProformaDetails = async () => {
+    const fetchProformaDetails = useCallback(async () => {
         setIsLoading(true);
         try {
             const data = await proformaService.findOne(id!);
@@ -89,11 +86,27 @@ const ProformaDetails: React.FC = () => {
         } finally {
             setIsLoading(false);
         }
-    };
+    }, [id, navigate, t]);
+
+    useEffect(() => {
+        if (id) {
+            fetchProformaDetails();
+        }
+        fetchBusinessSettings();
+    }, [id, fetchProformaDetails, fetchBusinessSettings]);
 
     const handleDownloadPDF = () => {
         if (!proforma) return;
         setIsGeneratingPDF(true);
+
+        const parsedBankAccounts = (() => {
+            try {
+                const parsed = JSON.parse(business.businessBankInfo);
+                return Array.isArray(parsed) ? parsed : [];
+            } catch {
+                return [];
+            }
+        })();
 
         try {
             const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
@@ -241,6 +254,27 @@ const ProformaDetails: React.FC = () => {
             line(margin, y, PW - margin, y);
             y += 5;
 
+            // Bank Details (if available)
+            if (parsedBankAccounts.length > 0) {
+                setFont('bold', 7, '#94a3b8');
+                pdf.text("ENFÒMASYON BANKÈ (BANK DETAILS)", margin, y);
+                y += 5;
+                
+                parsedBankAccounts.forEach((acc: any) => {
+                    setFont('bold', 8, '#0f172a');
+                    pdf.text(acc.bankName || 'Bank', margin, y);
+                    
+                    setFont('normal', 8, '#64748b');
+                    const accText = `${acc.accountNumber || ''} - ${acc.accountName || ''}`;
+                    pdf.text(accText, margin + 25, y);
+                    y += 4;
+                });
+                
+                y += 2;
+                line(margin, y, PW - margin, y);
+                y += 5;
+            }
+
             // ─── Table header ─────────────────────────────────────────────
             const isService = proforma.sellType === 'SERVICE';
             const colDesc  = margin;
@@ -281,8 +315,8 @@ const ProformaDetails: React.FC = () => {
                 setFont('normal', 9, '#374151');
                 pdf.text(String(item.qty), colQty, y, { align: 'center' });
 
-                const priceStr = Number(item.price).toLocaleString('en-US', { minimumFractionDigits: 2 }) + ' HTG';
-                const totalStr = parseFloat(item.total ?? item.price * item.qty).toLocaleString('en-US', { minimumFractionDigits: 2 }) + ' HTG';
+                const priceStr = Number(item.price).toLocaleString('en-US', { minimumFractionDigits: 2 }) + ` ${currency}`;
+                const totalStr = parseFloat(item.total ?? item.price * item.qty).toLocaleString('en-US', { minimumFractionDigits: 2 }) + ` ${currency}`;
                 pdf.text(priceStr, colPrice, y, { align: 'right' });
                 setFont('bold', 9, '#0f172a');
                 pdf.text(totalStr, colTotal, y, { align: 'right' });
@@ -300,7 +334,7 @@ const ProformaDetails: React.FC = () => {
             const numX = PW - margin;
 
             const fmtAmt = (n: number) =>
-                n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' HTG';
+                n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ` ${currency}`;
 
             const drawTotalLine = (label: string, value: string, bold = false, color = '#374151') => {
                 setFont(bold ? 'bold' : 'normal', bold ? 10 : 9, color);
@@ -373,9 +407,18 @@ const ProformaDetails: React.FC = () => {
     const total = parseFloat(proforma.total ?? 0);
     const taxRate = subtotal > 0 ? Math.round((tax / subtotal) * 100) : 0;
 
+    const parsedBankAccounts = (() => {
+        try {
+            const parsed = JSON.parse(business.businessBankInfo);
+            return Array.isArray(parsed) ? parsed : [];
+        } catch {
+            return [];
+        }
+    })();
+
     // Formater les montants avec espace insécable: 13,250.00 HTG
     const fmt = (n: number) =>
-        n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' HTG';
+        n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ` ${currency}`;
 
     const expiryFormatted = format(new Date(proforma.expiresAt), 'dd/MM/yyyy');
     const notesText = t('proforma.notes_text', { date: expiryFormatted });
@@ -614,6 +657,25 @@ const ProformaDetails: React.FC = () => {
                                         {notesText}
                                     </p>
                                 </div>
+                                {parsedBankAccounts.length > 0 && (
+                                    <div className="mt-4 bg-slate-800/20 print:bg-slate-50 p-5 rounded-xl border border-white/5 print:border-slate-200">
+                                        <div className="flex items-center gap-2 mb-3 font-bold text-slate-300 print:text-slate-600 uppercase tracking-widest text-[10px]">
+                                            <CreditCard className="h-3.5 w-3.5 text-blue-400" />
+                                            Enfòmasyon Bankè (Bank Details)
+                                        </div>
+                                        <div className="space-y-3">
+                                            {parsedBankAccounts.map((acc: any, i: number) => (
+                                                <div key={i} className="flex flex-col border-b border-white/5 print:border-slate-100 last:border-0 pb-2 last:pb-0">
+                                                    <span className="text-xs font-bold text-white print:text-black">{acc.bankName}</span>
+                                                    <div className="flex justify-between text-[11px] text-slate-400 print:text-slate-600 mt-0.5">
+                                                        <span>{acc.accountNumber}</span>
+                                                        <span className="italic">{acc.accountName}</span>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
                             </div>
 
                             {/* Amounts */}

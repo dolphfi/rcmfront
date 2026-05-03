@@ -418,8 +418,7 @@
         "price_tiers": {
             "retail": "Détail",
             "wholesale": "Gros",
-            "grand_dealer": "Grand Dealer",
-            "small_dealer": "Petit Dealer"
+            "grand_dealer": "Grand Dealer"
         },
         "credit_dialog": {
             "title": "Vant a Kredi",

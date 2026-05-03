@@ -21,10 +21,12 @@ import purchaseService from 'context/api/purchaseService';
 import { format } from 'date-fns';
 import { toast } from 'sonner';
 import { Link } from 'react-router-dom';
+import { useSettings } from 'context/SettingsContext';
 
 const PurchaseList: React.FC = () => {
     const [purchases, setPurchases] = useState<any[]>([]);
     const [isLoading, setIsLoading] = useState(true);
+    const { currency } = useSettings();
     const [searchTerm, setSearchTerm] = useState("");
 
     useEffect(() => {
@@ -145,7 +147,7 @@ const PurchaseList: React.FC = () => {
                                                 </Badge>
                                             </TableCell>
                                             <TableCell className="text-right text-emerald-400 font-bold">
-                                                {Number(p.total).toFixed(2)} HTG
+                                                {Number(p.total).toFixed(2)} {currency}
                                             </TableCell>
                                             <TableCell className="text-right">
                                                 <Button variant="ghost" size="icon" className="text-slate-400 hover:text-white hover:bg-white/10">

@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // Get API URL from environment variables
-const API_URL = process.env.REACT_APP_BACKEND_API_URL;
+const API_URL = 'http://127.0.0.1:3000';
 
 /**
  * Custom Axios instance for the Kolabo POS application

@@ -26,12 +26,15 @@ import {
 import { ScrollArea } from "components/ui/scroll-area";
 import { Search, Eye, Filter, Download, History, Store, User, CreditCard, ShoppingBag, Receipt, Loader2 } from "lucide-react";
 import salesService from 'context/api/salesService';
+import { useSettings } from 'context/SettingsContext';
 import { format } from 'date-fns';
 import { toast } from 'sonner';
+import { cn } from 'lib/utils';
 
 const SalesHistory: React.FC = () => {
     const [sales, setSales] = useState<any[]>([]);
     const [isLoading, setIsLoading] = useState(true);
+    const { currency } = useSettings();
     const [searchTerm, setSearchTerm] = useState("");
     const [selectedSale, setSelectedSale] = useState<any>(null);
     const [isDetailsOpen, setIsDetailsOpen] = useState(false);
@@ -63,7 +66,8 @@ const SalesHistory: React.FC = () => {
         sale.receiptNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
         sale.cashier?.firstName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         sale.cashier?.lastName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        sale.customer?.name?.toLowerCase().includes(searchTerm.toLowerCase())
+        sale.customer?.firstName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        sale.customer?.lastName?.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
     const handleReprintReceipt = async () => {
@@ -199,15 +203,23 @@ const SalesHistory: React.FC = () => {
                                                 {sale.cashier ? `${sale.cashier.firstName} ${sale.cashier.lastName}` : 'N/A'}
                                             </TableCell>
                                             <TableCell className="text-slate-300">
-                                                {sale.customer?.name || 'Walk-in'}
+                                                {sale.customer ? `${sale.customer.firstName} ${sale.customer.lastName}` : 'Walk-in'}
                                             </TableCell>
                                             <TableCell>
-                                                <Badge variant="outline" className="bg-blue-500/10 text-blue-400 border-blue-500/20 uppercase text-[10px]">
-                                                    {sale.paymentMethod}
+                                                <Badge 
+                                                    variant="outline" 
+                                                    className={cn(
+                                                        "uppercase text-[10px] border-0",
+                                                        sale.paymentMethod === 'CREDIT' 
+                                                            ? "bg-amber-500/20 text-amber-500" 
+                                                            : "bg-blue-500/10 text-blue-400"
+                                                    )}
+                                                >
+                                                    {sale.paymentMethod === 'CREDIT' ? 'Credit' : sale.paymentMethod}
                                                 </Badge>
                                             </TableCell>
                                             <TableCell className="text-right text-emerald-400 font-bold">
-                                                {Number(sale.total).toFixed(2)} HTG
+                                                {Number(sale.total).toFixed(2)} {currency}
                                             </TableCell>
                                             <TableCell className="text-center">
                                                 <Badge className="bg-emerald-500/20 text-emerald-500 hover:bg-emerald-500/30 border-0">
@@ -273,7 +285,7 @@ const SalesHistory: React.FC = () => {
                                             </div>
                                             <div className="flex justify-between text-sm">
                                                 <span className="text-slate-400">Client:</span>
-                                                <span className="text-white">{selectedSale.customer?.name || 'Walk-in'}</span>
+                                                <span className="text-white">{selectedSale.customer ? `${selectedSale.customer.firstName} ${selectedSale.customer.lastName}` : 'Walk-in'}</span>
                                             </div>
                                         </div>
                                     </div>
@@ -305,10 +317,10 @@ const SalesHistory: React.FC = () => {
                                                             x{item.qty}
                                                         </TableCell>
                                                         <TableCell className="text-right text-slate-300">
-                                                            {Number(item.price).toLocaleString()} HTG
+                                                            {Number(item.price).toLocaleString()} {currency}
                                                         </TableCell>
                                                         <TableCell className="text-right text-emerald-400 font-medium">
-                                                            {Number(item.total).toLocaleString()} HTG
+                                                            {Number(item.total).toLocaleString()} {currency}
                                                         </TableCell>
                                                     </TableRow>
                                                 ))}
@@ -322,19 +334,19 @@ const SalesHistory: React.FC = () => {
                                     <div className="w-full md:w-1/2 space-y-2">
                                         <div className="flex justify-between text-sm text-slate-400">
                                             <span>Sous-total:</span>
-                                            <span>{Number(selectedSale.subtotal).toLocaleString()} HTG</span>
+                                            <span>{Number(selectedSale.subtotal).toLocaleString()} {currency}</span>
                                         </div>
                                         <div className="flex justify-between text-sm text-slate-400">
                                             <span>Taxes:</span>
-                                            <span>{Number(selectedSale.tax).toLocaleString()} HTG</span>
+                                            <span>{Number(selectedSale.tax).toLocaleString()} {currency}</span>
                                         </div>
                                         <div className="flex justify-between text-sm text-orange-400">
                                             <span>Rabais:</span>
-                                            <span>-{Number(selectedSale.discount).toLocaleString()} HTG</span>
+                                            <span>-{Number(selectedSale.discount).toLocaleString()} {currency}</span>
                                         </div>
                                         <div className="flex justify-between items-center text-lg font-bold text-white pt-2 border-t border-white/10 mt-2">
                                             <span>Total Payé:</span>
-                                            <span className="text-emerald-400">{Number(selectedSale.total).toLocaleString()} HTG</span>
+                                            <span className="text-emerald-400">{Number(selectedSale.total).toLocaleString()} {currency}</span>
                                         </div>
                                         <div className="flex justify-between items-center text-sm mt-1">
                                             <span className="text-slate-400">Méthode de Paiement:</span>

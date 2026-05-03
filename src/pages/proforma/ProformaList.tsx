@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import {
     Table,
     TableBody,
@@ -22,30 +22,25 @@ import {
     Filter,
     Plus,
     FileText,
-    Calendar,
-    ShoppingCart,
-    ArrowRightLeft,
-    CheckCircle
+    Calendar
 } from "lucide-react";
 import proformaService from 'context/api/proformaService';
 import { format } from 'date-fns';
 import { toast } from 'sonner';
 import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { useSettings } from 'context/SettingsContext';
 
 
 const ProformaList: React.FC = () => {
     const { t } = useTranslation();
     const navigate = useNavigate();
     const [proformas, setProformas] = useState<any[]>([]);
+    const { currency } = useSettings();
     const [isLoading, setIsLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState("");
 
-    useEffect(() => {
-        fetchProformas();
-    }, []);
-
-    const fetchProformas = async () => {
+    const fetchProformas = useCallback(async () => {
         setIsLoading(true);
         try {
             const data = await proformaService.findAll();
@@ -56,7 +51,11 @@ const ProformaList: React.FC = () => {
         } finally {
             setIsLoading(false);
         }
-    };
+    }, [t]);
+
+    useEffect(() => {
+        fetchProformas();
+    }, [fetchProformas]);
 
     const filteredProformas = proformas.filter(p => {
         const searchTarget = searchTerm.toLowerCase();
@@ -172,7 +171,7 @@ const ProformaList: React.FC = () => {
                                                     : t('proforma.walk_in')}
                                             </TableCell>
                                             <TableCell className="text-emerald-400 font-bold">
-                                                {Number(p.total).toFixed(2)} HTG
+                                                {Number(p.total).toFixed(2)} {currency}
                                             </TableCell>
                                             <TableCell>
                                                 <Badge className={`${getStatusVariant(p.status)} border-0`}>
@@ -192,9 +191,20 @@ const ProformaList: React.FC = () => {
                                                         size="icon"
                                                         className="text-slate-400 hover:text-white hover:bg-white/10"
                                                         title={t('proforma.view_proforma')}
-                                                        onClick={() => navigate(`/proforma/details/${p.id}`)}
+                                                        asChild
                                                     >
-                                                        <Eye className="h-4 w-4" />
+                                                        <Link to={`/proforma/details/${p.id}`}>
+                                                            <Eye className="h-4 w-4" />
+                                                        </Link>
+                                                    </Button>
+                                                    <Button 
+                                                        variant="ghost" 
+                                                        size="icon" 
+                                                        className="text-emerald-400 hover:text-white hover:bg-white/10"
+                                                        onClick={() => handleConvertToSale(p)}
+                                                        title={t('proforma.convert_to_sale')}
+                                                    >
+                                                        <Plus className="h-4 w-4" />
                                                     </Button>
                                                 </div>
                                             </TableCell>

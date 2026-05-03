@@ -419,8 +419,7 @@
         "price_tiers": {
             "retail": "Retail",
             "wholesale": "Wholesale",
-            "grand_dealer": "Grand Dealer",
-            "small_dealer": "Small Dealer"
+            "grand_dealer": "Grand Dealer"
         },
         "credit_dialog": {
             "title": "Credit Sale",

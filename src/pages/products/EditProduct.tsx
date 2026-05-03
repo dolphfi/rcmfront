@@ -52,7 +52,6 @@ const EditProduct: React.FC = () => {
         price: 0,
         wholesalePrice: 0,
         grandDealerPrice: 0,
-        smallDealerPrice: 0,
         costPrice: 0,
         taxType: 'inclusive',
         tax: 0,
@@ -103,7 +102,6 @@ const EditProduct: React.FC = () => {
                     price: Number(product.pricingStocks?.[0]?.price || 0),
                     wholesalePrice: Number(product.pricingStocks?.[0]?.wholesalePrice || 0),
                     grandDealerPrice: Number(product.pricingStocks?.[0]?.grandDealerPrice || 0),
-                    smallDealerPrice: Number(product.pricingStocks?.[0]?.smallDealerPrice || 0),
                     costPrice: Number(product.pricingStocks?.[0]?.costPrice || 0),
                     isActive: product.isActive,
                     primaryPosId: firstPos?.posId || '',
@@ -170,7 +168,6 @@ const EditProduct: React.FC = () => {
                         price: Number(formData.price),
                         wholesalePrice: Number(formData.wholesalePrice),
                         grandDealerPrice: Number(formData.grandDealerPrice),
-                        smallDealerPrice: Number(formData.smallDealerPrice),
                         costPrice: Number(formData.costPrice),
                         taxType: formData.taxType,
                         tax: Number(formData.tax),
@@ -570,15 +567,6 @@ const EditProduct: React.FC = () => {
                                             type="number"
                                             value={formData.grandDealerPrice}
                                             onChange={(e) => setFormData(prev => ({ ...prev, grandDealerPrice: Number(e.target.value) }))}
-                                            className="bg-slate-900 border-white/10 text-white"
-                                        />
-                                    </div>
-                                    <div className="space-y-2">
-                                        <Label className="text-white">Prix Petit Dealer</Label>
-                                        <Input
-                                            type="number"
-                                            value={formData.smallDealerPrice}
-                                            onChange={(e) => setFormData(prev => ({ ...prev, smallDealerPrice: Number(e.target.value) }))}
                                             className="bg-slate-900 border-white/10 text-white"
                                         />
                                     </div>

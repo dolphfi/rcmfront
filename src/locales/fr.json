@@ -419,8 +419,7 @@
         "price_tiers": {
             "retail": "Détail",
             "wholesale": "Gros",
-            "grand_dealer": "Grand Dealer",
-            "small_dealer": "Petit Dealer"
+            "grand_dealer": "Grand Dealer"
         },
         "validate": "Valider la Vente",
         "credit_dialog": {

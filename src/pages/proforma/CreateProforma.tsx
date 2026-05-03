@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
     Card,
@@ -45,12 +45,13 @@ import {
     SelectTrigger,
     SelectValue,
 } from "components/ui/select";
-import { Label } from "components/ui/label";
 import { useTranslation } from 'react-i18next';
+import { useSettings } from 'context/SettingsContext';
 
 const CreateProforma: React.FC = () => {
     const { t } = useTranslation();
     const navigate = useNavigate();
+    const { currency } = useSettings();
     const { user } = useAuth();
     const [isLoading, setIsLoading] = useState(false);
     const [products, setProducts] = useState<any[]>([]);
@@ -105,11 +106,7 @@ const CreateProforma: React.FC = () => {
         localStorage.setItem('proforma_sellType', sellType);
     }, [sellType]);
 
-    useEffect(() => {
-        fetchInitialData();
-    }, []);
-
-    const fetchInitialData = async () => {
+    const fetchInitialData = useCallback(async () => {
         try {
             const isAdmin = user?.role?.name === UserRoleName.SUPER_ADMIN || user?.role?.name === UserRoleName.ADMIN;
 
@@ -129,12 +126,16 @@ const CreateProforma: React.FC = () => {
             setProducts(normalizedProducts);
             setServices(servicesData);
             setCustomers(customersData);
-            if (isAdmin) setPosLocations(posData.data || []);
+            if (isAdmin) setPosLocations(Array.isArray(posData) ? posData : (posData as any).data || []);
         } catch (error) {
-            console.error('Error fetching initial data:', error);
-            toast.error(t("common.error_loading_data"));
+            console.error('Error fetching proforma initial data:', error);
+            toast.error("Impossible de charger les données");
         }
-    };
+    }, [user?.role?.name]);
+
+    useEffect(() => {
+        fetchInitialData();
+    }, [fetchInitialData]);
 
     const addToCart = (item: any) => {
         const idKey = sellType === 'product' ? 'productId' : 'serviceId';
@@ -334,7 +335,7 @@ const CreateProforma: React.FC = () => {
                                         {/* Right — price + category/stock */}
                                         <div className="text-right flex-shrink-0 space-y-1">
                                             <p className="text-white font-bold text-sm">
-                                                {Number(item.price).toLocaleString('en-US', { minimumFractionDigits: 2 })}{'\u00a0'}HTG
+                                                {Number(item.price).toLocaleString('en-US', { minimumFractionDigits: 2 })}{'\u00a0'}{currency}
                                             </p>
                                             {sellType === 'service' && item.category?.name && (
                                                 <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-[10px] font-medium bg-purple-500/10 text-purple-400 border border-purple-500/20">
@@ -463,7 +464,7 @@ const CreateProforma: React.FC = () => {
                                         <div className="grid grid-cols-2 gap-4">
                                             <div className="space-y-2">
                                                 <label className="text-xs text-slate-400 flex items-center gap-1">
-                                                    <Search className="h-3 w-3" /> {t('proforma.discount')} (HTG)
+                                                    <Search className="h-3 w-3" /> {t('proforma.discount')} ({currency})
                                                 </label>
                                                 <Input
                                                     type="number"
@@ -497,24 +498,24 @@ const CreateProforma: React.FC = () => {
                                 <div className="space-y-3">
                                     <div className="flex justify-between text-slate-400 items-center">
                                         <span>{t('proforma.subtotal')}</span>
-                                        <span className="text-white font-medium">{subtotal.toFixed(2)} HTG</span>
+                                        <span className="text-white font-medium">{subtotal.toFixed(2)} {currency}</span>
                                     </div>
                                     {tax > 0 && (
                                         <div className="flex justify-between text-slate-400 items-center">
                                             <span>{t('proforma.tax')} (10%)</span>
-                                            <span className="text-white font-medium">{tax.toFixed(2)} HTG</span>
+                                            <span className="text-white font-medium">{tax.toFixed(2)} {currency}</span>
                                         </div>
                                     )}
                                     {safeDiscount > 0 && (
                                         <div className="flex justify-between text-slate-400 items-center">
                                             <span>{t('proforma.discount')}</span>
-                                            <span className="text-rose-400 font-medium">-{safeDiscount.toFixed(2)} HTG</span>
+                                            <span className="text-rose-400 font-medium">-{safeDiscount.toFixed(2)} {currency}</span>
                                         </div>
                                     )}
                                     <div className="h-px bg-white/10 my-2" />
                                     <div className="flex justify-between items-center bg-blue-500/10 p-4 rounded-xl border border-blue-500/20">
                                         <span className="text-blue-400 font-bold uppercase tracking-widest text-lg">Total</span>
-                                        <span className="text-2xl font-black text-white">{total.toFixed(2)} HTG</span>
+                                        <span className="text-2xl font-black text-white">{total.toFixed(2)} {currency}</span>
                                     </div>
                                     <Button
                                         className="w-full h-12 text-lg bg-blue-600 hover:bg-blue-700 text-white font-bold"

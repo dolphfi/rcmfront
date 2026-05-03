@@ -53,6 +53,9 @@ import PromotionLayout from 'components/layout/marketingcustomerslayout/Promotio
 import Promotion from 'pages/marketingcustomers/promotion';
 import LoyaltyLayout from 'components/layout/marketingcustomerslayout/LoyaltyLayout';
 import Loyalty from 'pages/marketingcustomers/loyalty';
+import PublicReceipt from 'pages/pos/PublicReceipt';
+import Expenses from 'pages/expenses/Expenses';
+import ExpensesLayout from 'components/layout/expenseslayout/ExpensesLayout';
 
 export const router = createBrowserRouter([
     {
@@ -66,6 +69,10 @@ export const router = createBrowserRouter([
     {
         path: "/reset-password",
         element: <ResetPassword />,
+    },
+    {
+        path: "/receipt/:receiptNo",
+        element: <PublicReceipt />,
     },
     // Protected Routes for Cashier
     {
@@ -341,6 +348,17 @@ export const router = createBrowserRouter([
                     {
                         index: true,
                         element: <Loyalty />,
+                    },
+                ],
+            },
+            // Expenses
+            {
+                path: "/expenses",
+                element: <ExpensesLayout />,
+                children: [
+                    {
+                        index: true,
+                        element: <Expenses />,
                     },
                 ],
             },

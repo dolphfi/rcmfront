@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import {
     Card,
     CardContent,
@@ -27,17 +27,36 @@ import {
     Truck,
     X,
     Loader2,
-    Upload,
     FileSpreadsheet,
     FileText,
-    ChevronDown
+    ChevronDown,
+    Gift,
+    Percent,
+    Settings,
+    Store,
+    Receipt,
+    ClockFading,
+    Tags,
+    LayoutList,
+    ShieldCheck,
+    History,
+    ReceiptText,
+    CornerDownLeft,
+    ShoppingBasket,
+    ShoppingBag,
+    HandCoins,
+    Book,
+    ChartLine,
+    MonitorCog,
+    Toolbox
 } from 'lucide-react';
 import { Button } from 'components/ui/button';
 import reportService from 'context/api/reportService';
 import settingsService from 'context/api/settingsService';
-import { format, startOfDay, endOfDay, subDays, isToday } from 'date-fns';
+import { format, startOfDay, endOfDay, subDays } from 'date-fns';
 import { fr, ht, enUS } from 'date-fns/locale';
 import { useTranslation } from 'react-i18next';
+import { useSettings } from 'context/SettingsContext';
 import {
     Popover,
     PopoverContent,
@@ -59,9 +78,11 @@ const Reports: React.FC = () => {
     const [stats, setStats] = useState<any>(null);
     const [chartData, setChartData] = useState<any[]>([]);
     const [posData, setPosData] = useState<any[]>([]);
+    const [productPosData, setProductPosData] = useState<any[]>([]);
     const [salesDates, setSalesDates] = useState<string[]>([]);
     const [businessName, setBusinessName] = useState('Kolabo POS');
     const [logoUrl, setLogoUrl] = useState('');
+    const { currency: globalCurrency } = useSettings();
     const [isLoading, setIsLoading] = useState(true);
     const [isCalendarOpen, setIsCalendarOpen] = useState(false);
     const [dateRange, setDateRange] = useState<DateRange | undefined>({
@@ -100,54 +121,59 @@ const Reports: React.FC = () => {
         }
     };
 
-    useEffect(() => {
-        fetchData();
-    }, [dateRange]);
-
-    useEffect(() => {
-        const fetchAvailableDates = async () => {
-            try {
-                const dates = await reportService.getSalesDates();
-                setSalesDates(dates);
-            } catch (error) {
-                console.error('Error fetching sales dates:', error);
-            }
-        };
-        fetchAvailableDates();
+    const fetchAvailableDates = useCallback(async () => {
+        try {
+            const dates = await reportService.getSalesDates();
+            setSalesDates(dates);
+        } catch (error) {
+            console.error('Error fetching sales dates:', error);
+        }
     }, []);
 
-    const fetchData = async () => {
+    const fetchData = useCallback(async () => {
+        if (!dateRange?.from || !dateRange?.to) return;
         setIsLoading(true);
         try {
-            // Use format with local time to avoid UTC shifting issues if the backend comparison is sensitive
-            const startDate = dateRange?.from ? format(startOfDay(dateRange.from), "yyyy-MM-dd HH:mm:ss") : undefined;
-            const endDate = dateRange?.to
-                ? format(endOfDay(dateRange.to), "yyyy-MM-dd HH:mm:ss")
-                : dateRange?.from
-                    ? format(endOfDay(dateRange.from), "yyyy-MM-dd HH:mm:ss")
-                    : undefined;
+            const startDate = format(startOfDay(dateRange.from), "yyyy-MM-dd HH:mm:ss");
+            const endDate = format(endOfDay(dateRange.to), "yyyy-MM-dd HH:mm:ss");
 
-            const [summary, chart, posSummary] = await Promise.all([
+            const [summary, chart, posSummary, productPosSummary] = await Promise.all([
                 reportService.getSummary(startDate, endDate),
                 reportService.getSalesChart('1W', startDate, endDate),
-                reportService.getPosSummary(startDate, endDate)
+                reportService.getPosSummary(startDate, endDate),
+                reportService.getSalesByProductPos(startDate, endDate)
             ]);
             setStats(summary);
             setChartData(chart);
             setPosData(posSummary);
+            setProductPosData(productPosSummary);
         } catch (error) {
             console.error('Error fetching reports:', error);
         } finally {
             setIsLoading(false);
         }
-    };
+    }, [dateRange]);
+
+    useEffect(() => {
+        fetchData();
+    }, [fetchData]);
+
+    useEffect(() => {
+        fetchAvailableDates();
+    }, [fetchAvailableDates]);
 
     const formatCurrency = (amount: number) => {
-        return new Intl.NumberFormat('en-US', {
-            style: 'currency',
-            currency: 'HTG',
-            maximumFractionDigits: 0,
-        }).format(amount);
+        try {
+            return new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: globalCurrency || 'HTG',
+                maximumFractionDigits: 0,
+            }).format(amount);
+        } catch (e) {
+            return `${new Intl.NumberFormat('en-US', {
+                maximumFractionDigits: 0,
+            }).format(amount)} ${globalCurrency}`;
+        }
     };
 
     const handleExportCSV = () => {
@@ -160,17 +186,27 @@ const Reports: React.FC = () => {
 
         // Summary Stats
         csvContent += "REZIME JENERAL\n";
-        csvContent += `Lavant Total,${stats?.totalSales || 0} HTG\n`;
-        csvContent += `Pwofi Estime,${stats?.totalProfit || 0} HTG\n`;
+        csvContent += `Lavant Total,${stats?.totalSales || 0} ${globalCurrency}\n`;
+        csvContent += `Pwofi Estime,${stats?.totalProfit || 0} ${globalCurrency}\n`;
         csvContent += `Kantite Lòd,${stats?.totalOrders || 0}\n`;
         csvContent += `Stock ki Ba,${stats?.lowStockCount || 0}\n\n`;
 
         // POS Performance Table
         if (posData.length > 0) {
             csvContent += "PÈFOMANS PA PWEN DE VANT\n";
-            csvContent += "Pwen de Vant,Lòd,Lavant (HTG),Pwofi (HTG)\n";
+            csvContent += `Pwen de Vant,Lòd,Lavant (${globalCurrency}),Pwofi (${globalCurrency})\n`;
             posData.forEach(pos => {
                 csvContent += `${pos.name},${pos.totalOrders},${pos.totalSales},${pos.totalProfit}\n`;
+            });
+            csvContent += "\n";
+        }
+
+        // Product by POS Table
+        if (productPosData.length > 0) {
+            csvContent += "VANT PA PWODWI AK PWEN DE VANT\n";
+            csvContent += `Pwodwi,Pwen de Vant,Kantite,Total (${globalCurrency})\n`;
+            productPosData.forEach(item => {
+                csvContent += `${item.productName},${item.posName},${item.totalQty},${item.totalAmount}\n`;
             });
         }
 
@@ -268,8 +304,8 @@ const Reports: React.FC = () => {
             doc.setFont("helvetica", "bold");
             doc.text("Pwen de Vant", 20, yPos);
             doc.text("Lod", 110, yPos, { align: 'right' });
-            doc.text("Lavant (HTG)", 150, yPos, { align: 'right' });
-            doc.text("Pwofi (HTG)", 190, yPos, { align: 'right' });
+            doc.text(`Lavant (${globalCurrency})`, 150, yPos, { align: 'right' });
+            doc.text(`Pwofi (${globalCurrency})`, 190, yPos, { align: 'right' });
 
             doc.setFont("helvetica", "normal");
             yPos += 10;
@@ -280,8 +316,8 @@ const Reports: React.FC = () => {
                 }
                 doc.text(pos.name, 20, yPos);
                 doc.text((pos.totalOrders || 0).toString(), 110, yPos, { align: 'right' });
-                doc.text(formatCurrency(pos.totalSales || 0).replace('HTG', '').trim(), 150, yPos, { align: 'right' });
-                doc.text(formatCurrency(pos.totalProfit || 0).replace('HTG', '').trim(), 190, yPos, { align: 'right' });
+                doc.text(formatCurrency(pos.totalSales || 0).replace(globalCurrency, '').trim(), 150, yPos, { align: 'right' });
+                doc.text(formatCurrency(pos.totalProfit || 0).replace(globalCurrency, '').trim(), 190, yPos, { align: 'right' });
 
                 doc.setDrawColor(241, 245, 249);
                 doc.line(15, yPos + 2, pageWidth - 15, yPos + 2);
@@ -334,12 +370,12 @@ const Reports: React.FC = () => {
         <div className="space-y-6">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
-                    <h2 className="text-3xl font-bold tracking-tight text-white flex items-center gap-2">
-                        <FileStack className="h-8 w-8 text-blue-500" />
-                        {t('reports.title', "Analytics & Rapports")}
+                    <h2 className="text-3xl font-bold tracking-tight text-slate-900 flex items-center gap-3">
+                        <ChartLine className="h-8 w-8 text-primary" />
+                        {t('reports.title', "Rapò Analitik")}
                     </h2>
-                    <p className="text-slate-400">
-                        {t('reports.subtitle', "Wè kijan biznis la ap mache ak done reyèl")}
+                    <p className="text-slate-500">
+                        {t('reports.subtitle', "Track pèfòmans biznis ou an tan reyèl")}
                     </p>
                 </div>
                 <div className="flex items-center gap-2">
@@ -347,10 +383,7 @@ const Reports: React.FC = () => {
                         <PopoverTrigger asChild>
                             <Button
                                 variant="outline"
-                                className={cn(
-                                    "bg-slate-800 border-white/10 text-white min-w-[240px] justify-start text-left font-normal",
-                                    !dateRange && "text-muted-foreground"
-                                )}
+                                className="bg-white border-slate-200 text-slate-700 min-w-[240px] justify-start text-left font-normal"
                             >
                                 <CalendarIcon className="mr-2 h-4 w-4" />
                                 {dateRange?.from ? (
@@ -367,13 +400,13 @@ const Reports: React.FC = () => {
                                 )}
                             </Button>
                         </PopoverTrigger>
-                        <PopoverContent className="w-auto p-0 bg-slate-900 border-white/10" align="end">
-                            <div className="p-3 border-b border-white/10 flex items-center justify-between">
-                                <span className="text-xs text-slate-400">{t('reports.select_period', "Chwazi peryòd")}</span>
+                        <PopoverContent className="w-auto p-0 bg-white border-slate-200" align="end">
+                            <div className="p-3 border-b border-slate-100 flex items-center justify-between">
+                                <span className="text-xs text-slate-500">{t('reports.select_period', "Chwazi peryòd")}</span>
                                 <Button
                                     variant="ghost"
                                     size="sm"
-                                    className="h-7 text-[10px] text-blue-500 hover:text-blue-400 hover:bg-white/5"
+                                    className="h-7 text-[10px] text-primary hover:text-primary/80"
                                     onClick={() => setIsCalendarOpen(false)}
                                 >
                                     {t('common.done', "OK")}
@@ -387,13 +420,7 @@ const Reports: React.FC = () => {
                                 onSelect={handleDateSelect}
                                 numberOfMonths={2}
                                 locale={getDateLocale()}
-                                modifiers={{
-                                    hasSales: (date) => salesDates.includes(format(date, "yyyy-MM-dd"))
-                                }}
-                                modifiersClassNames={{
-                                    hasSales: "bg-blue-500/20 text-blue-400 font-bold border-b-2 border-blue-500 rounded-none hover:bg-blue-500/30 transition-colors"
-                                }}
-                                className="bg-slate-900 border-none text-white"
+                                className="bg-white border-none text-slate-900"
                             />
                         </PopoverContent>
                     </Popover>
@@ -406,7 +433,7 @@ const Reports: React.FC = () => {
                                 from: subDays(new Date(), 7),
                                 to: new Date(),
                             })}
-                            className="bg-slate-800 border-white/10 text-slate-400 hover:text-white"
+                            className="text-slate-500 hover:text-slate-900"
                         >
                             <X className="h-4 w-4" />
                         </Button>
@@ -414,25 +441,25 @@ const Reports: React.FC = () => {
 
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                            <Button className="bg-blue-600 hover:bg-blue-700 text-white gap-2">
+                            <Button className="bg-primary hover:bg-primary/90 text-white gap-2">
                                 <Download className="h-4 w-4" />
                                 {t('common.export', "Export")}
                                 <ChevronDown className="h-4 w-4 opacity-50" />
                             </Button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="bg-slate-900 border-white/10 text-white">
+                        <DropdownMenuContent align="end" className="bg-white border-slate-200">
                             <DropdownMenuItem
                                 onClick={handleExportCSV}
-                                className="hover:bg-white/5 cursor-pointer gap-2"
+                                className="cursor-pointer gap-2"
                             >
-                                <FileSpreadsheet className="h-4 w-4 text-emerald-500" />
+                                <FileSpreadsheet className="h-4 w-4 text-emerald-600" />
                                 <span>{t('reports.export_csv', "Telechaje CSV")}</span>
                             </DropdownMenuItem>
                             <DropdownMenuItem
                                 onClick={handleExportPDF}
-                                className="hover:bg-white/5 cursor-pointer gap-2"
+                                className="cursor-pointer gap-2"
                             >
-                                <FileText className="h-4 w-4 text-blue-500" />
+                                <FileText className="h-4 w-4 text-blue-600" />
                                 <span>{t('reports.export_pdf', "Telechaje PDF")}</span>
                             </DropdownMenuItem>
                         </DropdownMenuContent>
@@ -443,9 +470,9 @@ const Reports: React.FC = () => {
             {/* Stats Overview */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 {analyticsCards.map((card, i) => (
-                    <Card key={i} className="bg-slate-900/50 border-white/10 backdrop-blur-xl border-l-4 border-l-transparent hover:border-l-current transition-all overflow-hidden" style={{ borderLeftColor: card.color.includes('emerald') ? '#10b981' : card.color.includes('blue') ? '#3b82f6' : card.color.includes('orange') ? '#f59e0b' : '#f43f5e' }}>
+                    <Card key={i} className="bg-white border-slate-200 shadow-sm border-l-4" style={{ borderLeftColor: card.color.includes('emerald') ? '#10b981' : card.color.includes('blue') ? '#3b82f6' : card.color.includes('orange') ? '#f59e0b' : '#f43f5e' }}>
                         <CardHeader className="flex flex-row items-center justify-between pb-2">
-                            <CardTitle className="text-sm font-medium text-slate-400">
+                            <CardTitle className="text-sm font-medium text-slate-500">
                                 {card.title}
                             </CardTitle>
                             <div className={`p-2 rounded-lg ${card.bg}`}>
@@ -453,15 +480,15 @@ const Reports: React.FC = () => {
                             </div>
                         </CardHeader>
                         <CardContent>
-                            <div className="text-2xl font-bold text-white">
-                                {isLoading ? <Loader2 className="h-6 w-6 animate-spin text-slate-500" /> : card.value}
+                            <div className="text-2xl font-bold text-slate-900">
+                                {isLoading ? <Loader2 className="h-6 w-6 animate-spin text-slate-400" /> : card.value}
                             </div>
-                            <p className="text-xs text-slate-500 mt-1 flex items-center gap-1">
+                            <p className="text-xs text-slate-400 mt-1 flex items-center gap-1">
                                 {card.description}
                                 {card.growth !== undefined && card.growth !== null && (
                                     <span className={cn(
                                         "ml-auto text-[10px] font-bold px-1 rounded",
-                                        card.growth >= 0 ? "text-emerald-500 bg-emerald-500/10" : "text-rose-500 bg-rose-500/10"
+                                        card.growth >= 0 ? "text-emerald-600 bg-emerald-50" : "text-rose-600 bg-rose-50"
                                     )}>
                                         {card.growth >= 0 ? "+" : ""}{card.growth}%
                                     </span>
@@ -473,9 +500,11 @@ const Reports: React.FC = () => {
             </div>
 
             {/* Sales Chart */}
-            <Card className="bg-slate-900/50 border-white/10 backdrop-blur-xl">
-                <CardHeader>
-                    <CardTitle className="text-white text-lg font-medium">{t('reports.sales_trend', "Tandans Lavant (Vant pa Jou)")}</CardTitle>
+            <Card className="bg-white border-slate-200 shadow-sm">
+                <CardHeader className="flex flex-row items-center justify-between pb-2">
+                    <CardTitle className="text-slate-900 text-lg font-bold flex items-center gap-2">
+                        {t('reports.sales_trend', "Tandans Lavant (Vant pa Jou)")}
+                    </CardTitle>
                     <CardDescription className="text-slate-400">{t('reports.sales_trend_desc', "Montre evolisyon lavant ou sou peryòd chwazi a")}</CardDescription>
                 </CardHeader>
                 <CardContent className="h-[400px] pt-4">
@@ -493,11 +522,11 @@ const Reports: React.FC = () => {
                             <AreaChart data={chartData}>
                                 <defs>
                                     <linearGradient id="colorTotal" x1="0" y1="0" x2="0" y2="1">
-                                        <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3} />
-                                        <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
+                                        <stop offset="5%" stopColor="#2563eb" stopOpacity={0.1} />
+                                        <stop offset="95%" stopColor="#2563eb" stopOpacity={0} />
                                     </linearGradient>
                                 </defs>
-                                <CartesianGrid strokeDasharray="3 3" stroke="#ffffff10" vertical={false} />
+                                <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
                                 <XAxis
                                     dataKey="date"
                                     stroke="#94a3b8"
@@ -510,15 +539,15 @@ const Reports: React.FC = () => {
                                     tickFormatter={(val) => `${val > 1000 ? (val / 1000).toFixed(1) + 'k' : val}`}
                                 />
                                 <RechartsTooltip
-                                    contentStyle={{ backgroundColor: '#0f172a', border: '1px solid #ffffff20', borderRadius: '8px', color: '#fff' }}
-                                    itemStyle={{ color: '#3b82f6' }}
-                                    formatter={(val: any) => [`${val} HTG`, t('dashboard.revenue', "Revenue")]}
+                                    contentStyle={{ backgroundColor: '#fff', border: '1px solid #e2e8f0', borderRadius: '8px', color: '#0f172a' }}
+                                    itemStyle={{ color: '#2563eb' }}
+                                    formatter={(val: any) => [`${val} ${globalCurrency}`, t('dashboard.revenue', "Revenue")]}
                                     labelFormatter={(label) => format(new Date(label), 'dd MMMM yyyy', { locale: getDateLocale() })}
                                 />
                                 <Area
                                     type="monotone"
                                     dataKey="total"
-                                    stroke="#3b82f6"
+                                    stroke="#2563eb"
                                     strokeWidth={3}
                                     fillOpacity={1}
                                     fill="url(#colorTotal)"
@@ -530,19 +559,19 @@ const Reports: React.FC = () => {
             </Card>
 
             {/* POS Performance */}
-            <Card className="bg-slate-900/50 border-white/10 backdrop-blur-xl">
+            <Card className="bg-white border-slate-200 shadow-sm">
                 <CardHeader>
-                    <CardTitle className="text-white text-lg font-medium flex items-center gap-2">
-                        <Package className="h-5 w-5 text-purple-500" />
+                    <CardTitle className="text-slate-900 text-lg font-bold flex items-center gap-2">
+                        <Package className="h-5 w-5 text-primary" />
                         {t('reports.pos_performance', "Pèfòmans pa Pwen de Vant")}
                     </CardTitle>
-                    <CardDescription className="text-slate-400">{t('reports.pos_performance_desc', "Konparezon lavant ak pwofi pou chak filyal")}</CardDescription>
+                    <CardDescription className="text-slate-500">{t('reports.pos_performance_desc', "Konparezon lavant ak pwofi pou chak filyal")}</CardDescription>
                 </CardHeader>
                 <CardContent>
                     <div className="overflow-x-auto">
                         <table className="w-full text-left border-collapse">
                             <thead>
-                                <tr className="border-b border-white/5 text-slate-400 text-xs uppercase tracking-wider">
+                                <tr className="border-b border-slate-100 text-slate-500 text-xs uppercase tracking-wider">
                                     <th className="px-4 py-3 font-medium">{t('reports.pos_name', "Pwen de Vant")}</th>
                                     <th className="px-4 py-3 font-medium text-right">{t('reports.pos_orders', "Lòd")}</th>
                                     <th className="px-4 py-3 font-medium text-right">{t('reports.pos_sales', "Lavant")}</th>
@@ -565,11 +594,61 @@ const Reports: React.FC = () => {
                                     </tr>
                                 ) : (
                                     posData.map((pos, idx) => (
-                                        <tr key={idx} className="border-b border-white/5 hover:bg-white/5 transition-colors">
-                                            <td className="px-4 py-4 text-sm font-medium text-white">{pos.name}</td>
-                                            <td className="px-4 py-4 text-sm text-right text-slate-300">{pos.totalOrders}</td>
-                                            <td className="px-4 py-4 text-sm text-right text-emerald-400 font-medium">{formatCurrency(pos.totalSales)}</td>
-                                            <td className="px-4 py-4 text-sm text-right text-blue-400 font-medium">{formatCurrency(pos.totalProfit)}</td>
+                                        <tr key={idx} className="border-b border-slate-50 hover:bg-slate-50 transition-colors">
+                                            <td className="px-4 py-4 text-sm font-medium text-slate-900">{pos.name}</td>
+                                            <td className="px-4 py-4 text-sm text-right text-slate-600">{pos.totalOrders}</td>
+                                            <td className="px-4 py-4 text-sm text-right text-emerald-600 font-medium">{formatCurrency(pos.totalSales)}</td>
+                                            <td className="px-4 py-4 text-sm text-right text-blue-600 font-medium">{formatCurrency(pos.totalProfit)}</td>
+                                        </tr>
+                                    ))
+                                )}
+                            </tbody>
+                        </table>
+                    </div>
+                </CardContent>
+            </Card>
+
+            {/* Sales by Product and POS */}
+            <Card className="bg-white border-slate-200 shadow-sm">
+                <CardHeader>
+                    <CardTitle className="text-slate-900 text-lg font-bold flex items-center gap-2">
+                        <FileText className="h-5 w-5 text-primary" />
+                        Vant pa Pwodwi ak Pwen de Vant
+                    </CardTitle>
+                    <CardDescription className="text-slate-500">Kantite chak pwodwi vann nan chak branch pwen de vant</CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <div className="overflow-x-auto">
+                        <table className="w-full text-left border-collapse">
+                            <thead>
+                                <tr className="border-b border-slate-100 text-slate-500 text-xs uppercase tracking-wider">
+                                    <th className="px-4 py-3 font-medium">Pwodwi</th>
+                                    <th className="px-4 py-3 font-medium">Pwen de Vant</th>
+                                    <th className="px-4 py-3 font-medium text-right">Kantite</th>
+                                    <th className="px-4 py-3 font-medium text-right">Total Lavant</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {isLoading ? (
+                                    <tr>
+                                        <td colSpan={4} className="px-4 py-8 text-center text-slate-500 italic">
+                                            <Loader2 className="h-4 w-4 animate-spin inline mr-2" />
+                                            Ap chaje...
+                                        </td>
+                                    </tr>
+                                ) : productPosData.length === 0 ? (
+                                    <tr>
+                                        <td colSpan={4} className="px-4 py-8 text-center text-slate-500 italic">
+                                            Okenn done poko disponib
+                                        </td>
+                                    </tr>
+                                ) : (
+                                    productPosData.map((item, idx) => (
+                                        <tr key={idx} className="border-b border-slate-50 hover:bg-slate-50 transition-colors">
+                                            <td className="px-4 py-4 text-sm font-medium text-slate-900">{item.productName}</td>
+                                            <td className="px-4 py-4 text-sm text-slate-600">{item.posName}</td>
+                                            <td className="px-4 py-4 text-sm text-right text-orange-600 font-bold">{item.totalQty}</td>
+                                            <td className="px-4 py-4 text-sm text-right text-emerald-600 font-medium">{formatCurrency(item.totalAmount)}</td>
                                         </tr>
                                     ))
                                 )}
@@ -581,36 +660,36 @@ const Reports: React.FC = () => {
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {/* Detailed Reports Access */}
-                <Card className="bg-slate-900/50 border-white/10 backdrop-blur-xl">
+                <Card className="bg-white border-slate-200 shadow-sm">
                     <CardHeader>
-                        <CardTitle className="text-white">{t('reports.detailed_reports', "Aksè Rapò Detaye")}</CardTitle>
+                        <CardTitle className="text-slate-900">{t('reports.detailed_reports', "Aksè Rapò Detaye")}</CardTitle>
                     </CardHeader>
                     <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <Button variant="outline" className="bg-white/5 border-white/10 text-white hover:bg-white/10 h-24 flex flex-col gap-2">
-                            <ShoppingCart className="h-6 w-6 text-emerald-500" />
+                        <Button variant="outline" className="border-slate-200 text-slate-700 hover:bg-slate-50 h-24 flex flex-col gap-2">
+                            <ShoppingCart className="h-6 w-6 text-emerald-600" />
                             <span>{t('reports.sales_report', "Rapò Lavant")}</span>
                         </Button>
-                        <Button variant="outline" className="bg-white/5 border-white/10 text-white hover:bg-white/10 h-24 flex flex-col gap-2">
-                            <Truck className="h-6 w-6 text-orange-500" />
+                        <Button variant="outline" className="border-slate-200 text-slate-700 hover:bg-slate-50 h-24 flex flex-col gap-2">
+                            <Truck className="h-6 w-6 text-orange-600" />
                             <span>{t('reports.purchase_report', "Rapò Acha")}</span>
                         </Button>
-                        <Button variant="outline" className="bg-white/5 border-white/10 text-white hover:bg-white/10 h-24 flex flex-col gap-2">
-                            <Package className="h-6 w-6 text-blue-500" />
+                        <Button variant="outline" className="border-slate-200 text-slate-700 hover:bg-slate-50 h-24 flex flex-col gap-2">
+                            <Package className="h-6 w-6 text-blue-600" />
                             <span>{t('reports.stock_report', "Rapò Stock")}</span>
                         </Button>
-                        <Button variant="outline" className="bg-white/5 border-white/10 text-white hover:bg-white/10 h-24 flex flex-col gap-2">
-                            <Users className="h-6 w-6 text-purple-500" />
+                        <Button variant="outline" className="border-slate-200 text-slate-700 hover:bg-slate-50 h-24 flex flex-col gap-2">
+                            <Users className="h-6 w-6 text-primary" />
                             <span>{t('reports.customer_report', "Rapò Kliyan")}</span>
                         </Button>
                     </CardContent>
                 </Card>
 
                 {/* Info Card */}
-                <Card className="bg-blue-600/20 border-blue-500/30 backdrop-blur-xl">
+                <Card className="bg-primary/5 border-primary/20 shadow-sm">
                     <CardHeader>
-                        <CardTitle className="text-white">{t('reports.note_data', "Note sou Done yo")}</CardTitle>
+                        <CardTitle className="text-primary font-bold">{t('reports.note_data', "Note sou Done yo")}</CardTitle>
                     </CardHeader>
-                    <CardContent className="text-slate-300 space-y-4">
+                    <CardContent className="text-slate-600 space-y-4 text-sm">
                         <p>{t('reports.profit_disclaimer', "Done pwofi yo se yon estimasyon baze sou dènye pri ou antre nan sistèm nan. Pou gen yon rapò ki pi presi, asire ou toujou antre pri acha (Cost Price) kòrèk lè w ap resevwa stock.")}</p>
                         <p>{t('reports.date_range_info', "Ou ka chwazi nenpòt peryòd dat ou vle pou w wè rezilta biznis ou sou tèm sa.")}</p>
                     </CardContent>
