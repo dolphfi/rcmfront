@@ -8,6 +8,7 @@ import { Label } from "../../components/ui/label";
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useAuth } from '../../context/AuthContext';
+import { useSettings } from '../../context/SettingsContext';
 
 const Login: React.FC = () => {
     const [showPassword, setShowPassword] = useState(false);
@@ -15,6 +16,7 @@ const Login: React.FC = () => {
     const [password, setPassword] = useState('');
     const navigate = useNavigate();
     const { login, isLoading } = useAuth();
+    const { logoUrl } = useSettings();
 
     const onLoginSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -56,7 +58,15 @@ const Login: React.FC = () => {
                         </div>
                         <div className="flex items-center">
                             <span className="bg-slate-50 p-2 rounded-full border border-slate-100 shadow-sm">
-                                <img src="https://img.icons8.com/color/48/000000/google-logo.png" alt="Google" className="w-6 h-6" />
+                                <img
+                                    src={logoUrl || '/logo.jpeg'}
+                                    alt="Logo"
+                                    className="w-6 h-6"
+                                    onError={(e) => {
+                                        const target = e.target as HTMLImageElement;
+                                        target.src = '/logo.png'; // Fallback if logo.jpeg fails
+                                    }}
+                                />
                             </span>
                         </div>
                     </div>
