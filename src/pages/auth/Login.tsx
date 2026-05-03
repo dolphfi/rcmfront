@@ -62,10 +62,10 @@ const Login: React.FC = () => {
                                     src={logoUrl || '/logo.jpeg'}
                                     alt="Logo"
                                     className="w-6 h-6"
-                                    onError={(e) => {
-                                        const target = e.target as HTMLImageElement;
-                                        target.src = '/logo.png'; // Fallback if logo.jpeg fails
-                                    }}
+                                // onError={(e) => {
+                                //     const target = e.target as HTMLImageElement;
+                                //     target.src = '/logo.png'; // Fallback if logo.jpeg fails
+                                // }}
                                 />
                             </span>
                         </div>
