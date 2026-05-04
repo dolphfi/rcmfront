@@ -65,18 +65,18 @@ const ResetPassword: React.FC = () => {
 
     if (isSuccess) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-slate-950 p-4">
-                <Card className="w-full max-w-md bg-slate-900 border-slate-800 shadow-xl text-center pb-6">
+            <div className="min-h-screen flex items-center justify-center bg-background p-4">
+                <Card className="w-full max-w-md bg-background border-border shadow-xl text-center pb-6">
                     <CardHeader className="space-y-3 pb-6 border-b border-emerald-900/30">
                         <div className="flex justify-center mb-4">
                             <div className="w-16 h-16 rounded-full bg-emerald-500/20 flex items-center justify-center">
                                 <KeyRound className="w-8 h-8 text-emerald-500" />
                             </div>
                         </div>
-                        <CardTitle className="text-2xl font-bold text-white">
+                        <CardTitle className="text-2xl font-bold text-foreground">
                             {t('auth.reset_success_title', 'All Set!')}
                         </CardTitle>
-                        <CardDescription className="text-slate-400">
+                        <CardDescription className="text-muted-foreground">
                             {t('auth.reset_success_desc', 'Your password has been changed successfully. You can now login with your new credentials.')}
                         </CardDescription>
                     </CardHeader>
@@ -94,18 +94,18 @@ const ResetPassword: React.FC = () => {
     }
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-slate-950 p-4">
-            <Card className="w-full max-w-md bg-slate-900 border-slate-800 shadow-xl">
+        <div className="min-h-screen flex items-center justify-center bg-background p-4">
+            <Card className="w-full max-w-md bg-background border-border shadow-xl">
                 <CardHeader className="space-y-3 pb-6">
                     <div className="flex justify-center mb-4">
                         <div className="w-16 h-16 rounded-2xl bg-blue-500/10 flex items-center justify-center">
                             <Lock className="w-8 h-8 text-blue-500" />
                         </div>
                     </div>
-                    <CardTitle className="text-2xl font-bold text-center text-white">
+                    <CardTitle className="text-2xl font-bold text-center text-foreground">
                         {t('auth.reset_password_title', 'Set New Password')}
                     </CardTitle>
-                    <CardDescription className="text-center text-slate-400">
+                    <CardDescription className="text-center text-muted-foreground">
                         {t('auth.reset_password_desc', 'Please enter your new password below.')}
                     </CardDescription>
                 </CardHeader>
@@ -113,7 +113,7 @@ const ResetPassword: React.FC = () => {
                 <CardContent>
                     <form onSubmit={handleSubmit} className="space-y-4">
                         <div className="space-y-2">
-                            <label className="text-sm font-medium text-slate-300">
+                            <label className="text-sm font-medium text-foreground">
                                 {t('auth.new_password', 'New Password')}
                             </label>
                             <div className="relative">
@@ -122,14 +122,14 @@ const ResetPassword: React.FC = () => {
                                     placeholder="••••••••"
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
-                                    className="bg-slate-950 border-slate-800 text-white placeholder:text-slate-600 focus-visible:ring-blue-500 pr-10"
+                                    className="bg-background border-border text-foreground placeholder:text-muted-foreground focus-visible:ring-ring pr-10"
                                     required
                                     disabled={isLoading || !token}
                                 />
                                 <button
                                     type="button"
                                     onClick={() => setShowPassword(!showPassword)}
-                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white"
+                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-primary"
                                     tabIndex={-1}
                                 >
                                     {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
@@ -137,7 +137,7 @@ const ResetPassword: React.FC = () => {
                             </div>
                         </div>
                         <div className="space-y-2">
-                            <label className="text-sm font-medium text-slate-300">
+                            <label className="text-sm font-medium text-foreground">
                                 {t('auth.confirm_new_password', 'Confirm New Password')}
                             </label>
                             <div className="relative">
@@ -146,14 +146,14 @@ const ResetPassword: React.FC = () => {
                                     placeholder="••••••••"
                                     value={confirmPassword}
                                     onChange={(e) => setConfirmPassword(e.target.value)}
-                                    className="bg-slate-950 border-slate-800 text-white placeholder:text-slate-600 focus-visible:ring-blue-500 pr-10"
+                                    className="bg-background border-border text-foreground placeholder:text-muted-foreground focus-visible:ring-ring pr-10"
                                     required
                                     disabled={isLoading || !token}
                                 />
                                 <button
                                     type="button"
                                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white"
+                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-primary"
                                     tabIndex={-1}
                                 >
                                     {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
@@ -180,7 +180,7 @@ const ResetPassword: React.FC = () => {
                 <CardFooter>
                     <Button
                         variant="ghost"
-                        className="w-full text-slate-400 hover:text-white hover:bg-slate-800"
+                        className="w-full text-muted-foreground hover:text-primary hover:bg-primary/10"
                         onClick={() => navigate('/')}
                     >
                         <ArrowLeft className="mr-2 h-4 w-4" />

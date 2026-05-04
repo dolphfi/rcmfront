@@ -41,7 +41,7 @@ export const SalesStatisticsCard: React.FC<SalesStatisticsCardProps> = ({ data: 
         } else if (initialData) {
             setChartData(initialData);
         }
-    }, [selectedYear]);
+    }, [selectedYear, initialData]);
 
     useEffect(() => {
         if (initialData && selectedYear === new Date().getFullYear()) {

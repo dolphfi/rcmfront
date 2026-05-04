@@ -112,34 +112,34 @@ const QRCodeView: React.FC<QRCodeViewProps> = ({ paymentMethod, amount, onBack }
     return (
         <>
             <DialogHeader>
-                <DialogTitle className="text-white text-xl flex items-center gap-2">
+                <DialogTitle className="text-foreground text-xl flex items-center gap-2">
                     <button onClick={onBack} className="hover:text-emerald-400 transition-colors">
                         ←
                     </button>
                     {t('pos.qr_code.title', { method: paymentMethod })}
                 </DialogTitle>
-                <DialogDescription className="text-slate-300">
+                <DialogDescription className="text-muted-foreground">
                     {t('pos.qr_code.description')}
                 </DialogDescription>
             </DialogHeader>
 
             <div className="flex flex-col items-center gap-4 mt-4">
-                <div className="bg-slate-800/50 p-4 rounded-lg border border-white/10">
+                <div className="bg-muted p-4 rounded-lg border border-border">
                     <canvas ref={canvasRef} className="rounded" />
                 </div>
 
                 <div className="w-full space-y-2 text-center">
-                    <div className="flex justify-between items-center px-4 py-2 bg-slate-800/30 rounded-lg">
-                        <span className="text-slate-400 text-sm">Amount:</span>
-                        <span className="text-white font-bold text-lg">${amount.toLocaleString()}</span>
+                    <div className="flex justify-between items-center px-4 py-2 bg-muted rounded-lg">
+                        <span className="text-muted-foreground text-sm">Amount:</span>
+                        <span className="text-foreground font-bold text-lg">${amount.toLocaleString()}</span>
                     </div>
-                    <div className="flex justify-between items-center px-4 py-2 bg-slate-800/30 rounded-lg">
-                        <span className="text-slate-400 text-sm">Method:</span>
+                    <div className="flex justify-between items-center px-4 py-2 bg-muted rounded-lg">
+                        <span className="text-muted-foreground text-sm">Method:</span>
                         <span className="text-emerald-400 font-medium">{paymentMethod}</span>
                     </div>
                 </div>
 
-                <p className="text-slate-400 text-xs text-center">
+                <p className="text-muted-foreground text-xs text-center">
                     {t('pos.qr_code.waiting')}
                 </p>
             </div>
@@ -632,15 +632,15 @@ const CashierPOS: React.FC = () => {
     return (
         <div className="flex h-full overflow-hidden">
             {/* Left Column - Category */}
-            <div className="w-32 lg:w-40 border-r border-white/10 flex-shrink-0 flex flex-col overflow-hidden">
+            <div className="w-32 lg:w-40 border-r border-border flex-shrink-0 flex flex-col overflow-hidden">
                 <ScrollArea className="flex-1">
                     <div className="space-y-2 p-4 flex flex-col items-center">
                         {/* All Categories Button */}
                         <Button
                             onClick={() => setCurrentSelected('all')}
-                            className={`h-24 w-24 rounded-lg border border-white/10 p-1 relative group ${currentSelected === 'all'
+                            className={`h-24 w-24 rounded-lg border border-border p-1 relative group ${currentSelected === 'all'
                                 ? 'bg-primary hover:bg-primary/90 text-white shadow-md'
-                                : 'bg-white border border-slate-200 hover:bg-slate-50 text-slate-600'
+                                : 'bg-white border border-border hover:bg-muted text-muted-foreground'
                                 }`}
                         >
                             All
@@ -650,7 +650,7 @@ const CashierPOS: React.FC = () => {
                         {isLoadingCategories ? (
                             <div className="flex flex-col gap-2">
                                 {[1, 2, 3].map(i => (
-                                    <div key={i} className="h-24 w-24 rounded-lg bg-slate-800 animate-pulse" />
+                                    <div key={i} className="h-24 w-24 rounded-lg bg-muted animate-pulse" />
                                 ))}
                             </div>
                         ) : (
@@ -658,15 +658,15 @@ const CashierPOS: React.FC = () => {
                                 <Button
                                     key={item.id}
                                     onClick={() => setCurrentSelected(item.id)}
-                                    className={`h-24 w-24 rounded-lg border border-white/10 p-1 relative group flex-col gap-2 ${currentSelected === item.id
+                                    className={`h-24 w-24 rounded-lg border border-border p-1 relative group flex-col gap-2 ${currentSelected === item.id
                                         ? 'bg-emerald-600 hover:bg-emerald-700 text-white'
-                                        : 'bg-slate-900 hover:bg-slate-800 text-slate-300'
+                                        : 'bg-background hover:bg-primary/10 text-foreground'
                                         }`}
                                 >
                                     {item.imageUrl ? (
                                         <img src={item.imageUrl} alt={item.name} className="h-10 w-10 object-contain" />
                                     ) : (
-                                        <div className="h-10 w-10 rounded-full bg-white/10 flex items-center justify-center text-xs">
+                                        <div className="h-10 w-10 rounded-full bg-muted flex items-center justify-center text-xs">
                                             {item.name.substring(0, 2).toUpperCase()}
                                         </div>
                                     )}
@@ -681,14 +681,14 @@ const CashierPOS: React.FC = () => {
             </div>
 
             {/* Middle Column - Products or Services */}
-            <div className="flex-1 backdrop-blur-sm border-r border-white/10 flex flex-col overflow-hidden">
+            <div className="flex-1 border-r border-border flex flex-col overflow-hidden">
                 <div className="p-2 sm:p-4 pb-0 pt-1">
                     <Input
                         type="text"
                         placeholder={`Search ${sellType === 'Service' ? 'services' : 'products'}...`}
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        className="w-full bg-white border-slate-200 text-slate-900 placeholder:text-slate-400 focus-visible:ring-primary shadow-sm"
+                        className="w-full bg-white border-border text-foreground placeholder:text-muted-foreground focus-visible:ring-primary shadow-sm"
                     />
                 </div>
                 <ScrollArea className="flex-1">
@@ -696,10 +696,10 @@ const CashierPOS: React.FC = () => {
                         <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-2 sm:gap-4">
                             {isLoadingProducts || isLoadingServices ? (
                                 Array.from({ length: 8 }).map((_, i) => (
-                                    <div key={i} className="h-56 sm:h-64 rounded-xl bg-slate-800 animate-pulse" />
+                                    <div key={i} className="h-56 sm:h-64 rounded-xl bg-muted animate-pulse" />
                                 ))
                             ) : displayedItems.length === 0 ? (
-                                <div className="col-span-full py-20 text-center text-slate-500">
+                                <div className="col-span-full py-20 text-center text-muted-foreground">
                                     Pak gen okenn atik yo jwenn
                                 </div>
                             ) : (
@@ -707,15 +707,15 @@ const CashierPOS: React.FC = () => {
                                     <div
                                         key={item.id}
                                         onClick={() => addToCart(item)}
-                                        className="h-56 sm:h-64 w-full rounded-xl border border-slate-200 bg-white transition-all cursor-pointer group flex flex-col overflow-hidden relative hover:border-primary active:scale-95 shadow-sm"
+                                        className="h-56 sm:h-64 w-full rounded-xl border border-border bg-white transition-all cursor-pointer group flex flex-col overflow-hidden relative hover:border-primary active:scale-95 shadow-sm"
                                     >
 
                                         {/* Image Area */}
-                                        <div className="h-24 sm:h-32 w-full bg-white/5 p-1 flex items-center justify-center relative">
+                                        <div className="h-24 sm:h-32 w-full bg-muted p-1 flex items-center justify-center relative">
                                             {item.imageUrl ? (
                                                 <img src={item.imageUrl} alt={item.name} className="h-full p-1 w-full rounded-lg object-cover" />
                                             ) : (
-                                                <div className="h-full p-1 w-full rounded-lg flex items-center justify-center text-slate-500 text-xs ">
+                                                <div className="h-full p-1 w-full rounded-lg flex items-center justify-center text-muted-foreground text-xs ">
                                                     Okenn Imaj
                                                 </div>
                                             )}
@@ -724,21 +724,21 @@ const CashierPOS: React.FC = () => {
                                         {/* Content Area */}
                                         <div className="flex-1 p-2 sm:p-3 flex flex-col gap-1">
                                             <div className="flex items-center justify-between gap-2">
-                                                <span className="text-slate-400 text-[10px] sm:text-xs font-medium truncate">
+                                                <span className="text-muted-foreground text-[10px] sm:text-xs font-medium truncate">
                                                     {getItemCategoryName(item.categoryId || item.category?.id)}
                                                 </span>
                                                 {sellType === 'Product' && (
-                                                    <span className="text-slate-400 font-medium text-[10px] sm:text-xs whitespace-nowrap shrink-0">
+                                                    <span className="text-muted-foreground font-medium text-[10px] sm:text-xs whitespace-nowrap shrink-0">
                                                         Sku: {item.sku}
                                                     </span>
                                                 )}
                                             </div>
-                                            <h3 className="text-slate-900 text-xs sm:text-sm font-semibold leading-tight line-clamp-2 min-h-[2rem] sm:min-h-[2.5rem]">
+                                            <h3 className="text-foreground text-xs sm:text-sm font-semibold leading-tight line-clamp-2 min-h-[2rem] sm:min-h-[2.5rem]">
                                                 {item.name}
                                             </h3>
 
                                             {/* Dotted Separator */}
-                                            <div className="h-px w-full border-t border-dashed border-slate-200" />
+                                            <div className="h-px w-full border-t border-dashed border-border" />
 
                                             {/* Price and Actions */}
                                             <div className="flex items-center justify-between mt-auto">
@@ -767,7 +767,7 @@ const CashierPOS: React.FC = () => {
             </div>
 
             {/* Right Column - Customer Info */}
-            <div className="w-full md:w-64 lg:w-80 backdrop-blur-sm flex-shrink-0 flex flex-col overflow-hidden">
+            <div className="w-full md:w-64 lg:w-80 flex-shrink-0 flex flex-col overflow-hidden">
                 <div className="p-4 pb-0 pt-1 flex items-center gap-2">
                     {/* Customer info will go here */}
                     <div className="flex-1 min-w-0">
@@ -776,7 +776,7 @@ const CashierPOS: React.FC = () => {
                                 <Button
                                     role="combobox"
                                     aria-expanded={open}
-                                    className="w-full h-10 justify-between bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 hover:text-slate-900 shadow-sm"
+                                    className="w-full h-10 justify-between bg-white border border-border text-foreground hover:bg-muted hover:text-foreground shadow-sm"
                                 >
                                     <span className="truncate flex-1 text-left text-xs sm:text-sm">
                                         {value === 'walk-in'
@@ -786,9 +786,9 @@ const CashierPOS: React.FC = () => {
                                     <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                                 </Button>
                             </PopoverTrigger>
-                            <PopoverContent className="w-[200px] lg:w-[240px] p-0 bg-slate-900/95 backdrop-blur-xl border-white/10 text-white">
-                                <Command className="bg-transparent border-none text-white">
-                                    <CommandInput placeholder="Search customer..." className="text-white placeholder:text-slate-500" />
+                            <PopoverContent className="w-[200px] lg:w-[240px] p-0 bg-background border-border text-foreground">
+                                <Command className="bg-transparent border-none text-foreground">
+                                    <CommandInput placeholder="Search customer..." className="text-foreground placeholder:text-muted-foreground" />
                                     <CommandList>
                                         <CommandEmpty>No customer found.</CommandEmpty>
                                         <CommandGroup>
@@ -798,7 +798,7 @@ const CashierPOS: React.FC = () => {
                                                     setValue("walk-in")
                                                     setOpen(false)
                                                 }}
-                                                className="text-white hover:bg-emerald-600 aria-selected:bg-emerald-600 aria-selected:text-white cursor-pointer"
+                                                className="text-foreground hover:bg-emerald-600 aria-selected:bg-emerald-600 aria-selected:text-white cursor-pointer"
                                             >
                                                 <Check
                                                     className={cn(
@@ -817,7 +817,7 @@ const CashierPOS: React.FC = () => {
                                                         setValue(currentValue)
                                                         setOpen(false)
                                                     }}
-                                                    className="text-white hover:bg-emerald-600 aria-selected:bg-emerald-600 aria-selected:text-white cursor-pointer"
+                                                    className="text-foreground hover:bg-emerald-600 aria-selected:bg-emerald-600 aria-selected:text-white cursor-pointer"
                                                 >
                                                     <Check
                                                         className={cn(
@@ -849,11 +849,11 @@ const CashierPOS: React.FC = () => {
                 </div>
                 <div className="p-4 pb-1 pt-1">
                     {selectedCustomer && (
-                        <div className="relative p-2 rounded-lg border border-orange-500/30 bg-orange-500/5 mt-2">
+                        <div className="relative p-2 rounded-lg border border-primary/30 bg-primary/5 mt-2">
                             {value !== 'walk-in' && (
                                 <Button
                                     onClick={() => setValue('walk-in')}
-                                    className="absolute -top-2 -right-2 h-5 w-5 rounded-full bg-orange-600 hover:bg-orange-700 text-white p-0 flex items-center justify-center"
+                                    className="absolute -top-2 -right-2 h-5 w-5 rounded-full bg-primary hover:bg-primary/90 text-white p-0 flex items-center justify-center"
                                 >
                                     <X className="h-3 w-3" />
                                 </Button>
@@ -861,23 +861,23 @@ const CashierPOS: React.FC = () => {
 
                             <div className="flex items-center justify-between">
                                 <div>
-                                    <h3 className="text-white font-medium text-sm mb-1 leading-none">
+                                    <h3 className="text-foreground font-medium text-sm mb-1 leading-none">
                                         {value === 'walk-in' ? "Walk-in Customer" : `${(selectedCustomer as Customer).firstName} ${(selectedCustomer as Customer).lastName}`}
                                     </h3>
                                     <div className="flex items-center gap-2 text-xs">
-                                        <span className="text-slate-400">Bonus :</span>
+                                        <span className="text-muted-foreground">Bonus :</span>
                                         <span className="bg-cyan-500 text-white px-1.5 py-0.5 rounded-md font-bold text-[10px]">
                                             {value === 'walk-in' ? 0 : (selectedCustomer as Customer).bonusPoints}
                                         </span>
-                                        <span className="text-slate-300">|</span>
-                                        <span className="text-slate-400">Loyalty :</span>
+                                        <span className="text-foreground">|</span>
+                                        <span className="text-muted-foreground">Loyalty :</span>
                                         <span className="bg-emerald-500 text-white px-1.5 py-0.5 rounded-md font-bold text-[10px]">
                                             {value === 'walk-in' ? 0 : (selectedCustomer as Customer).loyaltyPoints}
                                         </span>
                                     </div>
                                 </div>
                                 {value !== 'walk-in' && (
-                                    <Button className="h-6 text-xs bg-orange-600 hover:bg-orange-700 text-white px-3">
+                                    <Button className="h-6 text-xs bg-primary hover:bg-primary/90 text-white px-3">
                                         Apply
                                     </Button>
                                 )}
@@ -886,36 +886,36 @@ const CashierPOS: React.FC = () => {
                     )}
                 </div>
                 {/* Separator */}
-                <div className="h-px w-full border-t border border-white/10" />
+                <div className="h-px w-full border-t border border-border" />
                 <ScrollArea className="flex-1">
                     {/* cart items will go here */}
                     <div className="p-4">
-                        <div className='border border-white/10 p-2 rounded-md'>
+                        <div className='border border-border p-2 rounded-md'>
                             <div className="flex items-center justify-between mb-3">
                                 <div className="flex items-center gap-2">
-                                    <h4 className="text-white font-medium text-sm">Items in cart</h4>
+                                    <h4 className="text-foreground font-medium text-sm">Items in cart</h4>
                                     <span className="bg-emerald-500/20 text-emerald-500 text-[10px] px-2 py-0.5 rounded-md font-bold border border-emerald-500/20">
                                         {cartItemCount} Items
                                     </span>
                                 </div>
 
                                 <div className="flex items-center gap-2">
-                                    <span className="text-[10px] font-mono text-slate-400 bg-slate-800/50 px-2 py-1 rounded border border-white/5">
+                                    <span className="text-[10px] font-mono text-muted-foreground bg-muted px-2 py-1 rounded border border-border">
                                         #{cartReference}
                                     </span>
                                     <Button
                                         title='Clear cart'
                                         onClick={clearCart}
-                                        className="h-6 w-6 text-red-500 hover:text-red-400 hover:bg-red-500/10 p-0 rounded-md transition-colors bg-transparent border border-white/5 hover:border-red-500/20"
+                                        className="h-6 w-6 text-red-500 hover:text-red-400 hover:bg-red-500/10 p-0 rounded-md transition-colors bg-transparent border border-border hover:border-red-500/20"
                                     >
                                         <Trash className="h-3.5 w-3.5" />
                                     </Button>
                                 </div>
                             </div>
                             {/* Dotted Separator */}
-                            <div className="h-px w-full border-t border-dashed border-white/10" />
+                            <div className="h-px w-full border-t border-dashed border-border" />
                             {/* Cart Header */}
-                            <div className="grid grid-cols-12 gap-2 mb-2 px-2 text-[10px] font-semibold text-slate-400 uppercase tracking-wider mt-2">
+                            <div className="grid grid-cols-12 gap-2 mb-2 px-2 text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mt-2">
                                 <div className="col-span-6">Item</div>
                                 <div className="col-span-3 text-center">QTY</div>
                                 <div className="col-span-3 text-right">Cost</div>
@@ -923,22 +923,22 @@ const CashierPOS: React.FC = () => {
                             {/* Cart Items List */}
                             <div className="space-y-1 ">
                                 {cart.length === 0 ? (
-                                    <div className="text-slate-500 text-center text-sm py-4 italic">
+                                    <div className="text-muted-foreground text-center text-sm py-4 italic">
                                         Cart is empty
                                     </div>
                                 ) : (
                                     cart.map((item) => (
-                                        <div key={item.id} className="group grid grid-cols-12 gap-2 items-center p-2 rounded-lg hover:bg-white/5 transition-colors">
+                                        <div key={item.id} className="group grid grid-cols-12 gap-2 items-center p-2 rounded-lg hover:bg-primary/10 transition-colors">
                                             {/* Item Name & Delete */}
                                             <div className="col-span-6 flex items-center gap-2 overflow-hidden">
                                                 <button
                                                     onClick={() => removeFromCart(item.id)}
-                                                    className="text-slate-500 hover:text-red-500 transition-colors shrink-0"
+                                                    className="text-muted-foreground hover:text-red-500 transition-colors shrink-0"
                                                 >
                                                     <Trash className="h-3.5 w-3.5" />
                                                 </button>
                                                 <div className="flex flex-col min-w-0">
-                                                    <span className="text-sm font-medium text-white truncate group-hover:text-emerald-400 transition-colors">
+                                                    <span className="text-sm font-medium text-foreground truncate group-hover:text-emerald-400 transition-colors">
                                                         {item.name}
                                                     </span>
                                                     <div className="mt-1">
@@ -946,10 +946,10 @@ const CashierPOS: React.FC = () => {
                                                             value={item.priceType}
                                                             onValueChange={(val: any) => updatePriceType(item.id, val)}
                                                         >
-                                                            <SelectTrigger className="h-6 w-fit bg-slate-800 border-white/5 text-[10px] py-0 px-2 text-slate-400 hover:text-white transition-colors">
+                                                            <SelectTrigger className="h-6 w-fit bg-muted border-border text-[10px] py-0 px-2 text-muted-foreground hover:text-foreground transition-colors">
                                                                 <SelectValue />
                                                             </SelectTrigger>
-                                                            <SelectContent className="bg-slate-900 border-white/10 text-white min-w-[120px]">
+                                                            <SelectContent className="bg-background border-border text-foreground min-w-[120px]">
                                                                 <SelectItem value="retail" className="text-xs">{t('pos.price_tiers.retail')} (${(item.retailPrice || 0).toLocaleString()})</SelectItem>
                                                                 <SelectItem value="wholesale" className="text-xs">{t('pos.price_tiers.wholesale')} (${(item.wholesalePrice || 0).toLocaleString()})</SelectItem>
                                                                 <SelectItem value="grand" className="text-xs">{t('pos.price_tiers.grand_dealer')} (${(item.grandDealerPrice || 0).toLocaleString()})</SelectItem>
@@ -963,14 +963,14 @@ const CashierPOS: React.FC = () => {
                                             <div className="col-span-3 flex items-center justify-center gap-1">
                                                 <button
                                                     onClick={() => updateQty(item.id, -1)}
-                                                    className="h-5 w-5 rounded bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white flex items-center justify-center transition-colors"
+                                                    className="h-5 w-5 rounded bg-muted hover:bg-primary/10 text-muted-foreground hover:text-foreground flex items-center justify-center transition-colors"
                                                 >
                                                     <Minus className="h-3 w-3" />
                                                 </button>
-                                                <span className="text-white text-xs font-semibold w-4 text-center">{item.qty}</span>
+                                                <span className="text-foreground text-xs font-semibold w-4 text-center">{item.qty}</span>
                                                 <button
                                                     onClick={() => updateQty(item.id, 1)}
-                                                    className="h-5 w-5 rounded bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white flex items-center justify-center transition-colors"
+                                                    className="h-5 w-5 rounded bg-muted hover:bg-primary/10 text-muted-foreground hover:text-foreground flex items-center justify-center transition-colors"
                                                 >
                                                     <Plus className="h-3 w-3" />
                                                 </button>
@@ -978,7 +978,7 @@ const CashierPOS: React.FC = () => {
 
                                             {/* Price */}
                                             <div className="col-span-3 text-right">
-                                                <span className="text-white font-bold text-sm">
+                                                <span className="text-foreground font-bold text-sm">
                                                     ${(item.price * item.qty).toLocaleString()}
                                                 </span>
                                             </div>
@@ -987,30 +987,30 @@ const CashierPOS: React.FC = () => {
                                 )}
                             </div>
                             {/* Dotted Separator */}
-                            <div className="h-px w-full border-t border-dashed border-white/10" />
+                            <div className="h-px w-full border-t border-dashed border-border" />
                             {/* Payment Summary */}
                             <div className="space-y-2 mt-2">
                                 <div className="flex items-center justify-between">
-                                    <span className="text-slate-400 text-sm">Subtotal</span>
-                                    <span className="text-white font-medium text-sm">${subtotal.toLocaleString()}</span>
+                                    <span className="text-muted-foreground text-sm">Subtotal</span>
+                                    <span className="text-foreground font-medium text-sm">${subtotal.toLocaleString()}</span>
                                 </div>
                                 <div className="flex items-center justify-between">
-                                    <span className="text-slate-400 text-sm">Tax (10%)</span>
-                                    <span className="text-white font-medium text-sm">${tax.toLocaleString()}</span>
+                                    <span className="text-muted-foreground text-sm">Tax (10%)</span>
+                                    <span className="text-foreground font-medium text-sm">${tax.toLocaleString()}</span>
                                 </div>
                                 <div className="flex items-center justify-between">
-                                    <span className="text-slate-400 text-sm">Discount</span>
-                                    <span className="text-white font-medium text-sm">-${discount.toLocaleString()}</span>
+                                    <span className="text-muted-foreground text-sm">Discount</span>
+                                    <span className="text-foreground font-medium text-sm">-${discount.toLocaleString()}</span>
                                 </div>
                                 {/* Separator */}
-                                <div className="h-px w-full border-t border-dashed border-white/10 my-2" />
+                                <div className="h-px w-full border-t border-dashed border-border my-2" />
                                 {/* Total */}
                                 <div className="flex items-center justify-between pt-1">
-                                    <span className="text-white font-bold text-base">Total Payable</span>
+                                    <span className="text-foreground font-bold text-base">Total Payable</span>
                                     <div className="text-right">
                                         <div className="text-emerald-400 font-bold text-lg">{total.toLocaleString()} {currency}</div>
                                         {currency === 'HTG' && exchangeRate > 1 && (
-                                            <div className="text-slate-400 text-xs font-medium">
+                                            <div className="text-muted-foreground text-xs font-medium">
                                                 ≈ {(total / exchangeRate).toFixed(2)} USD
                                             </div>
                                         )}
@@ -1022,13 +1022,13 @@ const CashierPOS: React.FC = () => {
                     </div>
                     {/* payment method and Action button */}
                     <div className='p-4'>
-                        <div className='border border-white/10 rounded-md overflow-hidden'>
+                        <div className='border border-border rounded-md overflow-hidden'>
                             {/* 2-column grid */}
                             <div className="grid grid-cols-1 sm:grid-cols-2">
                                 {/* Left Column - Payment Methods */}
-                                <div className="border-r border-dashed border-white/10">
-                                    <div className="p-2 border-b border-white/10">
-                                        <h4 className="text-white font-medium text-sm underline underline-offset-4">Payment Method</h4>
+                                <div className="border-r border-dashed border-border">
+                                    <div className="p-2 border-b border-border">
+                                        <h4 className="text-foreground font-medium text-sm underline underline-offset-4">Payment Method</h4>
                                     </div>
                                     <div className="flex flex-col gap-1 p-2">
                                         <Button
@@ -1040,12 +1040,12 @@ const CashierPOS: React.FC = () => {
                                                 }
                                                 setSelectedPaymentMethod('cash');
                                             }}
-                                            className={`w-full justify-start gap-2 h-9 text-white hover:bg-emerald-600/20 hover:text-white ${selectedPaymentMethod === 'cash'
+                                            className={`w-full justify-start gap-2 h-9 text-foreground hover:bg-emerald-600/20 hover:text-foreground ${selectedPaymentMethod === 'cash'
                                                 ? 'bg-emerald-600/10 border-emerald-500/30'
-                                                : 'bg-slate-800/50 border-white/10 hover:bg-slate-700/50'
+                                                : 'bg-muted border-border hover:bg-primary/10'
                                                 }`}
                                         >
-                                            <Wallet className={`h-4 w-4 ${selectedPaymentMethod === 'cash' ? 'text-emerald-500' : 'text-slate-400'}`} />
+                                            <Wallet className={`h-4 w-4 ${selectedPaymentMethod === 'cash' ? 'text-emerald-500' : 'text-muted-foreground'}`} />
                                             <span className="text-sm">Cash</span>
                                         </Button>
                                         <Button
@@ -1062,12 +1062,12 @@ const CashierPOS: React.FC = () => {
                                                 }
                                                 toast.error("Peman pa kat poko disponib.");
                                             }}
-                                            className={`w-full justify-start gap-2 h-9 text-white hover:bg-emerald-600/20 hover:text-white ${!isOnline ? 'opacity-50 cursor-not-allowed' : ''} ${selectedPaymentMethod === 'card'
+                                            className={`w-full justify-start gap-2 h-9 text-foreground hover:bg-emerald-600/20 hover:text-foreground ${!isOnline ? 'opacity-50 cursor-not-allowed' : ''} ${selectedPaymentMethod === 'card'
                                                 ? 'bg-emerald-600/10 border-emerald-500/30'
-                                                : 'bg-slate-800/50 border-white/10 hover:bg-slate-700/50'
+                                                : 'bg-muted border-border hover:bg-primary/10'
                                                 }`}
                                         >
-                                            <CreditCard className={`h-4 w-4 ${selectedPaymentMethod === 'card' ? 'text-emerald-500' : 'text-orange-400'}`} />
+                                            <CreditCard className={`h-4 w-4 ${selectedPaymentMethod === 'card' ? 'text-emerald-500' : 'text-primary'}`} />
                                             <span className="text-sm">Card</span>
                                         </Button>
                                         <Button
@@ -1084,9 +1084,9 @@ const CashierPOS: React.FC = () => {
                                                 }
                                                 toast.error("Peman par scan poko disponib.");
                                             }}
-                                            className={`w-full justify-start gap-2 h-9 text-white hover:bg-emerald-600/20 hover:text-white ${!isOnline ? 'opacity-50 cursor-not-allowed' : ''} ${selectedPaymentMethod === 'scan'
+                                            className={`w-full justify-start gap-2 h-9 text-foreground hover:bg-emerald-600/20 hover:text-foreground ${!isOnline ? 'opacity-50 cursor-not-allowed' : ''} ${selectedPaymentMethod === 'scan'
                                                 ? 'bg-emerald-600/10 border-emerald-500/30'
-                                                : 'bg-slate-800/50 border-white/10 hover:bg-slate-700/50'
+                                                : 'bg-muted border-border hover:bg-primary/10'
                                                 }`}
                                         >
                                             <Scan className={`h-4 w-4 ${selectedPaymentMethod === 'scan' ? 'text-emerald-500' : 'text-blue-400'}`} />
@@ -1105,9 +1105,9 @@ const CashierPOS: React.FC = () => {
                                                 }
                                                 setSelectedPaymentMethod('credit');
                                             }}
-                                            className={`w-full justify-start gap-2 h-9 text-white hover:bg-emerald-600/20 hover:text-white ${selectedPaymentMethod === 'credit'
+                                            className={`w-full justify-start gap-2 h-9 text-foreground hover:bg-emerald-600/20 hover:text-foreground ${selectedPaymentMethod === 'credit'
                                                 ? 'bg-emerald-600/10 border-emerald-500/30'
-                                                : 'bg-slate-800/50 border-white/10 hover:bg-slate-700/50'
+                                                : 'bg-muted border-border hover:bg-primary/10'
                                                 }`}
                                         >
                                             <TicketCheck className={`h-4 w-4 ${selectedPaymentMethod === 'credit' ? 'text-emerald-500' : 'text-yellow-400'}`} />
@@ -1118,22 +1118,22 @@ const CashierPOS: React.FC = () => {
 
                                 {/* Right Column - Actions */}
                                 <div>
-                                    <div className="p-2 border-b border-white/10">
-                                        <h4 className="text-white font-medium text-sm underline underline-offset-4">Action</h4>
+                                    <div className="p-2 border-b border-border">
+                                        <h4 className="text-foreground font-medium text-sm underline underline-offset-4">Action</h4>
                                     </div>
                                     <div className="flex flex-col gap-1 p-2">
                                         <Button
                                             variant="outline"
-                                            className="w-full justify-start gap-2 h-9 bg-emerald-600/10 border-emerald-500/30 text-white hover:bg-emerald-600/20 hover:text-white"
+                                            className="w-full justify-start gap-2 h-9 bg-emerald-600/10 border-emerald-500/30 text-foreground hover:bg-emerald-600/20 hover:text-foreground"
                                         >
                                             <Pause className="h-4 w-4 text-emerald-500" />
                                             <span className="text-sm">En Pause</span>
                                         </Button>
                                         <Button
                                             variant="outline"
-                                            className="w-full justify-start gap-2 h-9 bg-slate-800/50 border-white/10 text-white hover:bg-slate-700/50 hover:text-white"
+                                            className="w-full justify-start gap-2 h-9 bg-muted border-border text-foreground hover:bg-primary/10 hover:text-foreground"
                                         >
-                                            <SquarePercent className="h-4 w-4 text-orange-400" />
+                                            <SquarePercent className="h-4 w-4 text-primary" />
                                             <span className="text-sm">Rabais</span>
                                         </Button>
                                         <Button
@@ -1148,7 +1148,7 @@ const CashierPOS: React.FC = () => {
                                                     handleFinalizeSale();
                                                 }
                                             }}
-                                            className="w-full justify-start gap-2 h-9 bg-slate-800/50 border-white/10 text-white hover:bg-blue-700 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed"
+                                            className="w-full justify-start gap-2 h-9 bg-muted border-border text-foreground hover:bg-blue-700 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed"
                                         >
                                             {isFinalizing ? (
                                                 <Loader2 className="h-4 w-4 animate-spin text-blue-400" />
@@ -1172,38 +1172,38 @@ const CashierPOS: React.FC = () => {
                 setCashDialogOpen(open);
                 if (!open && !isFinalizing) setAmountTendered('');
             }}>
-                <DialogContent className="bg-slate-900/95 backdrop-blur-xl border-white/20 text-white max-w-sm">
+                <DialogContent className="bg-background border-border text-foreground max-w-sm">
                     <DialogHeader>
-                        <DialogTitle className="text-white text-xl flex items-center gap-2">
+                        <DialogTitle className="text-foreground text-xl flex items-center gap-2">
                             <Wallet className="h-5 w-5 text-emerald-500" />
                             Pèman Lajan Kach
                         </DialogTitle>
-                        <DialogDescription className="text-slate-400">
-                            Peye pa: <span className="text-white font-bold">{value === 'walk-in' ? "Walk-in Customer" : realCustomers.find((c) => c.id === value)?.firstName + ' ' + realCustomers.find((c) => c.id === value)?.lastName}</span>
+                        <DialogDescription className="text-muted-foreground">
+                            Peye pa: <span className="text-foreground font-bold">{value === 'walk-in' ? "Walk-in Customer" : realCustomers.find((c) => c.id === value)?.firstName + ' ' + realCustomers.find((c) => c.id === value)?.lastName}</span>
                         </DialogDescription>
                     </DialogHeader>
 
                     <div className="space-y-4 py-2">
-                        <div className="flex justify-between items-center bg-slate-800/50 p-3 rounded-lg border border-white/10">
-                            <span className="text-slate-400">Total a Peye:</span>
+                        <div className="flex justify-between items-center bg-muted p-3 rounded-lg border border-border">
+                            <span className="text-muted-foreground">Total a Peye:</span>
                             <span className="text-xl font-bold text-emerald-400">{total.toLocaleString()} {currency}</span>
                         </div>
 
                         <div className="space-y-2">
-                            <label className="text-sm font-medium text-slate-300">Montant Reçu ({currency})</label>
+                            <label className="text-sm font-medium text-foreground">Montant Reçu ({currency})</label>
                             <Input
                                 type="number"
                                 value={amountTendered}
                                 onChange={(e) => setAmountTendered(e.target.value ? Number(e.target.value) : '')}
                                 placeholder={`Min: ${total.toLocaleString()}`}
-                                className="bg-slate-800/50 border-white/20 text-white text-lg h-12"
+                                className="bg-muted border-border text-foreground text-lg h-12"
                                 min={total}
                                 autoFocus
                             />
                         </div>
 
-                        <div className="flex justify-between items-center bg-slate-800/50 p-3 rounded-lg border border-white/10">
-                            <span className="text-slate-400">Monnaie (Rès kòb):</span>
+                        <div className="flex justify-between items-center bg-muted p-3 rounded-lg border border-border">
+                            <span className="text-muted-foreground">Monnaie (Rès kòb):</span>
                             <span className={`text-lg font-bold ${(typeof amountTendered === 'number' && amountTendered >= total) ? 'text-emerald-400' : 'text-rose-400'}`}>
                                 {typeof amountTendered === 'number' && amountTendered >= total
                                     ? (amountTendered - total).toLocaleString()
@@ -1216,7 +1216,7 @@ const CashierPOS: React.FC = () => {
                         <Button
                             variant="outline"
                             onClick={() => setCashDialogOpen(false)}
-                            className="bg-slate-800 border-white/10 text-white hover:bg-slate-700 w-full sm:w-auto"
+                            className="bg-background border-border text-foreground hover:bg-primary/10 w-full sm:w-auto"
                         >
                             <X className="h-4 w-4 mr-2" />
                             Anile
@@ -1242,37 +1242,37 @@ const CashierPOS: React.FC = () => {
                 setCreditDialogOpen(open);
                 if (!open && !isFinalizing) setAmountPaidCredit('');
             }}>
-                <DialogContent className="bg-slate-900/95 backdrop-blur-xl border-white/20 text-white max-w-sm">
+                <DialogContent className="bg-background border-border text-foreground max-w-sm">
                     <DialogHeader>
-                        <DialogTitle className="text-white text-xl flex items-center gap-2">
+                        <DialogTitle className="text-foreground text-xl flex items-center gap-2">
                             <TicketCheck className="h-5 w-5 text-emerald-500" />
                             {t('pos.credit_dialog.title')}
                         </DialogTitle>
-                        <DialogDescription className="text-slate-400">
-                            Kliyan: <span className="text-white font-bold">{realCustomers.find((c) => c.id === value)?.firstName + ' ' + realCustomers.find((c) => c.id === value)?.lastName}</span>
+                        <DialogDescription className="text-muted-foreground">
+                            Kliyan: <span className="text-foreground font-bold">{realCustomers.find((c) => c.id === value)?.firstName + ' ' + realCustomers.find((c) => c.id === value)?.lastName}</span>
                         </DialogDescription>
                     </DialogHeader>
 
                     <div className="space-y-4 py-2">
-                        <div className="flex justify-between items-center bg-slate-800/50 p-3 rounded-lg border border-white/10">
-                            <span className="text-slate-400">{t('pos.credit_dialog.total_sale')}</span>
+                        <div className="flex justify-between items-center bg-muted p-3 rounded-lg border border-border">
+                            <span className="text-muted-foreground">{t('pos.credit_dialog.total_sale')}</span>
                             <span className="text-xl font-bold text-emerald-400">{total.toLocaleString()} {currency}</span>
                         </div>
 
                         <div className="space-y-2">
-                            <label className="text-sm font-medium text-slate-300">{t('pos.credit_dialog.amount_received_label')}</label>
+                            <label className="text-sm font-medium text-foreground">{t('pos.credit_dialog.amount_received_label')}</label>
                             <Input
                                 type="number"
                                 value={amountPaidCredit}
                                 onChange={(e) => setAmountPaidCredit(e.target.value ? Number(e.target.value) : '')}
                                 placeholder="Egz: 500"
-                                className="bg-slate-800/50 border-white/20 text-white text-lg h-12"
+                                className="bg-muted border-border text-foreground text-lg h-12"
                                 autoFocus
                             />
                         </div>
 
-                        <div className="flex justify-between items-center bg-slate-800/50 p-3 rounded-lg border border-white/10">
-                            <span className="text-slate-400">{t('pos.credit_dialog.remaining_debt')}</span>
+                        <div className="flex justify-between items-center bg-muted p-3 rounded-lg border border-border">
+                            <span className="text-muted-foreground">{t('pos.credit_dialog.remaining_debt')}</span>
                             <span className="text-lg font-bold text-rose-400">
                                 {typeof amountPaidCredit === 'number'
                                     ? (total - Number(amountPaidCredit || 0)).toLocaleString()
@@ -1281,12 +1281,12 @@ const CashierPOS: React.FC = () => {
                         </div>
 
                         <div className="space-y-2">
-                            <label className="text-sm font-medium text-slate-300">Delè pou peye (Due Date)</label>
+                            <label className="text-sm font-medium text-foreground">Delè pou peye (Due Date)</label>
                             <Input
                                 type="date"
                                 value={dueDate}
                                 onChange={(e) => setDueDate(e.target.value)}
-                                className="bg-slate-800/50 border-white/20 text-white text-lg h-12"
+                                className="bg-muted border-border text-foreground text-lg h-12"
                             />
                         </div>
                     </div>
@@ -1295,7 +1295,7 @@ const CashierPOS: React.FC = () => {
                         <Button
                             variant="outline"
                             onClick={() => setCreditDialogOpen(false)}
-                            className="bg-slate-800 border-white/10 text-white hover:bg-slate-700 w-full sm:w-auto"
+                            className="bg-background border-border text-foreground hover:bg-primary/10 w-full sm:w-auto"
                         >
                             <X className="h-4 w-4 mr-2" />
                             {t('pos.credit_dialog.cancel')}
@@ -1321,13 +1321,13 @@ const CashierPOS: React.FC = () => {
             <Dialog open={printPromptOpen} onOpenChange={(open) => {
                 if (!open) handleNewSale();
             }}>
-                <DialogContent className="bg-slate-900 border-white/10 text-white max-w-sm">
+                <DialogContent className="bg-background border-border text-foreground max-w-sm">
                     <DialogHeader>
                         <DialogTitle className="text-xl font-bold flex items-center justify-center gap-2 text-emerald-400">
                             <Check className="h-6 w-6" />
                             Vant lan Reyisi!
                         </DialogTitle>
-                        <DialogDescription className="text-center text-slate-400 pt-2">
+                        <DialogDescription className="text-center text-muted-foreground pt-2">
                             Pèman ou an anrejistre kòrèkteman. Èske ou vle enprime resi a pou kliyan an?
                         </DialogDescription>
                     </DialogHeader>
@@ -1343,7 +1343,7 @@ const CashierPOS: React.FC = () => {
                         <Button
                             variant="outline"
                             onClick={handleNewSale}
-                            className="w-full bg-slate-800 border-white/10 text-white hover:bg-slate-700 h-10"
+                            className="w-full bg-background border-border text-foreground hover:bg-primary/10 h-10"
                         >
                             <Plus className="h-4 w-4 mr-2" />
                             Nouvo Vant
@@ -1357,12 +1357,12 @@ const CashierPOS: React.FC = () => {
                 setScanDialogOpen(open);
                 if (!open) setSelectedDigitalPayment(null);
             }}>
-                <DialogContent className="bg-slate-900/95 backdrop-blur-xl border-white/20 text-white max-w-md">
+                <DialogContent className="bg-background border-border text-foreground max-w-md">
                     {!selectedDigitalPayment ? (
                         <>
                             <DialogHeader>
-                                <DialogTitle className="text-white text-xl">Select Digital Payment Method</DialogTitle>
-                                <DialogDescription className="text-slate-300">
+                                <DialogTitle className="text-foreground text-xl">Select Digital Payment Method</DialogTitle>
+                                <DialogDescription className="text-muted-foreground">
                                     Choose a digital payment option to proceed with the transaction
                                 </DialogDescription>
                             </DialogHeader>
@@ -1370,7 +1370,7 @@ const CashierPOS: React.FC = () => {
                             <div className="grid grid-cols-2 gap-3 mt-4">
                                 <Button
                                     variant="outline"
-                                    className="h-20 flex flex-col items-center justify-center gap-2 bg-slate-800/50 border-white/10 text-white hover:bg-emerald-600/20 hover:border-emerald-500/30"
+                                    className="h-20 flex flex-col items-center justify-center gap-2 bg-muted border-border text-foreground hover:bg-emerald-600/20 hover:border-emerald-500/30"
                                     onClick={() => setSelectedDigitalPayment('Natcash')}
                                 >
                                     <Wallet className="h-6 w-6 text-cyan-400" />
@@ -1379,7 +1379,7 @@ const CashierPOS: React.FC = () => {
 
                                 <Button
                                     variant="outline"
-                                    className="h-20 flex flex-col items-center justify-center gap-2 bg-slate-800/50 border-white/10 text-white hover:bg-emerald-600/20 hover:border-emerald-500/30"
+                                    className="h-20 flex flex-col items-center justify-center gap-2 bg-muted border-border text-foreground hover:bg-emerald-600/20 hover:border-emerald-500/30"
                                     onClick={() => setSelectedDigitalPayment('Moncash')}
                                 >
                                     <CreditCard className="h-6 w-6 text-red-400" />
@@ -1388,7 +1388,7 @@ const CashierPOS: React.FC = () => {
 
                                 <Button
                                     variant="outline"
-                                    className="h-20 flex flex-col items-center justify-center gap-2 bg-slate-800/50 border-white/10 text-white hover:bg-emerald-600/20 hover:border-emerald-500/30"
+                                    className="h-20 flex flex-col items-center justify-center gap-2 bg-muted border-border text-foreground hover:bg-emerald-600/20 hover:border-emerald-500/30"
                                     onClick={() => setSelectedDigitalPayment('Paypal')}
                                 >
                                     <Wallet className="h-6 w-6 text-blue-400" />
@@ -1397,7 +1397,7 @@ const CashierPOS: React.FC = () => {
 
                                 <Button
                                     variant="outline"
-                                    className="h-20 flex flex-col items-center justify-center gap-2 bg-slate-800/50 border-white/10 text-white hover:bg-emerald-600/20 hover:border-emerald-500/30"
+                                    className="h-20 flex flex-col items-center justify-center gap-2 bg-muted border-border text-foreground hover:bg-emerald-600/20 hover:border-emerald-500/30"
                                     onClick={() => setSelectedDigitalPayment('Bousanm')}
                                 >
                                     <Scan className="h-6 w-6 text-emerald-400" />
@@ -1406,7 +1406,7 @@ const CashierPOS: React.FC = () => {
 
                                 <Button
                                     variant="outline"
-                                    className="h-20 flex flex-col items-center justify-center gap-2 bg-slate-800/50 border-white/10 text-white hover:bg-emerald-600/20 hover:border-emerald-500/30 col-span-2"
+                                    className="h-20 flex flex-col items-center justify-center gap-2 bg-muted border-border text-foreground hover:bg-emerald-600/20 hover:border-emerald-500/30 col-span-2"
                                     onClick={() => setSelectedDigitalPayment('Zelle')}
                                 >
                                     <CreditCard className="h-6 w-6 text-purple-400" />
@@ -1426,15 +1426,15 @@ const CashierPOS: React.FC = () => {
 
             {/* Clear Cart Confirmation Dialog */}
             <AlertDialog open={clearCartDialogOpen} onOpenChange={setClearCartDialogOpen}>
-                <AlertDialogContent className="bg-slate-900/95 backdrop-blur-xl border-white/20 text-white">
+                <AlertDialogContent className="bg-background border-border text-foreground">
                     <AlertDialogHeader>
-                        <AlertDialogTitle className="text-white">Are you sure you want to clear the cart?</AlertDialogTitle>
-                        <AlertDialogDescription className="text-slate-300">
+                        <AlertDialogTitle className="text-foreground">Are you sure you want to clear the cart?</AlertDialogTitle>
+                        <AlertDialogDescription className="text-muted-foreground">
                             This action will remove all items from your cart. This cannot be undone.
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                        <AlertDialogCancel className="bg-slate-800 text-white hover:bg-slate-700 border-white/10">
+                        <AlertDialogCancel className="bg-background text-foreground hover:bg-primary/10 border-border">
                             Cancel
                         </AlertDialogCancel>
                         <AlertDialogAction
@@ -1450,17 +1450,17 @@ const CashierPOS: React.FC = () => {
             {/* Split Payment Dialog */}
             <Dialog open={splitDialogOpen} onOpenChange={setSplitDialogOpen}>
 
-                <DialogContent className="bg-slate-900/95 backdrop-blur-xl border-white/20 text-white max-w-2xl">
+                <DialogContent className="bg-background border-border text-foreground max-w-2xl">
                     <DialogHeader>
-                        <DialogTitle className="text-white text-xl">Split Payment</DialogTitle>
-                        <DialogDescription className="text-slate-300">
+                        <DialogTitle className="text-foreground text-xl">Split Payment</DialogTitle>
+                        <DialogDescription className="text-muted-foreground">
                             Divide the payment across multiple methods
                         </DialogDescription>
                     </DialogHeader>
                     <div className="space-y-3 mt-4">
                         {paymentRows.map((row, index) => (
                             <div key={row.id} className="flex items-center gap-2">
-                                <span className="text-slate-400 text-sm w-20">Payment {index + 1}</span>
+                                <span className="text-muted-foreground text-sm w-20">Payment {index + 1}</span>
 
                                 <Select
                                     value={row.method}
@@ -1470,14 +1470,14 @@ const CashierPOS: React.FC = () => {
                                         setPaymentRows(newRows);
                                     }}
                                 >
-                                    <SelectTrigger className="w-40 bg-slate-800/50 border-white/10 text-white">
+                                    <SelectTrigger className="w-40 bg-muted border-border text-foreground">
                                         <SelectValue />
                                     </SelectTrigger>
-                                    <SelectContent className="bg-slate-900 border-white/20">
-                                        <SelectItem value="cash" className="text-white hover:bg-slate-800">Cash</SelectItem>
-                                        <SelectItem value="card" className="text-white hover:bg-slate-800">Card</SelectItem>
-                                        <SelectItem value="moncash" className="text-white hover:bg-slate-800">Moncash</SelectItem>
-                                        <SelectItem value="natcash" className="text-white hover:bg-slate-800">Natcash</SelectItem>
+                                    <SelectContent className="bg-background border-border">
+                                        <SelectItem value="cash" className="text-foreground hover:bg-primary/10">Cash</SelectItem>
+                                        <SelectItem value="card" className="text-foreground hover:bg-primary/10">Card</SelectItem>
+                                        <SelectItem value="moncash" className="text-foreground hover:bg-primary/10">Moncash</SelectItem>
+                                        <SelectItem value="natcash" className="text-foreground hover:bg-primary/10">Natcash</SelectItem>
                                     </SelectContent>
                                 </Select>
 
@@ -1490,11 +1490,11 @@ const CashierPOS: React.FC = () => {
                                         newRows[index].amount = e.target.value;
                                         setPaymentRows(newRows);
                                     }}
-                                    className="flex-1 bg-slate-800/50 border-white/10 text-white placeholder:text-slate-500"
+                                    className="flex-1 bg-muted border-border text-foreground placeholder:text-muted-foreground"
                                 />
 
                                 <Button
-                                    className="bg-slate-800 text-white hover:bg-slate-700 px-6"
+                                    className="bg-muted text-foreground hover:bg-primary/10 px-6"
                                 >
                                     Charge
                                 </Button>
@@ -1506,7 +1506,7 @@ const CashierPOS: React.FC = () => {
                                         onClick={() => {
                                             setPaymentRows(paymentRows.filter(r => r.id !== row.id));
                                         }}
-                                        className="text-slate-400 hover:text-red-400 hover:bg-red-400/10"
+                                        className="text-muted-foreground hover:text-red-400 hover:bg-red-400/10"
                                     >
                                         <Trash className="h-4 w-4" />
                                     </Button>
@@ -1521,7 +1521,7 @@ const CashierPOS: React.FC = () => {
                                     setPaymentRows([...paymentRows, { id: newId, method: 'cash', amount: '' }]);
                                 }}
                                 disabled={paymentRows.length >= 5}
-                                className="bg-slate-500/20 border border-slate-500 text-white hover:bg-emerald-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="bg-muted border border-border text-foreground hover:bg-emerald-500 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                                 Add More {paymentRows.length >= 5 && '(Max 5)'}
                             </Button>
@@ -1531,7 +1531,7 @@ const CashierPOS: React.FC = () => {
                     <div className="flex justify-end gap-2 mt-6">
                         <Button
                             onClick={() => setSplitDialogOpen(false)}
-                            className="bg-slate-500/20 border border-slate-500 text-white hover:bg-slate-500"
+                            className="bg-muted border border-border text-foreground hover:bg-primary/10"
                         >
                             Cancel
                         </Button>
@@ -1540,7 +1540,7 @@ const CashierPOS: React.FC = () => {
                                 toast.success("Sale completed successfully!");
                                 setSplitDialogOpen(false);
                             }}
-                            className="bg-slate-500/20 border border-slate-500 text-white hover:bg-emerald-500"
+                            className="bg-muted border border-border text-foreground hover:bg-emerald-500 hover:text-white"
                         >
                             Complete Sale
                         </Button>
@@ -1550,67 +1550,67 @@ const CashierPOS: React.FC = () => {
 
             {/* Add Customer Dialog */}
             <Dialog open={isCustomerDialogOpen} onOpenChange={setIsCustomerDialogOpen}>
-                <DialogContent className="bg-slate-900 border-white/10 text-white max-w-md">
+                <DialogContent className="bg-background border-border text-foreground max-w-md">
                     <DialogHeader>
                         <DialogTitle className="text-xl font-bold">Ajoute yon kliyan</DialogTitle>
-                        <DialogDescription className="text-slate-400 text-sm">
+                        <DialogDescription className="text-muted-foreground text-sm">
                             Antre enfòmasyon kliyan an anba la a.
                         </DialogDescription>
                     </DialogHeader>
 
                     <div className="grid gap-4 py-4">
                         <div className="space-y-2">
-                            <Label className="text-slate-300 text-sm">Siyati ak non <span className="text-rose-500">*</span></Label>
+                            <Label className="text-foreground text-sm">Siyati ak non <span className="text-rose-500">*</span></Label>
                             <div className="flex gap-2">
                                 <Input
                                     value={customerFormData.lastName}
                                     onChange={(e) => setCustomerFormData({ ...customerFormData, lastName: e.target.value })}
-                                    className="bg-white/5 border-white/10 text-white focus:ring-emerald-500"
+                                    className="bg-muted border-border text-foreground focus:ring-emerald-500"
                                     placeholder="egzanp. Dupont (Siyati)"
                                 />
                                 <Input
                                     value={customerFormData.firstName}
                                     onChange={(e) => setCustomerFormData({ ...customerFormData, firstName: e.target.value })}
-                                    className="bg-white/5 border-white/10 text-white focus:ring-emerald-500"
+                                    className="bg-muted border-border text-foreground focus:ring-emerald-500"
                                     placeholder="egzanp. Jean (Non)"
                                 />
                             </div>
                         </div>
                         <div className="space-y-2">
-                            <Label className="text-slate-300 text-sm">Telefòn</Label>
+                            <Label className="text-foreground text-sm">Telefòn</Label>
                             <Input
                                 value={customerFormData.phone}
                                 onChange={(e) => setCustomerFormData({ ...customerFormData, phone: e.target.value })}
-                                className="bg-white/5 border-white/10 text-white focus:ring-emerald-500"
+                                className="bg-muted border-border text-foreground focus:ring-emerald-500"
                                 placeholder="+509 1234 5678"
                             />
                         </div>
                         <div className="space-y-2">
-                            <Label className="text-slate-300 text-sm">Imèl (Email)</Label>
+                            <Label className="text-foreground text-sm">Imèl (Email)</Label>
                             <Input
                                 type="email"
                                 value={customerFormData.email}
                                 onChange={(e) => setCustomerFormData({ ...customerFormData, email: e.target.value })}
-                                className="bg-white/5 border-white/10 text-white focus:ring-emerald-500"
+                                className="bg-muted border-border text-foreground focus:ring-emerald-500"
                                 placeholder="jean.dupont@email.com"
                             />
                         </div>
                         <div className="space-y-2">
-                            <Label className="text-slate-300 text-sm">Adrès</Label>
+                            <Label className="text-foreground text-sm">Adrès</Label>
                             <Input
                                 value={customerFormData.address}
                                 onChange={(e) => setCustomerFormData({ ...customerFormData, address: e.target.value })}
-                                className="bg-white/5 border-white/10 text-white focus:ring-emerald-500"
+                                className="bg-muted border-border text-foreground focus:ring-emerald-500"
                                 placeholder="Pétion-Ville, Haiti"
                             />
                         </div>
                     </div>
 
-                    <DialogFooter className="bg-slate-900/50 -mx-6 -mb-6 p-4 border-t border-white/10">
+                    <DialogFooter className="bg-muted -mx-6 -mb-6 p-4 border-t border-border">
                         <Button
                             variant="outline"
                             onClick={() => setIsCustomerDialogOpen(false)}
-                            className="bg-transparent border-white/10 text-white hover:bg-white/5"
+                            className="bg-transparent border-border text-foreground hover:bg-primary/10"
                         >
                             Anile
                         </Button>
@@ -1626,13 +1626,13 @@ const CashierPOS: React.FC = () => {
 
             {/* Scan Customer Dialog */}
             <Dialog open={isScanCustomerDialogOpen} onOpenChange={setIsScanCustomerDialogOpen}>
-                <DialogContent className="bg-slate-900 border-white/10 text-white max-w-sm">
+                <DialogContent className="bg-background border-border text-foreground max-w-sm">
                     <DialogHeader>
                         <DialogTitle className="text-xl font-bold flex items-center gap-2">
                             <Scan className="h-5 w-5 text-emerald-500" />
                             Skane Kat Kliyan an
                         </DialogTitle>
-                        <DialogDescription className="text-slate-400 text-sm">
+                        <DialogDescription className="text-muted-foreground text-sm">
                             Pase eskanè a sou kòd la oswa tape telefòn/imèl li.
                         </DialogDescription>
                     </DialogHeader>
@@ -1643,7 +1643,7 @@ const CashierPOS: React.FC = () => {
                             value={scanCustomerQuery}
                             onChange={(e) => setScanCustomerQuery(e.target.value)}
                             placeholder="Tann eskanè a..."
-                            className="bg-white/5 border-emerald-500/30 focus:border-emerald-500 text-white text-center text-lg h-12"
+                            className="bg-muted border-emerald-500/30 focus:border-emerald-500 text-foreground text-center text-lg h-12"
                         />
                         <Button
                             type="submit"

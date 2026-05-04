@@ -45,7 +45,7 @@ export function DatePickerInput({ date, onDateChange, label, id }: DatePickerInp
 
     return (
         <div className="flex flex-col gap-3">
-            <Label htmlFor={id} className="text-white">
+            <Label htmlFor={id} className="text-foreground">
                 {label} <span className="text-red-500">*</span>
             </Label>
             <div className="relative flex gap-2">
@@ -54,7 +54,7 @@ export function DatePickerInput({ date, onDateChange, label, id }: DatePickerInp
                     value={value}
                     readOnly
                     placeholder="Pick a date"
-                    className="bg-slate-900 border-white/10 text-white placeholder:text-slate-500 focus-visible:ring-0 focus-visible:border-orange-500 focus-visible:ring-offset-0 disabled:cursor-not-allowed disabled:opacity-50 pr-10 cursor-pointer"
+                    className="bg-background border-border text-foreground placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 pr-10 cursor-pointer"
                     onClick={() => setOpen(true)}
                     onKeyDown={(e) => {
                         if (e.key === "ArrowDown") {
@@ -68,14 +68,14 @@ export function DatePickerInput({ date, onDateChange, label, id }: DatePickerInp
                         <Button
                             id={`${id}-trigger`}
                             variant="ghost"
-                            className="absolute top-1/2 right-2 size-6 -translate-y-1/2 hover:bg-white/10 text-slate-400 hover:text-white"
+                            className="absolute top-1/2 right-2 size-6 -translate-y-1/2 hover:bg-primary/10 text-muted-foreground hover:text-primary"
                         >
                             <CalendarIcon className="size-3.5" />
                             <span className="sr-only">Select date</span>
                         </Button>
                     </PopoverTrigger>
                     <PopoverContent
-                        className="w-auto overflow-hidden p-0 bg-slate-900 border-white/10 text-white"
+                        className="w-auto overflow-hidden p-0 bg-background border-border text-foreground"
                         align="end"
                         alignOffset={-8}
                         sideOffset={10}
@@ -91,20 +91,20 @@ export function DatePickerInput({ date, onDateChange, label, id }: DatePickerInp
                                 setValue(formatDate(newDate))
                                 setOpen(false)
                             }}
-                            className="bg-slate-900 text-white"
+                            className="bg-background text-foreground"
                             classNames={{
-                                day_selected: "bg-orange-500 text-white hover:bg-orange-500 hover:text-white focus:bg-orange-500 focus:text-white",
-                                day_today: "bg-white/10 text-white",
-                                day: "h-9 w-9 p-0 font-normal aria-selected:opacity-100 hover:bg-white/10 hover:text-white focus:bg-white/10 focus:text-white text-white",
-                                day_outside: "text-slate-500 opacity-50",
-                                day_disabled: "text-slate-500 opacity-50",
-                                day_range_middle: "aria-selected:bg-white/10 aria-selected:text-white",
+                                day_selected: "bg-primary text-white hover:bg-primary hover:text-white focus:bg-primary focus:text-white",
+                                day_today: "bg-primary/10 text-primary",
+                                day: "h-9 w-9 p-0 font-normal aria-selected:opacity-100 hover:bg-primary/10 hover:text-primary focus:bg-primary/10 focus:text-primary text-foreground",
+                                day_outside: "text-muted-foreground opacity-50",
+                                day_disabled: "text-muted-foreground opacity-50",
+                                day_range_middle: "aria-selected:bg-primary/10 aria-selected:text-primary",
                                 day_hidden: "invisible",
-                                nav_button: "border border-white/10 hover:bg-white/10 hover:text-white",
+                                nav_button: "border border-border hover:bg-primary/10 hover:text-primary",
                                 nav_button_previous: "absolute left-1",
                                 nav_button_next: "absolute right-1",
-                                caption: "flex justify-center pt-1 relative items-center text-white",
-                                head_cell: "text-slate-500 rounded-md w-9 font-normal text-[0.8rem]",
+                                caption: "flex justify-center pt-1 relative items-center text-foreground",
+                                head_cell: "text-muted-foreground rounded-md w-9 font-normal text-[0.8rem]",
                             }}
                         />
                     </PopoverContent>

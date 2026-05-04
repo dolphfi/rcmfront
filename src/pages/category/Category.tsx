@@ -52,7 +52,6 @@ import categoryService from '../../context/api/categoryservice';
 const Category: React.FC = () => {
     const { t } = useTranslation();
     const [categoriesList, setCategoriesList] = React.useState<any[]>([]);
-    const [isLoading, setIsLoading] = React.useState(true);
     const [currentPage, setCurrentPage] = React.useState(1);
     const [itemsPerPage, setItemsPerPage] = React.useState(10);
     const [searchTerm, setSearchTerm] = React.useState('');
@@ -63,23 +62,22 @@ const Category: React.FC = () => {
     const [selectedCategory, setSelectedCategory] = React.useState('All');
     const [currentPageSub, setCurrentPageSub] = React.useState(1);
     const [itemsPerPageSub, setItemsPerPageSub] = React.useState(10);
-
-    const fetchCategories = async () => {
+    const fetchCategories = React.useCallback(async () => {
         try {
-            setIsLoading(true);
+            // setIsLoading(true);
             const data = await categoryService.getAll();
             setCategoriesList(data);
         } catch (error) {
             toast.error(t('common.error_fetching_data'));
             console.error(error);
         } finally {
-            setIsLoading(false);
+            // setIsLoading(false);
         }
-    };
+    }, [t]);
 
     React.useEffect(() => {
         fetchCategories();
-    }, []);
+    }, [fetchCategories]);
 
     const categoryData = categoriesList;
     const subCategoryData = categoriesList.flatMap((cat: any) =>
@@ -289,104 +287,104 @@ const Category: React.FC = () => {
             {/* Page Header */}
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div>
-                    <h1 className="text-2xl font-bold text-white tracking-tight">{t('category.title')}</h1>
-                    <p className="text-sm text-slate-400">{t('category.subtitle_cat')}</p>
+                    <h1 className="text-2xl font-bold text-foreground tracking-tight">{t('category.title')}</h1>
+                    <p className="text-sm text-muted-foreground">{t('category.subtitle_cat')}</p>
                 </div>
 
                 <div className="flex flex-wrap items-center gap-2">
                     {/* Action Icons */}
-                    <div className="flex items-center gap-1 bg-white/5 p-1 rounded-lg border border-white/10 mr-2">
-                        <Button variant="ghost" size="icon" className="h-8 w-8 text-rose-500 hover:bg-white/10 hover:text-rose-400" title="PDF">
+                    <div className="flex items-center gap-1 bg-muted p-1 rounded-lg border border-border mr-2">
+                        <Button variant="ghost" size="icon" className="h-8 w-8 text-rose-500 hover:bg-primary/10 hover:text-rose-400" title="PDF">
                             <FileText className="h-4 w-4" />
                         </Button>
-                        <Button variant="ghost" size="icon" className="h-8 w-8 text-emerald-500 hover:bg-white/10 hover:text-emerald-400" title="Excel">
+                        <Button variant="ghost" size="icon" className="h-8 w-8 text-emerald-500 hover:bg-primary/10 hover:text-emerald-400" title="Excel">
                             <FileSpreadsheet className="h-4 w-4" />
                         </Button>
-                        <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:bg-white/10 hover:text-white" title="Print">
+                        <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:bg-primary/10 hover:text-primary" title="Print">
                             <Printer className="h-4 w-4" />
                         </Button>
-                        <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:bg-white/10 hover:text-white" title="Refresh">
+                        <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:bg-primary/10 hover:text-primary" title="Refresh">
                             <RotateCw className="h-4 w-4" />
                         </Button>
-                        <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:bg-white/10 hover:text-white" title="Toggle">
+                        <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:bg-primary/10 hover:text-primary" title="Toggle">
                             <ChevronDown className="h-4 w-4" />
                         </Button>
                     </div>
                     <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
                         <DialogTrigger asChild>
-                            <Button className="bg-orange-500 hover:bg-orange-600 text-white gap-2">
+                            <Button className="bg-primary hover:bg-primary/90 text-white gap-2">
                                 <Plus className="h-4 w-4" />
                                 <span className="hidden sm:inline">{t('category.add_cat')}</span>
                             </Button>
                         </DialogTrigger>
-                        <DialogContent className="bg-slate-900 border-white/10 text-white sm:max-w-[425px]">
+                        <DialogContent className="bg-background border-border text-foreground sm:max-w-[425px]">
                             <DialogHeader>
                                 <DialogTitle>{t('category.add_cat')}</DialogTitle>
-                                <DialogDescription className="text-slate-400">
+                                <DialogDescription className="text-muted-foreground">
                                     {t('category.add_cat_desc')}
                                 </DialogDescription>
                             </DialogHeader>
 
                             <div className="grid gap-4 py-4">
                                 <div className="space-y-2">
-                                    <Label htmlFor="category" className="text-white">{t('products.category')} <span className="text-rose-500">*</span></Label>
+                                    <Label htmlFor="category" className="text-foreground">{t('products.category')} <span className="text-rose-500">*</span></Label>
                                     <Input
                                         id="category"
                                         value={newCategory.name}
                                         onChange={handleNameChange}
-                                        className="bg-white/5 border-white/10 text-white focus-visible:ring-orange-500/50"
+                                        className="bg-muted border-border text-foreground focus-visible:ring-ring"
                                         placeholder={t('category.cat_name_placeholder')}
                                     />
                                 </div>
                                 <div className="space-y-2">
-                                    <Label htmlFor="slug" className="text-white">{t('category.table_slug')} <span className="text-rose-500">*</span></Label>
+                                    <Label htmlFor="slug" className="text-foreground">{t('category.table_slug')} <span className="text-rose-500">*</span></Label>
                                     <Input
                                         id="slug"
                                         value={newCategory.slug}
                                         readOnly
-                                        className="bg-white/5 border-white/10 text-slate-400 cursor-not-allowed focus-visible:ring-0"
+                                        className="bg-muted border-border text-muted-foreground cursor-not-allowed focus-visible:ring-0"
                                         placeholder={t('category.slug_placeholder')}
                                     />
                                 </div>
                                 <div className="space-y-2">
-                                    <Label className="text-white">{t('category.table_type')} <span className="text-rose-500">*</span></Label>
+                                    <Label className="text-foreground">{t('category.table_type')} <span className="text-rose-500">*</span></Label>
                                     <Select
                                         value={newCategory.type}
                                         onValueChange={(value) => setNewCategory({ ...newCategory, type: value as 'product' | 'service' })}
                                     >
-                                        <SelectTrigger className="bg-white/5 border border-white/10 text-white focus:ring-orange-500">
+                                        <SelectTrigger className="bg-muted border border-border text-foreground focus-visible:ring-ring">
                                             <SelectValue placeholder="Select type" />
                                         </SelectTrigger>
-                                        <SelectContent className="bg-slate-900 border-white/10 text-white">
+                                        <SelectContent className="bg-background border-border text-foreground">
                                             <SelectItem value="product">Product</SelectItem>
                                             <SelectItem value="service">Service</SelectItem>
                                         </SelectContent>
                                     </Select>
                                 </div>
                                 <div className="flex items-center justify-between pt-2">
-                                    <Label htmlFor="status" className="text-white">{t('category.table_status')} <span className="text-rose-500">*</span></Label>
+                                    <Label htmlFor="status" className="text-foreground">{t('category.table_status')} <span className="text-rose-500">*</span></Label>
                                     <Switch
                                         id="status"
                                         checked={newCategory.status}
                                         onCheckedChange={(checked) => setNewCategory({ ...newCategory, status: checked })}
-                                        className="bg-white/5 border border-white/10 backdrop-blur-sm data-[state=checked]:bg-emerald-500 data-[state=unchecked]:bg-white/5"
+                                        className="bg-muted border border-border data-[state=checked]:bg-emerald-500 data-[state=unchecked]:bg-muted"
                                     />
                                 </div>
                             </div>
                             <DialogFooter>
-                                <Button variant="outline" className="bg-slate-800 border-white/10 text-white hover:bg-slate-700 hover:text-white" onClick={() => setIsAddOpen(false)}>{t('common.cancel')}</Button>
-                                <Button className="bg-orange-500 hover:bg-orange-600 text-white" onClick={handleAddCategory}>{t('common.save_button')}</Button>
+                                <Button variant="outline" className="bg-background border-border text-foreground hover:bg-primary/10 hover:text-primary" onClick={() => setIsAddOpen(false)}>{t('common.cancel')}</Button>
+                                <Button className="bg-primary hover:bg-primary/90 text-white" onClick={handleAddCategory}>{t('common.save_button')}</Button>
                             </DialogFooter>
                         </DialogContent>
                     </Dialog>
                     <Dialog open={isAddSubOpen} onOpenChange={setIsAddSubOpen}>
                         <DialogTrigger asChild>
-                            <Button className="bg-orange-500 hover:bg-orange-600 text-white gap-2">
+                            <Button className="bg-primary hover:bg-primary/90 text-white gap-2">
                                 <Plus className="h-4 w-4" />
                                 <span className="hidden sm:inline">{t('category.add_sub')}</span>
                             </Button>
                         </DialogTrigger>
-                        <DialogContent className="max-w-2xl bg-slate-900 border-white/10 text-white">
+                        <DialogContent className="max-w-2xl bg-background border-border text-foreground">
                             <DialogHeader>
                                 <DialogTitle>{t('category.add_sub')}</DialogTitle>
                                 <DialogDescription>
@@ -397,17 +395,17 @@ const Category: React.FC = () => {
                                 <div>
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         <div>
-                                            <Label htmlFor="category" className="text-white">{t('products.category')} <span className="text-rose-500">*</span></Label>
+                                            <Label htmlFor="category" className="text-foreground">{t('products.category')} <span className="text-rose-500">*</span></Label>
                                             <Select
                                                 value={newSubCategory.category_id}
                                                 onValueChange={(value) => setNewSubCategory({ ...newSubCategory, category_id: value })}
                                             >
-                                                <SelectTrigger className="bg-white/5 border border-white/10 backdrop-blur-sm text-white focus:ring-orange-500 mt-2">
+                                                <SelectTrigger className="bg-muted border border-border text-foreground focus-visible:ring-ring mt-2">
                                                     <SelectValue placeholder={t('category.select_cat')} />
                                                 </SelectTrigger>
-                                                <SelectContent className="bg-slate-900 border-white/10 text-white">
+                                                <SelectContent className="bg-background border-border text-foreground">
                                                     {categoryData.map((cat) => (
-                                                        <SelectItem key={cat.id} value={cat.id} className="focus:bg-white/10 focus:text-white cursor-pointer">
+                                                        <SelectItem key={cat.id} value={cat.id} className="focus:bg-primary/10 focus:text-foreground cursor-pointer">
                                                             {cat.name}
                                                         </SelectItem>
                                                     ))}
@@ -415,38 +413,38 @@ const Category: React.FC = () => {
                                             </Select>
                                         </div>
                                         <div>
-                                            <Label htmlFor="name" className="text-white">{t('category.table_name')} <span className="text-rose-500">*</span></Label>
+                                            <Label htmlFor="name" className="text-foreground">{t('category.table_name')} <span className="text-rose-500">*</span></Label>
                                             <Input
                                                 id="name"
                                                 value={newSubCategory.name}
                                                 onChange={(e) => setNewSubCategory({ ...newSubCategory, name: e.target.value })}
-                                                className="bg-white/5 border border-white/10 backdrop-blur-sm text-white focus:ring-orange-500 mt-2"
+                                                className="bg-muted border border-border text-foreground focus-visible:ring-ring mt-2"
                                             />
                                         </div>
                                         <div>
-                                            <Label htmlFor="description" className="text-white">{t('category.table_description')}</Label>
+                                            <Label htmlFor="description" className="text-foreground">{t('category.table_description')}</Label>
                                             <Input
                                                 id="description"
                                                 value={newSubCategory.description}
                                                 onChange={(e) => setNewSubCategory({ ...newSubCategory, description: e.target.value })}
-                                                className="bg-white/5 border border-white/10 backdrop-blur-sm text-white focus:ring-orange-500 mt-2"
+                                                className="bg-muted border border-border text-foreground focus-visible:ring-ring mt-2"
                                             />
                                         </div>
                                         <div className="flex items-center justify-between pt-2">
-                                            <Label htmlFor="sub-status" className="text-white">{t('category.table_status')}</Label>
+                                            <Label htmlFor="sub-status" className="text-foreground">{t('category.table_status')}</Label>
                                             <Switch
                                                 id="sub-status"
                                                 checked={newSubCategory.status}
                                                 onCheckedChange={(checked) => setNewSubCategory({ ...newSubCategory, status: checked })}
-                                                className="bg-white/5 border border-white/10 backdrop-blur-sm data-[state=checked]:bg-emerald-500 data-[state=unchecked]:bg-white/5"
+                                                className="bg-muted border border-border data-[state=checked]:bg-emerald-500 data-[state=unchecked]:bg-muted"
                                             />
                                         </div>
                                     </div>
                                 </div>
                             </div>
                             <DialogFooter>
-                                <Button variant="outline" className="bg-slate-800 border-white/10 text-white hover:bg-slate-700 hover:text-white" onClick={() => setIsAddSubOpen(false)}>{t('common.cancel')}</Button>
-                                <Button className="bg-orange-500 hover:bg-orange-600 text-white" onClick={handleAddSubCategory}>{t('common.save_button')}</Button>
+                                <Button variant="outline" className="bg-background border-border text-foreground hover:bg-primary/10 hover:text-primary" onClick={() => setIsAddSubOpen(false)}>{t('common.cancel')}</Button>
+                                <Button className="bg-primary hover:bg-primary/90 text-white" onClick={handleAddSubCategory}>{t('common.save_button')}</Button>
                             </DialogFooter>
                         </DialogContent>
                     </Dialog>
@@ -454,29 +452,29 @@ const Category: React.FC = () => {
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Main Category card */}
-                <Card className="flex-1 bg-white/5 backdrop-blur-sm border border-white/10 text-white overflow-hidden flex flex-col">
+                <Card className="flex-1 bg-muted border border-border text-foreground overflow-hidden flex flex-col">
                     <CardContent className="p-0 flex flex-col h-full">
                         {/* Toolbar / Filters */}
-                        <div className="p-4 flex flex-col sm:flex-row items-center justify-between gap-4 border-b border-white/10">
+                        <div className="p-4 flex flex-col sm:flex-row items-center justify-between gap-4 border-b border-border">
                             <div className="relative w-full sm:w-72">
-                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                                 <Input
                                     placeholder="Search..."
                                     value={searchTerm}
                                     onChange={(e) => setSearchTerm(e.target.value)}
-                                    className="pl-9 bg-white/5 border-white/10 text-white placeholder:text-slate-500 focus-visible:ring-orange-500/50 focus-visible:border-orange-500"
+                                    className="pl-9 bg-muted border-border text-foreground placeholder:text-muted-foreground focus-visible:ring-ring focus-visible:border-primary"
                                 />
                             </div>
 
                             <div className="flex items-center gap-2 w-full sm:w-auto">
                                 <DropdownMenu>
                                     <DropdownMenuTrigger asChild>
-                                        <Button variant="outline" className="bg-white/5 border-white/10 text-slate-300 hover:bg-white/10 hover:text-white w-full sm:w-32 justify-between">
+                                        <Button variant="outline" className="bg-muted border-border text-foreground hover:bg-primary/10 hover:text-primary w-full sm:w-32 justify-between">
                                             {selectedType === 'All' ? t('category.table_type') : selectedType}
                                             <ChevronDown className="h-4 w-4 opacity-50" />
                                         </Button>
                                     </DropdownMenuTrigger>
-                                    <DropdownMenuContent className="bg-slate-900 border-white/10 text-white">
+                                    <DropdownMenuContent className="bg-background border-border text-foreground">
                                         <DropdownMenuItem onClick={() => setSelectedType('All')}>All</DropdownMenuItem>
                                         <DropdownMenuItem onClick={() => setSelectedType('Product')}>Product</DropdownMenuItem>
                                         <DropdownMenuItem onClick={() => setSelectedType('Service')}>Service</DropdownMenuItem>
@@ -484,17 +482,17 @@ const Category: React.FC = () => {
                                 </DropdownMenu>
                                 <DropdownMenu>
                                     <DropdownMenuTrigger asChild>
-                                        <Button variant="outline" className="bg-white/5 border-white/10 text-slate-300 hover:bg-white/10 hover:text-white w-full sm:w-32 justify-between">
+                                        <Button variant="outline" className="bg-muted border-border text-foreground hover:bg-primary/10 hover:text-primary w-full sm:w-32 justify-between">
                                             {selectedStatus === 'All' ? t('common.status') : selectedStatus}
                                             <ChevronDown className="h-4 w-4 opacity-50" />
                                         </Button>
                                     </DropdownMenuTrigger>
-                                    <DropdownMenuContent className="bg-slate-900 border-white/10 text-white">
+                                    <DropdownMenuContent className="bg-background border-border text-foreground">
                                         {uniqueStatuses.map((status) => (
                                             <DropdownMenuItem
                                                 key={status}
                                                 onClick={() => setSelectedStatus(status)}
-                                                className="focus:bg-white/10 focus:text-white cursor-pointer"
+                                                className="focus:bg-primary/10 focus:text-foreground cursor-pointer"
                                             >
                                                 {status}
                                             </DropdownMenuItem>
@@ -504,27 +502,27 @@ const Category: React.FC = () => {
                             </div>
                         </div>
                         {/* Table */}
-                        <div className="flex-1 overflow-auto rounded-lg border border-white/10 bg-slate-900/50">
+                        <div className="flex-1 overflow-auto rounded-lg border border-border bg-background">
                             <Table>
-                                <TableHeader className="bg-slate-900 border-b border-white/10">
-                                    <TableRow className="hover:bg-transparent border-white/10">
-                                        <TableHead className="text-white">{t('category.table_name')}</TableHead>
-                                        <TableHead className="text-white">{t('category.table_type')}</TableHead>
-                                        <TableHead className="text-white">{t('category.table_status')}</TableHead>
-                                        <TableHead className="text-right text-white">{t('category.table_actions')}</TableHead>
+                                <TableHeader className="bg-background border-b border-border">
+                                    <TableRow className="hover:bg-transparent border-border">
+                                        <TableHead className="text-foreground">{t('category.table_name')}</TableHead>
+                                        <TableHead className="text-foreground">{t('category.table_type')}</TableHead>
+                                        <TableHead className="text-foreground">{t('category.table_status')}</TableHead>
+                                        <TableHead className="text-right text-foreground">{t('category.table_actions')}</TableHead>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
                                     {currentCategory.length > 0 ? (
                                         currentCategory.map((category) => (
-                                            <TableRow key={category.id} className="hover:bg-white/5 transition-colors border-white/5 group">
-                                                <TableCell className='font-medium text-slate-300'>{category.name}</TableCell>
-                                                <TableCell className='font-medium text-slate-300'>
+                                            <TableRow key={category.id} className="hover:bg-muted transition-colors border-border group">
+                                                <TableCell className='font-medium text-foreground'>{category.name}</TableCell>
+                                                <TableCell className='font-medium text-foreground'>
                                                     <Badge className={category.type === 'service' ? "rounded-md bg-orange-500/20 text-orange-400 border-orange-500/30" : "rounded-md bg-blue-500/20 text-blue-400 border-blue-500/30"}>
                                                         {category.type === 'service' ? 'Service' : 'Product'}
                                                     </Badge>
                                                 </TableCell>
-                                                <TableCell className='font-medium text-slate-300'>
+                                                <TableCell className='font-medium text-foreground'>
                                                     <span className={`px-2 py-1 rounded-md text-xs font-medium border ${category.isActive
                                                         ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20 rounded-md'
                                                         : 'bg-orange-500/10 text-orange-500 border-orange-500/20 rounded-md'
@@ -534,26 +532,26 @@ const Category: React.FC = () => {
                                                 </TableCell>
                                                 <TableCell className="text-right">
                                                     <div className="flex items-center justify-end gap-1">
-                                                        <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-emerald-400 hover:bg-emerald-500/10" onClick={() => handleEditClick(category)}>
+                                                        <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-emerald-400 hover:bg-emerald-500/10" onClick={() => handleEditClick(category)}>
                                                             <Edit className="h-4 w-4" />
                                                         </Button>
                                                         <AlertDialog>
                                                             <AlertDialogTrigger asChild>
-                                                                <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-rose-400 hover:bg-rose-500/10">
+                                                                <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-rose-400 hover:bg-rose-500/10">
                                                                     <Trash2 className="h-4 w-4" />
                                                                 </Button>
                                                             </AlertDialogTrigger>
-                                                            <AlertDialogContent className="bg-slate-900 border-white/10">
+                                                            <AlertDialogContent className="bg-background border-border">
                                                                 <AlertDialogHeader>
-                                                                    <AlertDialogTitle className="text-white">Are you absolutely sure?</AlertDialogTitle>
-                                                                    <AlertDialogDescription className="text-slate-400">
+                                                                    <AlertDialogTitle className="text-foreground">Are you absolutely sure?</AlertDialogTitle>
+                                                                    <AlertDialogDescription className="text-muted-foreground">
                                                                         This action cannot be undone. This will permanently delete the category
-                                                                        <span className="font-medium text-white"> "{category.name}" </span>
+                                                                        <span className="font-medium text-foreground"> "{category.name}" </span>
                                                                         and remove it from our servers.
                                                                     </AlertDialogDescription>
                                                                 </AlertDialogHeader>
                                                                 <AlertDialogFooter>
-                                                                    <AlertDialogCancel className="bg-transparent border-white/10 text-white hover:bg-white/10 hover:text-white">Cancel</AlertDialogCancel>
+                                                                    <AlertDialogCancel className="bg-transparent border-border text-foreground hover:bg-primary/10 hover:text-primary">Cancel</AlertDialogCancel>
                                                                     <AlertDialogAction className="bg-rose-500 hover:bg-rose-600 text-white border-0">Delete</AlertDialogAction>
                                                                 </AlertDialogFooter>
                                                             </AlertDialogContent>
@@ -565,7 +563,7 @@ const Category: React.FC = () => {
 
                                     ) : (
                                         <TableRow>
-                                            <TableCell colSpan={10} className="text-center py-8 text-slate-400">
+                                            <TableCell colSpan={10} className="text-center py-8 text-muted-foreground">
                                                 {t('category.no_cat')}
                                             </TableCell>
                                         </TableRow>
@@ -575,18 +573,18 @@ const Category: React.FC = () => {
                         </div>
 
                         {/* Pagination */}
-                        <div className="p-4 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-slate-400">
+                        <div className="p-4 border-t border-border flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-muted-foreground">
                             <div className="flex items-center gap-2">
                                 <span>{t('category.row_per_page')}</span>
                                 <Select defaultValue="10" onValueChange={(value) => { setItemsPerPage(Number(value)); setCurrentPage(1); }}>
-                                    <SelectTrigger className="w-[70px] h-8 bg-white/5 border-white/10 text-white focus:ring-orange-500/50">
+                                    <SelectTrigger className="w-[70px] h-8 bg-muted border-border text-foreground focus-visible:ring-ring">
                                         <SelectValue placeholder="10" />
                                     </SelectTrigger>
-                                    <SelectContent className="bg-slate-900 border-white/10 text-white">
-                                        <SelectItem value="5" className="focus:bg-white/10 focus:text-white">5</SelectItem>
-                                        <SelectItem value="10" className="focus:bg-white/10 focus:text-white">10</SelectItem>
-                                        <SelectItem value="25" className="focus:bg-white/10 focus:text-white">25</SelectItem>
-                                        <SelectItem value="50" className="focus:bg-white/10 focus:text-white">50</SelectItem>
+                                    <SelectContent className="bg-background border-border text-foreground">
+                                        <SelectItem value="5" className="focus:bg-primary/10 focus:text-foreground">5</SelectItem>
+                                        <SelectItem value="10" className="focus:bg-primary/10 focus:text-foreground">10</SelectItem>
+                                        <SelectItem value="25" className="focus:bg-primary/10 focus:text-foreground">25</SelectItem>
+                                        <SelectItem value="50" className="focus:bg-primary/10 focus:text-foreground">50</SelectItem>
                                     </SelectContent>
                                 </Select>
                                 <span>{t('category.entries')}</span>
@@ -602,7 +600,7 @@ const Category: React.FC = () => {
                                             <PaginationPrevious
                                                 href="#"
                                                 onClick={(e) => { e.preventDefault(); handlePageChange(currentPage - 1); }}
-                                                className={`text-slate-400 hover:text-white hover:bg-white/10 ${currentPage === 1 ? 'pointer-events-none opacity-50' : ''}`}
+                                                className={`text-muted-foreground hover:text-primary hover:bg-primary/10 ${currentPage === 1 ? 'pointer-events-none opacity-50' : ''}`}
                                             />
                                         </PaginationItem>
 
@@ -612,7 +610,7 @@ const Category: React.FC = () => {
                                                     href="#"
                                                     isActive={currentPage === page}
                                                     onClick={(e) => { e.preventDefault(); handlePageChange(page); }}
-                                                    className={currentPage === page ? "text-white bg-orange-500 rounded-md hover:bg-orange-600 border-none" : "text-slate-400 rounded-md hover:text-white hover:bg-white/10"}
+                                                    className={currentPage === page ? "text-white bg-primary rounded-md hover:bg-primary/90 border-none" : "text-muted-foreground rounded-md hover:text-primary hover:bg-primary/10"}
                                                 >
                                                     {page}
                                                 </PaginationLink>
@@ -623,7 +621,7 @@ const Category: React.FC = () => {
                                             <PaginationNext
                                                 href="#"
                                                 onClick={(e) => { e.preventDefault(); handlePageChange(currentPage + 1); }}
-                                                className={`text-slate-400 hover:text-white hover:bg-white/10 ${currentPage === totalPages ? 'pointer-events-none opacity-50' : ''}`}
+                                                className={`text-muted-foreground hover:text-primary hover:bg-primary/10 ${currentPage === totalPages ? 'pointer-events-none opacity-50' : ''}`}
                                             />
                                         </PaginationItem>
                                     </PaginationContent>
@@ -635,96 +633,96 @@ const Category: React.FC = () => {
 
                 {/* Edit Category Dialog */}
                 <Dialog open={!!editingCategory} onOpenChange={(open) => !open && setEditingCategory(null)}>
-                    <DialogContent className="bg-slate-900 border-white/10 text-white sm:max-w-[425px]">
+                    <DialogContent className="bg-background border-border text-foreground sm:max-w-[425px]">
                         <DialogHeader>
                             <DialogTitle>{t('category.edit_cat')}</DialogTitle>
-                            <DialogDescription className="text-slate-400">
+                            <DialogDescription className="text-muted-foreground">
                                 Make changes to your category here.
                             </DialogDescription>
                         </DialogHeader>
                         {editingCategory && (
                             <div className="grid gap-4 py-4">
                                 <div className="space-y-2">
-                                    <Label htmlFor="edit-category" className="text-white">{t('products.category')} <span className="text-rose-500">*</span></Label>
+                                    <Label htmlFor="edit-category" className="text-foreground">{t('products.category')} <span className="text-rose-500">*</span></Label>
                                     <Input
                                         id="edit-category"
                                         value={editingCategory.name}
                                         onChange={handleEditNameChange}
-                                        className="bg-white/5 border-white/10 text-white focus-visible:ring-orange-500/50"
+                                        className="bg-muted border-border text-foreground focus-visible:ring-ring"
                                     />
                                 </div>
                                 <div className="space-y-2">
-                                    <Label htmlFor="edit-slug" className="text-white">Slug <span className="text-rose-500">*</span></Label>
+                                    <Label htmlFor="edit-slug" className="text-foreground">Slug <span className="text-rose-500">*</span></Label>
                                     <Input
                                         id="edit-slug"
                                         value={editingCategory.slug}
                                         readOnly
-                                        className="bg-white/5 border-white/10 text-slate-400 cursor-not-allowed focus-visible:ring-0"
+                                        className="bg-muted border-border text-muted-foreground cursor-not-allowed focus-visible:ring-0"
                                     />
                                 </div>
                                 <div className="space-y-2">
-                                    <Label className="text-white">{t('category.table_type')} <span className="text-rose-500">*</span></Label>
+                                    <Label className="text-foreground">{t('category.table_type')} <span className="text-rose-500">*</span></Label>
                                     <Select
                                         value={editingCategory.type}
                                         onValueChange={(value) => setEditingCategory(prev => prev ? { ...prev, type: value as 'product' | 'service' } : null)}
                                     >
-                                        <SelectTrigger className="bg-white/5 border border-white/10 text-white focus:ring-orange-500">
+                                        <SelectTrigger className="bg-muted border border-border text-foreground focus-visible:ring-ring">
                                             <SelectValue placeholder="Select type" />
                                         </SelectTrigger>
-                                        <SelectContent className="bg-slate-900 border-white/10 text-white">
+                                        <SelectContent className="bg-background border-border text-foreground">
                                             <SelectItem value="product">Product</SelectItem>
                                             <SelectItem value="service">Service</SelectItem>
                                         </SelectContent>
                                     </Select>
                                 </div>
                                 <div className="flex items-center justify-between pt-2">
-                                    <Label htmlFor="edit-status" className="text-white">Status <span className="text-rose-500">*</span></Label>
+                                    <Label htmlFor="edit-status" className="text-foreground">Status <span className="text-rose-500">*</span></Label>
                                     <Switch
                                         id="edit-status"
                                         checked={editingCategory.status}
                                         onCheckedChange={(checked) => setEditingCategory(prev => prev ? { ...prev, status: checked } : null)}
-                                        className="bg-white/5 border border-white/10 backdrop-blur-sm data-[state=checked]:bg-emerald-500 data-[state=unchecked]:bg-white/5"
+                                        className="bg-muted border border-border data-[state=checked]:bg-emerald-500 data-[state=unchecked]:bg-muted"
                                     />
                                 </div>
                             </div>
                         )}
                         <DialogFooter>
-                            <Button variant="outline" className="bg-slate-800 border-white/10 text-white hover:bg-slate-700 hover:text-white" onClick={() => setEditingCategory(null)}>{t('common.cancel')}</Button>
+                            <Button variant="outline" className="bg-background border-border text-foreground hover:bg-primary/10 hover:text-primary" onClick={() => setEditingCategory(null)}>{t('common.cancel')}</Button>
                             <Button className="bg-emerald-500 hover:bg-emerald-600 text-white" onClick={handleUpdateCategory}>{t('common.save_button')}</Button>
                         </DialogFooter>
                     </DialogContent>
                 </Dialog>
 
                 {/* Main Sub-Category card */}
-                <Card className="flex-1 bg-white/5 backdrop-blur-sm border border-white/10 text-white overflow-hidden flex flex-col">
+                <Card className="flex-1 bg-muted border border-border text-foreground overflow-hidden flex flex-col">
                     <CardContent className="p-0 flex flex-col h-full">
                         {/* Toolbar / Filters */}
-                        <div className="p-4 flex flex-col sm:flex-row items-center justify-between gap-4 border-b border-white/10">
+                        <div className="p-4 flex flex-col sm:flex-row items-center justify-between gap-4 border-b border-border">
                             <div className="relative w-full sm:w-72">
-                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                                 <Input
                                     placeholder="Search..."
                                     value={searchTermSub}
                                     onChange={(e) => setSearchTermSub(e.target.value)}
-                                    className="pl-9 bg-white/5 border-white/10 text-white placeholder:text-slate-500 focus-visible:ring-orange-500/50 focus-visible:border-orange-500"
+                                    className="pl-9 bg-muted border-border text-foreground placeholder:text-muted-foreground focus-visible:ring-ring focus-visible:border-primary"
                                 />
                             </div>
 
                             <div className="flex items-center gap-2 w-full sm:w-auto">
                                 <DropdownMenu>
                                     <DropdownMenuTrigger asChild>
-                                        <Button variant="outline" className="bg-white/5 border-white/10 text-slate-300 hover:bg-white/10 hover:text-white w-full sm:w-32 justify-between">
+                                        <Button variant="outline" className="bg-muted border-border text-foreground hover:bg-primary/10 hover:text-primary w-full sm:w-32 justify-between">
                                             {selectedCategory === 'All' ? t('products.category') : selectedCategory}
                                             <ChevronDown className="h-4 w-4 opacity-50" />
                                         </Button>
                                     </DropdownMenuTrigger>
-                                    <DropdownMenuContent className="bg-slate-900 border-white/10 text-white">
-                                        <DropdownMenuItem onClick={() => setSelectedCategory('All')} className="focus:bg-white/10 focus:text-white cursor-pointer">All</DropdownMenuItem>
+                                    <DropdownMenuContent className="bg-background border-border text-foreground">
+                                        <DropdownMenuItem onClick={() => setSelectedCategory('All')} className="focus:bg-primary/10 focus:text-foreground cursor-pointer">All</DropdownMenuItem>
                                         {categoryData.map((cat) => (
                                             <DropdownMenuItem
                                                 key={cat.id}
                                                 onClick={() => setSelectedCategory(cat.name)}
-                                                className="focus:bg-white/10 focus:text-white cursor-pointer"
+                                                className="focus:bg-primary/10 focus:text-foreground cursor-pointer"
                                             >
                                                 {cat.name}
                                             </DropdownMenuItem>
@@ -733,17 +731,17 @@ const Category: React.FC = () => {
                                 </DropdownMenu>
                                 <DropdownMenu>
                                     <DropdownMenuTrigger asChild>
-                                        <Button variant="outline" className="bg-white/5 border-white/10 text-slate-300 hover:bg-white/10 hover:text-white w-full sm:w-32 justify-between">
+                                        <Button variant="outline" className="bg-muted border-border text-foreground hover:bg-primary/10 hover:text-primary w-full sm:w-32 justify-between">
                                             {selectedStatusSub === 'All' ? t('common.status') : selectedStatusSub}
                                             <ChevronDown className="h-4 w-4 opacity-50" />
                                         </Button>
                                     </DropdownMenuTrigger>
-                                    <DropdownMenuContent className="bg-slate-900 border-white/10 text-white">
+                                    <DropdownMenuContent className="bg-background border-border text-foreground">
                                         {uniqueSubStatuses.map((status) => (
                                             <DropdownMenuItem
                                                 key={status}
                                                 onClick={() => setSelectedStatusSub(status)}
-                                                className="focus:bg-white/10 focus:text-white cursor-pointer"
+                                                className="focus:bg-primary/10 focus:text-foreground cursor-pointer"
                                             >
                                                 {status}
                                             </DropdownMenuItem>
@@ -754,27 +752,27 @@ const Category: React.FC = () => {
                         </div>
 
                         {/* Table */}
-                        <div className="flex-1 overflow-auto rounded-lg border border-white/10 bg-slate-900/50">
+                        <div className="flex-1 overflow-auto rounded-lg border border-border bg-background">
                             <Table>
-                                <TableHeader className="bg-slate-900 border-b border-white/10">
-                                    <TableRow className="hover:bg-transparent border-white/10">
-                                        <TableHead className="text-white">{t('category.table_name')}</TableHead>
-                                        <TableHead className="text-white">{t('products.category')}</TableHead>
-                                        <TableHead className="text-white">{t('category.table_status')}</TableHead>
-                                        <TableHead className="text-right text-white">{t('category.table_actions')}</TableHead>
+                                <TableHeader className="bg-background border-b border-border">
+                                    <TableRow className="hover:bg-transparent border-border">
+                                        <TableHead className="text-foreground">{t('category.table_name')}</TableHead>
+                                        <TableHead className="text-foreground">{t('products.category')}</TableHead>
+                                        <TableHead className="text-foreground">{t('category.table_status')}</TableHead>
+                                        <TableHead className="text-right text-foreground">{t('category.table_actions')}</TableHead>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
                                     {currentSubCategory.length > 0 ? (
                                         currentSubCategory.map((sub) => (
-                                            <TableRow key={sub.id} className="hover:bg-white/5 transition-colors border-white/5 group">
+                                            <TableRow key={sub.id} className="hover:bg-muted transition-colors border-border group">
                                                 <TableCell>
                                                     <div className="flex flex-col">
-                                                        <span className="font-medium text-slate-200">{sub.name}</span>
-                                                        <span className="text-xs text-slate-500">{sub.description}</span>
+                                                        <span className="font-medium text-foreground">{sub.name}</span>
+                                                        <span className="text-xs text-muted-foreground">{sub.description}</span>
                                                     </div>
                                                 </TableCell>
-                                                <TableCell className="text-slate-300">
+                                                <TableCell className="text-foreground">
                                                     {sub.parent?.name || 'Unknown'}
                                                 </TableCell>
                                                 <TableCell>
@@ -787,26 +785,26 @@ const Category: React.FC = () => {
                                                 </TableCell>
                                                 <TableCell className="text-right">
                                                     <div className="flex items-center justify-end gap-1">
-                                                        <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-emerald-400 hover:bg-emerald-500/10" onClick={() => handleEditSubClick(sub)}>
+                                                        <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-emerald-400 hover:bg-emerald-500/10" onClick={() => handleEditSubClick(sub)}>
                                                             <Edit className="h-4 w-4" />
                                                         </Button>
                                                         <AlertDialog>
                                                             <AlertDialogTrigger asChild>
-                                                                <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-rose-400 hover:bg-rose-500/10">
+                                                                <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-rose-400 hover:bg-rose-500/10">
                                                                     <Trash2 className="h-4 w-4" />
                                                                 </Button>
                                                             </AlertDialogTrigger>
-                                                            <AlertDialogContent className="bg-slate-900 border-white/10">
+                                                            <AlertDialogContent className="bg-background border-border">
                                                                 <AlertDialogHeader>
-                                                                    <AlertDialogTitle className="text-white">Are you absolutely sure?</AlertDialogTitle>
-                                                                    <AlertDialogDescription className="text-slate-400">
+                                                                    <AlertDialogTitle className="text-foreground">Are you absolutely sure?</AlertDialogTitle>
+                                                                    <AlertDialogDescription className="text-muted-foreground">
                                                                         This action cannot be undone. This will permanently delete the sub category
-                                                                        <span className="font-medium text-white"> "{sub.name}" </span>
+                                                                        <span className="font-medium text-foreground"> "{sub.name}" </span>
                                                                         and remove it from our servers.
                                                                     </AlertDialogDescription>
                                                                 </AlertDialogHeader>
                                                                 <AlertDialogFooter>
-                                                                    <AlertDialogCancel className="bg-transparent border-white/10 text-white hover:bg-white/10 hover:text-white">Cancel</AlertDialogCancel>
+                                                                    <AlertDialogCancel className="bg-transparent border-border text-foreground hover:bg-primary/10 hover:text-primary">Cancel</AlertDialogCancel>
                                                                     <AlertDialogAction className="bg-rose-500 hover:bg-rose-600 text-white border-0">Delete</AlertDialogAction>
                                                                 </AlertDialogFooter>
                                                             </AlertDialogContent>
@@ -817,7 +815,7 @@ const Category: React.FC = () => {
                                         ))
                                     ) : (
                                         <TableRow>
-                                            <TableCell colSpan={6} className="text-center py-8 text-slate-400">
+                                            <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
                                                 {t('category.no_sub')}
                                             </TableCell>
                                         </TableRow>
@@ -827,18 +825,18 @@ const Category: React.FC = () => {
                         </div>
 
                         {/* Pagination sub*/}
-                        <div className="p-4 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-slate-400">
+                        <div className="p-4 border-t border-border flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-muted-foreground">
                             <div className="flex items-center gap-2">
                                 <span>{t('category.row_per_page')}</span>
                                 <Select defaultValue="10" onValueChange={(value) => { setItemsPerPageSub(Number(value)); setCurrentPageSub(1); }}>
-                                    <SelectTrigger className="w-[70px] h-8 bg-white/5 border-white/10 text-white focus:ring-orange-500/50">
+                                    <SelectTrigger className="w-[70px] h-8 bg-muted border-border text-foreground focus-visible:ring-ring">
                                         <SelectValue placeholder="10" />
                                     </SelectTrigger>
-                                    <SelectContent className="bg-slate-900 border-white/10 text-white">
-                                        <SelectItem value="5" className="focus:bg-white/10 focus:text-white">5</SelectItem>
-                                        <SelectItem value="10" className="focus:bg-white/10 focus:text-white">10</SelectItem>
-                                        <SelectItem value="25" className="focus:bg-white/10 focus:text-white">25</SelectItem>
-                                        <SelectItem value="50" className="focus:bg-white/10 focus:text-white">50</SelectItem>
+                                    <SelectContent className="bg-background border-border text-foreground">
+                                        <SelectItem value="5" className="focus:bg-primary/10 focus:text-foreground">5</SelectItem>
+                                        <SelectItem value="10" className="focus:bg-primary/10 focus:text-foreground">10</SelectItem>
+                                        <SelectItem value="25" className="focus:bg-primary/10 focus:text-foreground">25</SelectItem>
+                                        <SelectItem value="50" className="focus:bg-primary/10 focus:text-foreground">50</SelectItem>
                                     </SelectContent>
                                 </Select>
                                 <span>{t('category.entries')}</span>
@@ -854,7 +852,7 @@ const Category: React.FC = () => {
                                             <PaginationPrevious
                                                 href="#"
                                                 onClick={(e) => { e.preventDefault(); handlePageChangeSub(currentPageSub - 1); }}
-                                                className={`text-slate-400 hover:text-white hover:bg-white/10 ${currentPageSub === 1 ? 'pointer-events-none opacity-50' : ''}`}
+                                                className={`text-muted-foreground hover:text-primary hover:bg-primary/10 ${currentPageSub === 1 ? 'pointer-events-none opacity-50' : ''}`}
                                             />
                                         </PaginationItem>
 
@@ -864,7 +862,7 @@ const Category: React.FC = () => {
                                                     href="#"
                                                     isActive={currentPageSub === page}
                                                     onClick={(e) => { e.preventDefault(); handlePageChangeSub(page); }}
-                                                    className={currentPageSub === page ? "text-white bg-orange-500 hover:bg-orange-600 border-none" : "text-slate-400 hover:text-white hover:bg-white/10"}
+                                                    className={currentPageSub === page ? "text-white bg-primary hover:bg-primary/90 border-none" : "text-muted-foreground hover:text-primary hover:bg-primary/10"}
                                                 >
                                                     {page}
                                                 </PaginationLink>
@@ -875,7 +873,7 @@ const Category: React.FC = () => {
                                             <PaginationNext
                                                 href="#"
                                                 onClick={(e) => { e.preventDefault(); handlePageChangeSub(currentPageSub + 1); }}
-                                                className={`text-slate-400 hover:text-white hover:bg-white/10 ${currentPageSub === totalPagesSub ? 'pointer-events-none opacity-50' : ''}`}
+                                                className={`text-muted-foreground hover:text-primary hover:bg-primary/10 ${currentPageSub === totalPagesSub ? 'pointer-events-none opacity-50' : ''}`}
                                             />
                                         </PaginationItem>
                                     </PaginationContent>
@@ -887,7 +885,7 @@ const Category: React.FC = () => {
 
                 {/* Edit Sub Category Dialog */}
                 <Dialog open={isEditSubOpen} onOpenChange={setIsEditSubOpen}>
-                    <DialogContent className="max-w-2xl bg-slate-900 border-white/10 text-white">
+                    <DialogContent className="max-w-2xl bg-background border-border text-foreground">
                         <DialogHeader>
                             <DialogTitle>{t('category.edit_sub')}</DialogTitle>
                             <DialogDescription>
@@ -899,17 +897,17 @@ const Category: React.FC = () => {
                                 <div>
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         <div>
-                                            <Label htmlFor="edit-category" className="text-white">{t('products.category')} <span className="text-rose-500">*</span></Label>
+                                            <Label htmlFor="edit-category" className="text-foreground">{t('products.category')} <span className="text-rose-500">*</span></Label>
                                             <Select
                                                 value={editingSubCategory.category_id}
                                                 onValueChange={(value) => setEditingSubCategory({ ...editingSubCategory, category_id: value })}
                                             >
-                                                <SelectTrigger className="bg-white/5 border border-white/10 backdrop-blur-sm text-white focus:ring-orange-500 mt-2">
+                                                <SelectTrigger className="bg-muted border border-border text-foreground focus-visible:ring-ring mt-2">
                                                     <SelectValue placeholder="Select Category" />
                                                 </SelectTrigger>
-                                                <SelectContent className="bg-slate-900 border-white/10 text-white">
+                                                <SelectContent className="bg-background border-border text-foreground">
                                                     {categoryData.map((cat) => (
-                                                        <SelectItem key={cat.id} value={cat.id} className="focus:bg-white/10 focus:text-white cursor-pointer">
+                                                        <SelectItem key={cat.id} value={cat.id} className="focus:bg-primary/10 focus:text-foreground cursor-pointer">
                                                             {cat.name}
                                                         </SelectItem>
                                                     ))}
@@ -917,30 +915,30 @@ const Category: React.FC = () => {
                                             </Select>
                                         </div>
                                         <div>
-                                            <Label htmlFor="edit-name" className="text-white">Name <span className="text-rose-500">*</span></Label>
+                                            <Label htmlFor="edit-name" className="text-foreground">Name <span className="text-rose-500">*</span></Label>
                                             <Input
                                                 id="edit-name"
                                                 value={editingSubCategory.name}
                                                 onChange={(e) => setEditingSubCategory({ ...editingSubCategory, name: e.target.value })}
-                                                className="bg-white/5 border border-white/10 backdrop-blur-sm text-white focus:ring-orange-500 mt-2"
+                                                className="bg-muted border border-border text-foreground focus-visible:ring-ring mt-2"
                                             />
                                         </div>
                                         <div>
-                                            <Label htmlFor="edit-description" className="text-white">{t('category.table_description')}</Label>
+                                            <Label htmlFor="edit-description" className="text-foreground">{t('category.table_description')}</Label>
                                             <Input
                                                 id="edit-description"
                                                 value={editingSubCategory.description}
                                                 onChange={(e) => setEditingSubCategory({ ...editingSubCategory, description: e.target.value })}
-                                                className="bg-white/5 border border-white/10 backdrop-blur-sm text-white focus:ring-orange-500 mt-2"
+                                                className="bg-muted border border-border text-foreground focus-visible:ring-ring mt-2"
                                             />
                                         </div>
                                         <div className="flex items-center justify-between pt-2">
-                                            <Label htmlFor="edit-status" className="text-white">Status</Label>
+                                            <Label htmlFor="edit-status" className="text-foreground">Status</Label>
                                             <Switch
                                                 id="edit-status"
                                                 checked={editingSubCategory.status}
                                                 onCheckedChange={(checked) => setEditingSubCategory({ ...editingSubCategory, status: checked })}
-                                                className="bg-white/5 border border-white/10 backdrop-blur-sm data-[state=checked]:bg-emerald-500 data-[state=unchecked]:bg-white/5"
+                                                className="bg-muted border border-border data-[state=checked]:bg-emerald-500 data-[state=unchecked]:bg-muted"
                                             />
                                         </div>
                                     </div>
@@ -948,7 +946,7 @@ const Category: React.FC = () => {
                             )}
                         </div>
                         <DialogFooter>
-                            <Button variant="outline" className="bg-slate-800 border-white/10 text-white hover:bg-slate-700 hover:text-white" onClick={() => setIsEditSubOpen(false)}>{t('common.cancel')}</Button>
+                            <Button variant="outline" className="bg-background border-border text-foreground hover:bg-primary/10 hover:text-primary" onClick={() => setIsEditSubOpen(false)}>{t('common.cancel')}</Button>
                             <Button className="bg-emerald-500 hover:bg-emerald-600 text-white" onClick={handleUpdateSubCategory}>{t('common.save_button')}</Button>
                         </DialogFooter>
                     </DialogContent>

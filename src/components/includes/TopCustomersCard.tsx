@@ -47,7 +47,7 @@ export const TopCustomersCard: React.FC<TopCustomersCardProps> = ({ customers: i
         } else if (initialData) {
             setCustomersData(initialData);
         }
-    }, [selectedPeriod]);
+    }, [selectedPeriod, initialData]);
 
     const formatCurrency = (amount: number | string) => {
         const value = typeof amount === 'string' ? parseFloat(amount) : amount;
@@ -63,30 +63,29 @@ export const TopCustomersCard: React.FC<TopCustomersCardProps> = ({ customers: i
     };
 
     return (
-        <Card className="shadow-sm h-full bg-white/5 backdrop-blur-sm border border-white/10 text-white flex flex-col">
+        <Card className="shadow-sm h-full border border-border flex flex-col">
             <CardContent className="p-6 flex flex-col h-full relative">
-                {/* Header */}
-                <div className="flex items-center justify-between pb-4 border-b border-white/10 mb-4 px-6 -mx-6">
+                <div className="flex items-center justify-between pb-4 border-b border-border mb-4 px-6 -mx-6">
                     <div className="flex items-center gap-2">
                         <div className="p-2 bg-orange-500/10 rounded-lg">
                             <Users className="h-5 w-5 text-orange-500" />
                         </div>
-                        <h3 className="text-lg font-bold text-white">{t('dashboard.top_customers')}</h3>
+                        <h3 className="text-lg font-bold text-foreground">{t('dashboard.top_customers')}</h3>
                     </div>
 
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                            <Button variant="outline" size="sm" className="h-8 text-xs bg-white/5 border-white/10 text-slate-300 hover:bg-white/10 hover:text-white gap-2">
+                            <Button variant="outline" size="sm" className="h-8 text-xs border-border text-gray-500 hover:bg-primary/10 hover:text-primary gap-2">
                                 {isLoading ? <Loader2 className="h-3 w-3 animate-spin" /> : periods.find(p => p.id === selectedPeriod)?.label || t('dashboard.today')}
                                 <ChevronDown className="h-3 w-3" />
                             </Button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent className="bg-slate-900 border-white/10 text-white">
+                        <DropdownMenuContent>
                             {periods.map((p) => (
-                                <DropdownMenuItem 
-                                    key={p.id} 
+                                <DropdownMenuItem
+                                    key={p.id}
                                     onSelect={() => setSelectedPeriod(p.id)}
-                                    className="hover:bg-white/10 cursor-pointer"
+                                    className="hover:bg-primary/10 cursor-pointer"
                                 >
                                     {p.label}
                                 </DropdownMenuItem>
@@ -95,23 +94,22 @@ export const TopCustomersCard: React.FC<TopCustomersCardProps> = ({ customers: i
                     </DropdownMenu>
                 </div>
 
-                {/* List */}
                 <div className={`flex flex-col gap-4 flex-1 transition-opacity ${isLoading ? "opacity-50" : "opacity-100"}`}>
                     {customersData.map((customer, index) => (
                         <div key={index} className="flex items-center justify-between group">
                             <div className="flex items-center gap-3 overflow-hidden">
-                                <Avatar className="h-10 w-10 rounded-lg bg-white/10 border border-white/5">
-                                    <AvatarFallback className="bg-transparent text-white/50 text-xs font-bold">
+                                <Avatar className="h-10 w-10 rounded-lg bg-gray-100 border border-border">
+                                    <AvatarFallback className="bg-transparent text-gray-500 text-xs font-bold">
                                         {getInitials(customer.firstName, customer.lastName)}
                                     </AvatarFallback>
                                 </Avatar>
                                 <div className="flex flex-col min-w-0">
-                                    <span className="text-sm font-bold text-white group-hover:text-orange-400 transition-colors truncate">
+                                    <span className="text-sm font-bold text-foreground group-hover:text-orange-500 transition-colors truncate">
                                         {customer.firstName} {customer.lastName}
                                     </span>
-                                    <div className="flex items-center gap-2 text-[10px] text-slate-400">
-                                        <span className="text-teal-400 font-bold">{formatCurrency(customer.totalSpent)}</span>
-                                        <span className="w-1 h-1 rounded-full bg-slate-600" />
+                                    <div className="flex items-center gap-2 text-[10px] text-muted-foreground">
+                                        <span className="text-teal-600 font-bold">{formatCurrency(customer.totalSpent)}</span>
+                                        <span className="w-1 h-1 rounded-full bg-gray-300" />
                                         <span className="flex items-center gap-1">
                                             <ShoppingBag className="h-2.5 w-2.5" />
                                             {customer.orderCount} {t('dashboard.orders')}
@@ -122,9 +120,9 @@ export const TopCustomersCard: React.FC<TopCustomersCardProps> = ({ customers: i
 
                             <div className="flex flex-col items-end gap-1 shrink-0 pl-2">
                                 <div className={`flex items-center gap-0.5 text-[10px] font-bold px-1.5 py-0.5 rounded ${
-                                    customer.growth >= 0 
-                                    ? "text-emerald-500 bg-emerald-500/10" 
-                                    : "text-rose-500 bg-rose-500/10"
+                                    customer.growth >= 0
+                                    ? "text-emerald-600 bg-emerald-500/10"
+                                    : "text-rose-600 bg-rose-500/10"
                                 }`}>
                                     {customer.growth >= 0 ? <TrendingUp className="h-3 w-3" /> : <TrendingDown className="h-3 w-3" />}
                                     {customer.growth >= 0 ? "+" : ""}{customer.growth}%
@@ -133,7 +131,7 @@ export const TopCustomersCard: React.FC<TopCustomersCardProps> = ({ customers: i
                         </div>
                     ))}
                     {customersData.length === 0 && !isLoading && (
-                        <div className="flex flex-col items-center justify-center py-12 text-slate-500 gap-2">
+                        <div className="flex flex-col items-center justify-center py-12 text-muted-foreground gap-2">
                             <Users className="h-8 w-8 opacity-20" />
                             <span className="text-sm">{t('common.no_data')}</span>
                         </div>

@@ -18,7 +18,7 @@ interface OrderStatisticsCardProps {
 export const OrderStatisticsCard: React.FC<OrderStatisticsCardProps> = ({ data: initialData }) => {
     const { t } = useTranslation();
     const [orderData, setOrderData] = useState<any[]>(initialData || []);
-    const [selectedPeriod, setSelectedPeriod] = useState('1M'); // Default to 30 days
+    const [selectedPeriod, setSelectedPeriod] = useState('1M');
     const [isLoading, setIsLoading] = useState(false);
 
     const periods = [
@@ -27,24 +27,14 @@ export const OrderStatisticsCard: React.FC<OrderStatisticsCardProps> = ({ data: 
         { id: '1Y', label: t('dashboard.yearly') },
     ];
 
-    // Days for X-axis (1=Sun in MySQL, 2=Mon...)
     const days = [
-        t('common.days.mon'),
-        t('common.days.tue'),
-        t('common.days.wed'),
-        t('common.days.thu'),
-        t('common.days.fri'),
-        t('common.days.sat'),
-        t('common.days.sun')
+        t('common.days.mon'), t('common.days.tue'), t('common.days.wed'),
+        t('common.days.thu'), t('common.days.fri'), t('common.days.sat'), t('common.days.sun')
     ];
 
-    // Hour slots for Y-axis (from 0 to 22, every 2 hours)
-    const timeSlots = [
-        '22:00', '20:00', '18:00', '16:00', '14:00', '12:00', '10:00', '08:00', '06:00', '04:00', '02:00', '00:00'
-    ];
-
+    const timeSlots = ['22:00','20:00','18:00','16:00','14:00','12:00','10:00','08:00','06:00','04:00','02:00','00:00'];
     const hours = [22, 20, 18, 16, 14, 12, 10, 8, 6, 4, 2, 0];
-    const dayIndices = [2, 3, 4, 5, 6, 7, 1]; // Mon=2, ..., Sat=7, Sun=1
+    const dayIndices = [2, 3, 4, 5, 6, 7, 1];
 
     const fetchOrderStats = async (period: string) => {
         try {
@@ -59,17 +49,13 @@ export const OrderStatisticsCard: React.FC<OrderStatisticsCardProps> = ({ data: 
     };
 
     useEffect(() => {
-        // Always fetch when period changes, except if it's initial load and we already have data
-        // But for Heatmap, we usually want fresh data for the specific period
         fetchOrderStats(selectedPeriod);
     }, [selectedPeriod]);
 
-    // Build the data grid (hours x days)
     const dataGrid = hours.map(h => {
         return dayIndices.map(d => {
             const entry = orderData?.find(item => item.day === d && item.hour === h);
             const count = entry?.count || 0;
-            // Scale intensity from 0 to 4
             if (count > 20) return 4;
             if (count > 10) return 3;
             if (count > 5) return 2;
@@ -84,38 +70,37 @@ export const OrderStatisticsCard: React.FC<OrderStatisticsCardProps> = ({ data: 
             case 3: return 'bg-orange-500';
             case 2: return 'bg-orange-400';
             case 1: return 'bg-orange-300/60';
-            default: return 'bg-white/5'; 
+            default: return 'bg-muted';
         }
     };
 
     return (
-        <Card className="shadow-sm h-full bg-white/5 backdrop-blur-sm border border-white/10 text-white flex flex-col">
+        <Card className="shadow-sm h-full border border-border flex flex-col">
             <CardContent className="p-6 flex flex-col h-full relative">
-                {/* Header */}
-                <div className="flex items-center justify-between pb-4 border-b border-white/10 mb-4 px-6 -mx-6">
+                <div className="flex items-center justify-between pb-4 border-b border-border mb-4 px-6 -mx-6">
                     <div className="flex items-center gap-2">
                         <div className="p-2 bg-indigo-500/10 rounded-lg">
                             <Box className="h-5 w-5 text-indigo-500" />
                         </div>
-                        <h3 className="text-lg font-bold text-white">{t('dashboard.order_statistics')}</h3>
+                        <h3 className="text-lg font-bold text-foreground">{t('dashboard.order_statistics')}</h3>
                     </div>
 
                     <div className="flex items-center gap-2">
-                        {isLoading && <Loader2 className="h-3 w-3 animate-spin text-slate-400" />}
+                        {isLoading && <Loader2 className="h-3 w-3 animate-spin text-muted-foreground" />}
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                                <Button variant="outline" size="sm" className="h-8 text-[10px] bg-white/5 border-white/10 text-slate-300 hover:bg-white/10 hover:text-white gap-2 px-2">
+                                <Button variant="outline" size="sm" className="h-8 text-[10px] border-border text-gray-500 hover:bg-primary/10 hover:text-primary gap-2 px-2">
                                     <Calendar className="h-3 w-3" />
                                     {periods.find(p => p.id === selectedPeriod)?.label || t('dashboard.weekly')}
                                     <ChevronDown className="h-3 w-3" />
                                 </Button>
                             </DropdownMenuTrigger>
-                            <DropdownMenuContent className="bg-slate-900 border-white/10 text-white">
+                            <DropdownMenuContent>
                                 {periods.map((p) => (
-                                    <DropdownMenuItem 
-                                        key={p.id} 
+                                    <DropdownMenuItem
+                                        key={p.id}
                                         onSelect={() => setSelectedPeriod(p.id)}
-                                        className="hover:bg-white/10 cursor-pointer"
+                                        className="hover:bg-primary/10 cursor-pointer"
                                     >
                                         {p.label}
                                     </DropdownMenuItem>
@@ -125,12 +110,10 @@ export const OrderStatisticsCard: React.FC<OrderStatisticsCardProps> = ({ data: 
                     </div>
                 </div>
 
-                {/* Heatmap Grid */}
                 <div className={`flex-1 overflow-hidden transition-opacity ${isLoading ? "opacity-50" : "opacity-100"}`}>
                     <div className="overflow-x-auto pb-2 no-scrollbar h-full">
                         <div className="flex gap-4 min-h-[300px] min-w-[340px] h-full">
-                            {/* Y-Axis Labels */}
-                            <div className="flex flex-col justify-between py-2 text-[10px] text-slate-500 font-bold w-8">
+                            <div className="flex flex-col justify-between py-2 text-[10px] text-gray-400 font-bold w-8">
                                 {timeSlots.map((time) => (
                                     <div key={time} className="h-6 flex items-center justify-end whitespace-nowrap">
                                         {time}
@@ -138,7 +121,6 @@ export const OrderStatisticsCard: React.FC<OrderStatisticsCardProps> = ({ data: 
                                 ))}
                             </div>
 
-                            {/* Grid Container */}
                             <div className="flex-1 flex flex-col justify-between">
                                 <div className="flex-1 grid grid-rows-12 gap-1.5 pb-2">
                                     {dataGrid.map((row, rowIndex) => (
@@ -154,10 +136,9 @@ export const OrderStatisticsCard: React.FC<OrderStatisticsCardProps> = ({ data: 
                                     ))}
                                 </div>
 
-                                {/* X-Axis Labels */}
                                 <div className="grid grid-cols-7 gap-1.5">
                                     {days.map((day) => (
-                                        <div key={day} className="text-[10px] text-slate-500 text-center font-bold uppercase tracking-wider">
+                                        <div key={day} className="text-[10px] text-gray-400 text-center font-bold uppercase tracking-wider">
                                             {day}
                                         </div>
                                     ))}

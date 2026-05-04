@@ -430,24 +430,24 @@ const ProformaDetails: React.FC = () => {
                 <div className="flex items-center gap-4">
                     <Button
                         variant="ghost"
-                        className="text-slate-400 hover:text-white"
+                        className="text-muted-foreground hover:text-primary"
                         onClick={() => navigate('/proforma/list')}
                     >
                         <ArrowLeft className="h-4 w-4 mr-2" />
                         {t('common.back')}
                     </Button>
                     <div>
-                        <h2 className="text-3xl font-bold text-white flex items-center gap-2">
+                        <h2 className="text-3xl font-bold text-foreground flex items-center gap-2">
                             <FileText className="h-8 w-8 text-blue-500" />
                             {t('proforma.title_details')}
                         </h2>
-                        <p className="text-slate-400">{proforma.proformaNumber}</p>
+                        <p className="text-muted-foreground">{proforma.proformaNumber}</p>
                     </div>
                 </div>
                 <div className="flex items-center gap-3">
                     <Button
                         variant="outline"
-                        className="bg-slate-800 border-white/10 text-white gap-2"
+                        className="bg-muted border-border text-foreground gap-2"
                         onClick={handleDownloadPDF}
                         disabled={isGeneratingPDF}
                     >
@@ -467,13 +467,13 @@ const ProformaDetails: React.FC = () => {
 
             {/* Proforma View / Print Content */}
             <div className="print:m-0 print:p-0 print:bg-white print:text-black" id="printable-proforma">
-                <Card className="bg-slate-900/50 border-white/10 backdrop-blur-xl print:border-none print:shadow-none print:bg-white overflow-hidden print:m-0 print:p-0 print:rounded-none">
+                <Card className="bg-background border-border print:border-none print:shadow-none print:bg-white overflow-hidden print:m-0 print:p-0 print:rounded-none">
                     <CardContent className="p-8 md:p-12 print:p-0">
                         {/* Company Branding & Proforma Info */}
-                        <div className="flex flex-col md:flex-row print:flex-row justify-between gap-8 mb-12 border-b border-white/10 print:border-slate-200 pb-8">
+                        <div className="flex flex-col md:flex-row print:flex-row justify-between gap-8 mb-12 border-b border-border print:border-slate-200 pb-8">
                             <div className="space-y-4">
                                 <div className="flex items-center gap-3">
-                                    <div className="w-14 h-14 bg-slate-800/50 print:bg-slate-100 rounded-lg flex items-center justify-center overflow-hidden border border-white/10 print:border-slate-200 flex-shrink-0">
+                                    <div className="w-14 h-14 bg-muted print:bg-slate-100 rounded-lg flex items-center justify-center overflow-hidden border border-border print:border-slate-200 flex-shrink-0">
                                         {business.businessLogo ? (
                                             <img
                                                 src={business.businessLogo}
@@ -490,13 +490,13 @@ const ProformaDetails: React.FC = () => {
                                             {business.businessName}
                                         </h1>
                                         {business.businessSlogan && (
-                                            <p className="text-xs text-blue-400 print:text-slate-500 italic mt-0.5" style={{ wordSpacing: '0.05em' }}>
+                                            <p className="text-xs text-blue-400 print:text-muted-foreground italic mt-0.5" style={{ wordSpacing: '0.05em' }}>
                                                 {business.businessSlogan}
                                             </p>
                                         )}
                                     </div>
                                 </div>
-                                <div className="text-slate-400 print:text-slate-600 space-y-1 text-sm" style={{ wordSpacing: '0.05em', letterSpacing: 'normal' }}>
+                                <div className="text-muted-foreground print:text-muted-foreground space-y-1 text-sm" style={{ wordSpacing: '0.05em', letterSpacing: 'normal' }}>
                                     {business.businessAddress && <p>{business.businessAddress}</p>}
                                     {business.businessPhone && <p>{t('common.phone', 'Tél')}{' '}{business.businessPhone}</p>}
                                     {business.businessEmail && <p>Email{' '}{business.businessEmail}</p>}
@@ -508,10 +508,10 @@ const ProformaDetails: React.FC = () => {
                                 </h1>
                                 <div className="space-y-1.5">
                                     <p className="text-white print:text-black font-semibold tracking-normal"># {proforma.proformaNumber}</p>
-                                    <p className="text-slate-400 print:text-slate-600 text-sm" style={{ wordSpacing: '0.05em' }}>
+                                    <p className="text-muted-foreground print:text-muted-foreground text-sm" style={{ wordSpacing: '0.05em' }}>
                                         {t('proforma.date')}:{' '}{format(new Date(proforma.createdAt), 'dd MMMM yyyy')}
                                     </p>
-                                    <p className="text-slate-400 print:text-slate-600 text-sm" style={{ wordSpacing: '0.05em' }}>
+                                    <p className="text-muted-foreground print:text-muted-foreground text-sm" style={{ wordSpacing: '0.05em' }}>
                                         {t('proforma.expiry_date')}:{' '}{format(new Date(proforma.expiresAt), 'dd MMMM yyyy')}
                                     </p>
                                     {/* Badges statut + type — yon sèl liy */}
@@ -520,7 +520,7 @@ const ProformaDetails: React.FC = () => {
                                             proforma.status === 'PENDING'   ? 'bg-amber-500/20 text-amber-400' :
                                             proforma.status === 'ACCEPTED'  ? 'bg-emerald-500/20 text-emerald-400' :
                                             proforma.status === 'EXPIRED'   ? 'bg-red-500/20 text-red-400' :
-                                                                               'bg-slate-500/20 text-slate-400'
+                                                                               'bg-slate-500/20 text-muted-foreground'
                                         }`}>
                                             {t(`proforma.status_${proforma.status.toLowerCase()}`)}
                                         </span>
@@ -544,7 +544,7 @@ const ProformaDetails: React.FC = () => {
                         {/* Customer & POS Info */}
                         <div className="grid grid-cols-1 md:grid-cols-2 print:grid-cols-2 gap-12 mb-10">
                             <div className="space-y-3">
-                                <h3 className="text-slate-400 print:text-slate-500 text-[10px] font-bold uppercase tracking-widest flex items-center gap-2">
+                                <h3 className="text-muted-foreground print:text-muted-foreground text-[10px] font-bold uppercase tracking-widest flex items-center gap-2">
                                     <User className="h-3 w-3" />
                                     {t('proforma.bill_to')}
                                 </h3>
@@ -555,14 +555,14 @@ const ProformaDetails: React.FC = () => {
                                             : t('proforma.direct_sale')}
                                     </p>
                                     {proforma.customer && proforma.customer.phone && (
-                                        <div className="text-slate-400 print:text-slate-600 text-sm space-y-0.5" style={{ wordSpacing: '0.05em' }}>
+                                        <div className="text-muted-foreground print:text-muted-foreground text-sm space-y-0.5" style={{ wordSpacing: '0.05em' }}>
                                             <p>{proforma.customer.phone}</p>
                                         </div>
                                     )}
                                 </div>
                             </div>
                             <div className="space-y-3 md:text-right print:text-right">
-                                <h3 className="text-slate-400 print:text-slate-500 text-[10px] font-bold uppercase tracking-widest flex items-center justify-start md:justify-end print:justify-end gap-2">
+                                <h3 className="text-muted-foreground print:text-muted-foreground text-[10px] font-bold uppercase tracking-widest flex items-center justify-start md:justify-end print:justify-end gap-2">
                                     <MapPin className="h-3 w-3" />
                                     {t('proforma.location')}
                                 </h3>
@@ -570,7 +570,7 @@ const ProformaDetails: React.FC = () => {
                                     <p className="text-lg font-bold text-white print:text-black" style={{ letterSpacing: 'normal', wordSpacing: '0.08em' }}>
                                         {proforma.pos?.name || '-'}
                                     </p>
-                                    <div className="text-slate-400 print:text-slate-600 text-sm space-y-0.5" style={{ wordSpacing: '0.05em' }}>
+                                    <div className="text-muted-foreground print:text-muted-foreground text-sm space-y-0.5" style={{ wordSpacing: '0.05em' }}>
                                         <p>{proforma.pos?.address || t('common.no_address')}</p>
                                         {proforma.pos?.phone && <p>{proforma.pos.phone}</p>}
                                     </div>
@@ -581,31 +581,31 @@ const ProformaDetails: React.FC = () => {
                         {/* Items Table */}
                         <div className="mb-10">
                             <Table>
-                                <TableHeader className="bg-slate-800/50 print:bg-slate-100">
-                                    <TableRow className="border-white/10 print:border-slate-200">
-                                        <TableHead className="text-slate-300 print:text-black font-bold w-[40%]">
+                                <TableHeader className="bg-muted print:bg-slate-100">
+                                    <TableRow className="border-border print:border-slate-200">
+                                        <TableHead className="text-foreground print:text-black font-bold w-[40%]">
                                             {t('proforma.item_description')}
                                         </TableHead>
                                         {proforma.sellType === 'SERVICE' && (
-                                            <TableHead className="text-slate-300 print:text-black font-bold whitespace-nowrap hidden md:table-cell print:table-cell">
+                                            <TableHead className="text-foreground print:text-black font-bold whitespace-nowrap hidden md:table-cell print:table-cell">
                                                 {t('common.category')}
                                             </TableHead>
                                         )}
-                                        <TableHead className="text-center text-slate-300 print:text-black font-bold whitespace-nowrap w-16">
+                                        <TableHead className="text-center text-foreground print:text-black font-bold whitespace-nowrap w-16">
                                             {t('proforma.item_qty')}
                                         </TableHead>
-                                        <TableHead className="text-right text-slate-300 print:text-black font-bold whitespace-nowrap">
+                                        <TableHead className="text-right text-foreground print:text-black font-bold whitespace-nowrap">
                                             {t('proforma.item_price')}
                                         </TableHead>
-                                        <TableHead className="text-right text-slate-300 print:text-black font-bold whitespace-nowrap">
+                                        <TableHead className="text-right text-foreground print:text-black font-bold whitespace-nowrap">
                                             {t('proforma.table_total')}
                                         </TableHead>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
                                     {proforma.items.map((item: any, idx: number) => (
-                                        <TableRow key={idx} className="border-white/10 print:border-slate-200 hover:bg-white/5 transition-colors">
-                                            <TableCell className="text-white print:text-black font-medium py-4">
+                                        <TableRow key={idx} className="border-border print:border-slate-200 hover:bg-muted transition-colors">
+                                            <TableCell className="text-foreground print:text-black font-medium py-4">
                                                 <div className="space-y-1">
                                                     <div className="flex items-center gap-2">
                                                         {proforma.sellType === 'SERVICE' && (
@@ -614,7 +614,7 @@ const ProformaDetails: React.FC = () => {
                                                         <span>{item.name}</span>
                                                     </div>
                                                     {proforma.sellType === 'SERVICE' && item.service?.description && (
-                                                        <p className="text-xs text-slate-500 print:text-slate-500 italic pl-5 leading-relaxed">
+                                                        <p className="text-xs text-muted-foreground print:text-muted-foreground italic pl-5 leading-relaxed">
                                                             {item.service.description}
                                                         </p>
                                                     )}
@@ -627,15 +627,15 @@ const ProformaDetails: React.FC = () => {
                                                             {item.service.category.name}
                                                         </span>
                                                     ) : (
-                                                        <span className="text-slate-600 text-xs">—</span>
+                                                        <span className="text-muted-foreground text-xs">—</span>
                                                     )}
                                                 </TableCell>
                                             )}
-                                            <TableCell className="text-center text-slate-400 print:text-black py-4">{item.qty}</TableCell>
-                                            <TableCell className="text-right text-slate-400 print:text-black py-4 whitespace-nowrap">
+                                            <TableCell className="text-center text-muted-foreground print:text-black py-4">{item.qty}</TableCell>
+                                            <TableCell className="text-right text-muted-foreground print:text-black py-4 whitespace-nowrap">
                                                 {fmt(Number(item.price))}
                                             </TableCell>
-                                            <TableCell className="text-right text-white print:text-black font-bold py-4 whitespace-nowrap">
+                                            <TableCell className="text-right text-foreground print:text-black font-bold py-4 whitespace-nowrap">
                                                 {fmt(parseFloat(item.total ?? item.price * item.qty))}
                                             </TableCell>
                                         </TableRow>
@@ -648,26 +648,26 @@ const ProformaDetails: React.FC = () => {
                         <div className="flex flex-col md:flex-row justify-between gap-8 mt-4">
                             {/* Notes box */}
                             <div className="flex-1">
-                                <div className="bg-slate-800/20 print:bg-slate-50 p-5 rounded-xl border border-white/5 print:border-slate-200">
-                                    <div className="flex items-center gap-2 mb-3 font-bold text-slate-300 print:text-slate-600 uppercase tracking-widest text-[10px]">
+                                <div className="bg-muted/20 print:bg-slate-50 p-5 rounded-xl border border-border print:border-slate-200">
+                                    <div className="flex items-center gap-2 mb-3 font-bold text-foreground print:text-muted-foreground uppercase tracking-widest text-[10px]">
                                         <Info className="h-3.5 w-3.5 text-blue-400" />
                                         {t('proforma.notes')}
                                     </div>
-                                    <p className="text-sm text-slate-400 print:text-slate-600 leading-relaxed" style={{ wordSpacing: '0.08em', letterSpacing: 'normal' }}>
+                                    <p className="text-sm text-muted-foreground print:text-muted-foreground leading-relaxed" style={{ wordSpacing: '0.08em', letterSpacing: 'normal' }}>
                                         {notesText}
                                     </p>
                                 </div>
                                 {parsedBankAccounts.length > 0 && (
-                                    <div className="mt-4 bg-slate-800/20 print:bg-slate-50 p-5 rounded-xl border border-white/5 print:border-slate-200">
-                                        <div className="flex items-center gap-2 mb-3 font-bold text-slate-300 print:text-slate-600 uppercase tracking-widest text-[10px]">
+                                    <div className="mt-4 bg-muted/20 print:bg-slate-50 p-5 rounded-xl border border-border print:border-slate-200">
+                                        <div className="flex items-center gap-2 mb-3 font-bold text-foreground print:text-muted-foreground uppercase tracking-widest text-[10px]">
                                             <CreditCard className="h-3.5 w-3.5 text-blue-400" />
                                             Enfòmasyon Bankè (Bank Details)
                                         </div>
                                         <div className="space-y-3">
                                             {parsedBankAccounts.map((acc: any, i: number) => (
-                                                <div key={i} className="flex flex-col border-b border-white/5 print:border-slate-100 last:border-0 pb-2 last:pb-0">
+                                                <div key={i} className="flex flex-col border-b border-border print:border-slate-100 last:border-0 pb-2 last:pb-0">
                                                     <span className="text-xs font-bold text-white print:text-black">{acc.bankName}</span>
-                                                    <div className="flex justify-between text-[11px] text-slate-400 print:text-slate-600 mt-0.5">
+                                                    <div className="flex justify-between text-[11px] text-muted-foreground print:text-muted-foreground mt-0.5">
                                                         <span>{acc.accountNumber}</span>
                                                         <span className="italic">{acc.accountName}</span>
                                                     </div>
@@ -680,18 +680,18 @@ const ProformaDetails: React.FC = () => {
 
                             {/* Amounts */}
                             <div className="w-full md:w-64 space-y-1.5">
-                                <div className="flex items-center justify-between text-sm text-slate-400 print:text-slate-600 py-1.5 border-b border-white/5 print:border-slate-100">
+                                <div className="flex items-center justify-between text-sm text-muted-foreground print:text-muted-foreground py-1.5 border-b border-border print:border-slate-100">
                                     <span>{t('proforma.subtotal')}</span>
                                     <span className="font-medium text-white print:text-black tabular-nums">{fmt(subtotal)}</span>
                                 </div>
                                 {tax > 0 && (
-                                    <div className="flex items-center justify-between text-sm text-slate-400 print:text-slate-600 py-1.5 border-b border-white/5 print:border-slate-100">
+                                    <div className="flex items-center justify-between text-sm text-muted-foreground print:text-muted-foreground py-1.5 border-b border-border print:border-slate-100">
                                         <span className="whitespace-nowrap">{t('proforma.tax')}{' '}({taxRate}%)</span>
                                         <span className="font-medium tabular-nums">{fmt(tax)}</span>
                                     </div>
                                 )}
                                 {discount > 0 && (
-                                    <div className="flex items-center justify-between text-sm text-rose-400 print:text-rose-600 py-1.5 border-b border-white/5 print:border-slate-100">
+                                    <div className="flex items-center justify-between text-sm text-rose-400 print:text-rose-600 py-1.5 border-b border-border print:border-slate-100">
                                         <span>{t('proforma.discount')}</span>
                                         <span className="font-medium tabular-nums">-{fmt(discount)}</span>
                                     </div>
@@ -704,7 +704,7 @@ const ProformaDetails: React.FC = () => {
                         </div>
 
                         {/* Footer (HTML Print View) */}
-                        <div className="mt-16 pt-6 border-t border-white/10 print:border-slate-200 text-center text-xs text-slate-500 print:text-slate-500 font-medium tracking-wider">
+                        <div className="mt-16 pt-6 border-t border-border print:border-slate-200 text-center text-xs text-muted-foreground print:text-muted-foreground font-medium tracking-wider">
                             {business.businessName} — #{proforma.proformaNumber}
                         </div>
                     </CardContent>

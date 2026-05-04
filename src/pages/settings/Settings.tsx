@@ -352,15 +352,15 @@ const Settings: React.FC = () => {
     return (
         <div className="space-y-6">
             <div>
-                <h2 className="text-3xl font-bold tracking-tight text-slate-900 flex items-center gap-3">
+                <h2 className="text-3xl font-bold tracking-tight text-foreground flex items-center gap-3">
                     <SettingsIcon className="h-8 w-8 text-primary" />
                     {t('settings.title')}
                 </h2>
-                <p className="text-slate-500">{t('settings.description')}</p>
+                <p className="text-muted-foreground">{t('settings.description')}</p>
             </div>
 
             <Tabs defaultValue="general" className="space-y-4">
-                <TabsList className="bg-slate-100 border border-slate-200 p-1">
+                <TabsList className="bg-muted border border-border p-1">
                     <TabsTrigger value="general" className="data-[state=active]:bg-primary data-[state=active]:text-white gap-2 transition-all">
                         <Store className="h-4 w-4" /> {t('settings.tab_general')}
                     </TabsTrigger>
@@ -376,11 +376,11 @@ const Settings: React.FC = () => {
                 </TabsList>
                 {/* General Settings */}
                 <TabsContent value="general" className="space-y-4">
-                    <Card className="bg-white border-slate-200 shadow-sm">
-                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-7 border-b border-slate-50 mb-6">
+                    <Card className="bg-background border-border shadow-sm">
+                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-7 border-b border-border mb-6">
                             <div className="space-y-1">
-                                <CardTitle className="text-slate-900 font-bold">{t('settings.general_title')}</CardTitle>
-                                <CardDescription className="text-slate-500">{t('settings.general_desc')}</CardDescription>
+                                <CardTitle className="text-foreground font-bold">{t('settings.general_title')}</CardTitle>
+                                <CardDescription className="text-muted-foreground">{t('settings.general_desc')}</CardDescription>
                             </div>
                             {!isEditingGeneral && (
                                 <Button
@@ -398,50 +398,50 @@ const Settings: React.FC = () => {
                                 <>
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                         <div className="space-y-2">
-                                            <Label className="text-slate-700 font-medium">{t('settings.business_name')}</Label>
+                                            <Label className="text-foreground font-medium">{t('settings.business_name')}</Label>
                                             <Input
-                                                className="bg-slate-50 border-slate-200 text-slate-900 focus:ring-primary"
+                                                className="bg-background border-border text-foreground focus:ring-ring"
                                                 value={businessName}
                                                 onChange={(e) => setBusinessName(e.target.value)}
                                             />
                                         </div>
                                         <div className="space-y-2">
-                                            <Label className="text-slate-700 font-medium">{t('settings.business_slogan')}</Label>
+                                            <Label className="text-foreground font-medium">{t('settings.business_slogan')}</Label>
                                             <Input
-                                                className="bg-slate-50 border-slate-200 text-slate-900 focus:ring-primary"
+                                                className="bg-background border-border text-foreground focus:ring-ring"
                                                 value={businessSlogan}
                                                 onChange={(e) => setBusinessSlogan(e.target.value)}
                                                 placeholder="Egz: Inovasyon nan sèvis ou"
                                             />
                                         </div>
                                         <div className="space-y-2">
-                                            <Label className="text-slate-700 font-medium">{t('settings.business_address')}</Label>
+                                            <Label className="text-foreground font-medium">{t('settings.business_address')}</Label>
                                             <Input
-                                                className="bg-slate-50 border-slate-200 text-slate-900 focus:ring-primary"
+                                                className="bg-background border-border text-foreground focus:ring-ring"
                                                 value={businessAddress}
                                                 onChange={(e) => setBusinessAddress(e.target.value)}
                                             />
                                         </div>
                                         <div className="space-y-2">
-                                            <Label className="text-slate-700 font-medium">{t('settings.business_phone')}</Label>
+                                            <Label className="text-foreground font-medium">{t('settings.business_phone')}</Label>
                                             <Input
-                                                className="bg-slate-50 border-slate-200 text-slate-900 focus:ring-primary"
+                                                className="bg-background border-border text-foreground focus:ring-ring"
                                                 value={businessPhone}
                                                 onChange={(e) => setBusinessPhone(e.target.value)}
                                             />
                                         </div>
                                         <div className="space-y-2">
-                                            <Label className="text-slate-700 font-medium">{t('settings.business_email')}</Label>
+                                            <Label className="text-foreground font-medium">{t('settings.business_email')}</Label>
                                             <Input
-                                                className="bg-slate-50 border-slate-200 text-slate-900 focus:ring-primary"
+                                                className="bg-background border-border text-foreground focus:ring-ring"
                                                 value={businessEmail}
                                                 onChange={(e) => setBusinessEmail(e.target.value)}
                                             />
                                         </div>
                                         <div className="space-y-2">
-                                            <Label className="text-slate-700 font-medium">{t('settings.currency')}</Label>
+                                            <Label className="text-foreground font-medium">{t('settings.currency')}</Label>
                                             <select
-                                                className="w-full bg-slate-50 border border-slate-200 text-slate-900 rounded-md h-10 px-3 outline-none focus:ring-2 focus:ring-primary transition-all"
+                                                className="w-full bg-background border border-border text-foreground rounded-md h-10 px-3 outline-none focus:ring-2 focus:ring-ring transition-all"
                                                 value={currency}
                                                 onChange={(e) => setCurrency(e.target.value)}
                                             >
@@ -453,10 +453,10 @@ const Settings: React.FC = () => {
                                             </select>
                                         </div>
                                         <div className="space-y-2">
-                                            <Label className="text-slate-300">Taux de Change (USD {'->'} HTG)</Label>
+                                            <Label className="text-foreground">Taux de Change (USD {'->'} HTG)</Label>
                                             <Input
                                                 type="number"
-                                                className="bg-slate-800 border-white/10 text-white"
+                                                className="bg-background border-border text-foreground focus:ring-ring"
                                                 value={exchangeRate}
                                                 onChange={(e) => setExchangeRate(e.target.value)}
                                                 placeholder="Egz: 130.5"
@@ -464,7 +464,7 @@ const Settings: React.FC = () => {
                                         </div>
                                         <div className="space-y-4 md:col-span-2">
                                             <div className="flex items-center justify-between">
-                                                <Label className="text-slate-300">Kont Bank (Bank Accounts)</Label>
+                                                <Label className="text-foreground">Kont Bank (Bank Accounts)</Label>
                                                 <Button
                                                     type="button"
                                                     variant="outline"
@@ -478,30 +478,30 @@ const Settings: React.FC = () => {
 
                                             <div className="space-y-3">
                                                 {bankAccounts.map((account, index) => (
-                                                    <div key={index} className="grid grid-cols-1 md:grid-cols-3 gap-3 p-4 bg-slate-800/30 border border-white/5 rounded-lg relative group">
+                                                    <div key={index} className="grid grid-cols-1 md:grid-cols-3 gap-3 p-4 bg-muted border border-border rounded-lg relative group">
                                                         <div className="space-y-1">
-                                                            <Label className="text-[10px] text-slate-500 uppercase">Non Bank</Label>
+                                                            <Label className="text-[10px] text-muted-foreground uppercase">Non Bank</Label>
                                                             <Input
-                                                                className="h-8 bg-slate-800 border-white/10 text-white text-xs"
+                                                                className="h-8 bg-background border-border text-foreground text-xs"
                                                                 value={account.bankName}
                                                                 onChange={(e) => handleUpdateBankAccount(index, 'bankName', e.target.value)}
                                                                 placeholder="Egz: BNC"
                                                             />
                                                         </div>
                                                         <div className="space-y-1">
-                                                            <Label className="text-[10px] text-slate-500 uppercase">Nimewo Kont</Label>
+                                                            <Label className="text-[10px] text-muted-foreground uppercase">Nimewo Kont</Label>
                                                             <Input
-                                                                className="h-8 bg-slate-800 border-white/10 text-white text-xs"
+                                                                className="h-8 bg-background border-border text-foreground text-xs"
                                                                 value={account.accountNumber}
                                                                 onChange={(e) => handleUpdateBankAccount(index, 'accountNumber', e.target.value)}
                                                                 placeholder="123-456-789"
                                                             />
                                                         </div>
                                                         <div className="space-y-1">
-                                                            <Label className="text-[10px] text-slate-500 uppercase">Nom sou Kont lan</Label>
+                                                            <Label className="text-[10px] text-muted-foreground uppercase">Nom sou Kont lan</Label>
                                                             <div className="flex gap-2">
                                                                 <Input
-                                                                    className="h-8 bg-slate-800 border-white/10 text-white text-xs flex-1"
+                                                                    className="h-8 bg-background border-border text-foreground text-xs flex-1"
                                                                     value={account.accountName}
                                                                     onChange={(e) => handleUpdateBankAccount(index, 'accountName', e.target.value)}
                                                                     placeholder="Nom Biznis lan"
@@ -520,8 +520,8 @@ const Settings: React.FC = () => {
                                                     </div>
                                                 ))}
                                                 {bankAccounts.length === 0 && (
-                                                    <div className="text-center py-6 border border-dashed border-white/10 rounded-lg">
-                                                        <p className="text-xs text-slate-500 italic">Pa gen okenn kont bank anrejistre.</p>
+                                                    <div className="text-center py-6 border border-dashed border-border rounded-lg">
+                                                        <p className="text-xs text-muted-foreground italic">Pa gen okenn kont bank anrejistre.</p>
                                                     </div>
                                                 )}
                                             </div>
@@ -529,7 +529,7 @@ const Settings: React.FC = () => {
                                     </div>
 
                                     <div className="space-y-2">
-                                        <Label className="text-slate-300">{t('settings.business_logo')}</Label>
+                                        <Label className="text-foreground">{t('settings.business_logo')}</Label>
                                         <div className="flex flex-wrap gap-4">
                                             <input
                                                 type="file"
@@ -542,17 +542,17 @@ const Settings: React.FC = () => {
                                             />
 
                                             {logoUrl ? (
-                                                <div className="h-24 w-24 rounded-lg border border-white/10 p-1 relative group bg-white/5">
+                                                <div className="h-24 w-24 rounded-lg border border-border p-1 relative group bg-muted">
                                                     <img
                                                         src={logoUrl}
                                                         alt="Logo"
                                                         className="h-full w-full object-contain rounded-md"
                                                     />
-                                                    <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2 rounded-md">
+                                                    <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2 rounded-md">
                                                         <Button
                                                             variant="ghost"
                                                             size="icon"
-                                                            className="h-8 w-8 text-white hover:bg-orange-500/20 hover:text-orange-500"
+                                                            className="h-8 w-8 text-white hover:bg-primary/20 hover:text-white"
                                                             onClick={() => fileInputRef.current?.click()}
                                                             disabled={isLoading}
                                                         >
@@ -561,7 +561,7 @@ const Settings: React.FC = () => {
                                                         <Button
                                                             variant="ghost"
                                                             size="icon"
-                                                            className="h-8 w-8 text-white hover:bg-rose-500/20 hover:text-rose-500"
+                                                            className="h-8 w-8 text-white hover:bg-rose-500/20 hover:text-rose-300"
                                                             onClick={() => {
                                                                 setLogoUrl('');
                                                                 setSelectedFile(null);
@@ -572,7 +572,7 @@ const Settings: React.FC = () => {
                                                         </Button>
                                                     </div>
                                                     {isLoading && selectedFile && (
-                                                        <div className="absolute inset-0 bg-black/40 flex items-center justify-center rounded-md">
+                                                        <div className="absolute inset-0 bg-black/30 flex items-center justify-center rounded-md">
                                                             <RotateCw className="h-5 w-5 text-white animate-spin" />
                                                         </div>
                                                     )}
@@ -581,16 +581,16 @@ const Settings: React.FC = () => {
                                                 <div
                                                     onClick={() => fileInputRef.current?.click()}
                                                     className={cn(
-                                                        "h-24 w-24 rounded-lg border border-dashed border-white/20 hover:border-orange-500 flex flex-col items-center justify-center cursor-pointer group transition-colors",
+                                                        "h-24 w-24 rounded-lg border border-dashed border-border hover:border-primary flex flex-col items-center justify-center cursor-pointer group transition-colors",
                                                         isLoading && "opacity-50 cursor-not-allowed"
                                                     )}
                                                 >
                                                     {isLoading && selectedFile ? (
-                                                        <RotateCw className="h-5 w-5 text-slate-400 animate-spin" />
+                                                        <RotateCw className="h-5 w-5 text-muted-foreground animate-spin" />
                                                     ) : (
                                                         <>
-                                                            <CirclePlus className="h-5 w-5 text-slate-400 group-hover:text-orange-500" />
-                                                            <span className="text-[10px] mt-2 text-slate-500 group-hover:text-orange-500 font-medium">Logo</span>
+                                                            <CirclePlus className="h-5 w-5 text-muted-foreground group-hover:text-primary" />
+                                                            <span className="text-[10px] mt-2 text-muted-foreground group-hover:text-primary font-medium">Logo</span>
                                                         </>
                                                     )}
                                                 </div>
@@ -598,52 +598,52 @@ const Settings: React.FC = () => {
                                         </div>
                                     </div>
 
-                                    <div className="pt-4 border-t border-white/10 flex gap-3">
-                                        <Button className="bg-orange-500 hover:bg-orange-600 text-white gap-2" onClick={handleSaveGeneral} disabled={isLoading}>
+                                    <div className="pt-4 border-t border-border flex gap-3">
+                                        <Button className="bg-primary hover:bg-primary/90 text-white gap-2" onClick={handleSaveGeneral} disabled={isLoading}>
                                             <Save className="h-4 w-4" /> {isLoading ? t('settings.saving') : t('common.save_button')}
                                         </Button>
-                                        <Button variant="ghost" className="text-slate-400 hover:text-white" onClick={() => setIsEditingGeneral(false)} disabled={isLoading}>
+                                        <Button variant="ghost" className="text-muted-foreground hover:text-foreground" onClick={() => setIsEditingGeneral(false)} disabled={isLoading}>
                                             {t('common.cancel')}
                                         </Button>
                                     </div>
                                 </>
                             ) : (
                                 <div className="flex flex-col md:flex-row gap-8 items-start">
-                                    <div className="h-32 w-32 rounded-xl bg-white/5 border border-white/10 p-2 flex items-center justify-center overflow-hidden flex-shrink-0">
+                                    <div className="h-32 w-32 rounded-xl bg-muted border border-border p-2 flex items-center justify-center overflow-hidden flex-shrink-0">
                                         {logoUrl ? (
                                             <img src={logoUrl} alt="Logo" className="h-full w-full object-contain" />
                                         ) : (
-                                            <Store className="h-12 w-12 text-slate-700" />
+                                            <Store className="h-12 w-12 text-muted-foreground" />
                                         )}
                                     </div>
                                     <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-y-4 gap-x-12">
                                         <div className="space-y-1">
-                                            <p className="text-[10px] uppercase tracking-widest text-slate-500 font-bold">{t('settings.business_name')}</p>
-                                            <p className="text-slate-300 italic">{businessName || '---'}</p>
+                                            <p className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold">{t('settings.business_name')}</p>
+                                            <p className="text-foreground italic">{businessName || '---'}</p>
                                         </div>
                                         <div className="space-y-1">
-                                            <p className="text-[10px] uppercase tracking-widest text-slate-500 font-bold">{t('settings.business_slogan')}</p>
-                                            <p className="text-slate-300 italic">"{businessSlogan || '---'}"</p>
+                                            <p className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold">{t('settings.business_slogan')}</p>
+                                            <p className="text-foreground italic">"{businessSlogan || '---'}"</p>
                                         </div>
                                         <div className="space-y-1">
-                                            <p className="text-[10px] uppercase tracking-widest text-slate-500 font-bold">{t('settings.business_address')}</p>
-                                            <p className="text-slate-300">{businessAddress || '---'}</p>
+                                            <p className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold">{t('settings.business_address')}</p>
+                                            <p className="text-foreground">{businessAddress || '---'}</p>
                                         </div>
                                         <div className="space-y-1">
-                                            <p className="text-[10px] uppercase tracking-widest text-slate-500 font-bold">{t('settings.business_phone')}</p>
-                                            <p className="text-slate-300">{businessPhone || '---'}</p>
+                                            <p className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold">{t('settings.business_phone')}</p>
+                                            <p className="text-foreground">{businessPhone || '---'}</p>
                                         </div>
                                         <div className="space-y-1">
-                                            <p className="text-[10px] uppercase tracking-widest text-slate-500 font-bold">{t('settings.business_email')}</p>
-                                            <p className="text-slate-300">{businessEmail || '---'}</p>
+                                            <p className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold">{t('settings.business_email')}</p>
+                                            <p className="text-foreground">{businessEmail || '---'}</p>
                                         </div>
                                         <div className="space-y-1">
-                                            <p className="text-[10px] uppercase tracking-widest text-slate-500 font-bold">{t('settings.currency')}</p>
-                                            <p className="text-slate-300 font-mono">{currency}</p>
+                                            <p className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold">{t('settings.currency')}</p>
+                                            <p className="text-foreground font-mono">{currency}</p>
                                         </div>
                                         <div className="space-y-1">
-                                            <p className="text-[10px] uppercase tracking-widest text-slate-500 font-bold">Taux de Change</p>
-                                            <p className="text-slate-300 font-mono">{exchangeRate} HTG = 1 USD</p>
+                                            <p className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold">Taux de Change</p>
+                                            <p className="text-foreground font-mono">{exchangeRate} HTG = 1 USD</p>
                                         </div>
                                     </div>
                                 </div>
@@ -654,10 +654,10 @@ const Settings: React.FC = () => {
 
                 {/* System Settings */}
                 <TabsContent value="system" className="space-y-4">
-                    <Card className="bg-slate-900/50 border-white/10 backdrop-blur-xl">
+                    <Card className="bg-background border-border">
                         <CardHeader>
-                            <CardTitle className="text-white flex items-center gap-2">
-                                <ShieldCheck className="h-5 w-5 text-orange-500" />
+                            <CardTitle className="text-foreground flex items-center gap-2">
+                                <ShieldCheck className="h-5 w-5 text-primary" />
                                 {t('settings.tab_system')}
                             </CardTitle>
                         </CardHeader>
@@ -667,10 +667,10 @@ const Settings: React.FC = () => {
                                 <div className="space-y-1">
                                     <div className="flex items-center gap-2">
                                         <AlertTriangle className="h-4 w-4 text-rose-500" />
-                                        <p className="font-semibold text-white uppercase tracking-wider text-xs">{t('settings.critical_actions')}</p>
+                                        <p className="font-semibold text-rose-600 uppercase tracking-wider text-xs">{t('settings.critical_actions')}</p>
                                     </div>
-                                    <p className="text-lg font-bold text-white">{t('settings.maintenance_mode')}</p>
-                                    <p className="text-sm text-slate-400">{t('settings.maintenance_desc')}</p>
+                                    <p className="text-lg font-bold text-foreground">{t('settings.maintenance_mode')}</p>
+                                    <p className="text-sm text-muted-foreground">{t('settings.maintenance_desc')}</p>
                                 </div>
                                 <Switch
                                     checked={maintenanceMode}
@@ -684,19 +684,19 @@ const Settings: React.FC = () => {
                                 {/* Removed Backup Section from here */}
 
                                 {/* Logs Section */}
-                                <div className="p-4 bg-slate-950/40 border border-white/5 rounded-xl space-y-3">
+                                <div className="p-4 bg-muted border border-border rounded-xl space-y-3">
                                     <div className="flex items-center gap-3">
                                         <div className="p-2 bg-blue-500/10 rounded-lg">
                                             <History className="h-5 w-5 text-blue-500" />
                                         </div>
                                         <div>
-                                            <p className="text-sm font-medium text-white">{t('settings.logs_title')}</p>
-                                            <p className="text-xs text-slate-500">{t('settings.logs_desc')}</p>
+                                            <p className="text-sm font-medium text-foreground">{t('settings.logs_title')}</p>
+                                            <p className="text-xs text-muted-foreground">{t('settings.logs_desc')}</p>
                                         </div>
                                     </div>
                                     <Button
                                         variant="outline"
-                                        className="w-full border-white/10 bg-transparent hover:bg-white/5 text-xs h-9 text-slate-300"
+                                        className="w-full border-border bg-background hover:bg-primary/10 hover:text-primary text-xs h-9 text-foreground"
                                         onClick={handleViewLogs}
                                     >
                                         {t('settings.logs_button')}
@@ -704,19 +704,19 @@ const Settings: React.FC = () => {
                                 </div>
 
                                 {/* Optimization Section */}
-                                <div className="p-4 bg-slate-950/40 border border-white/5 rounded-xl space-y-3">
+                                <div className="p-4 bg-muted border border-border rounded-xl space-y-3">
                                     <div className="flex items-center gap-3">
                                         <div className="p-2 bg-emerald-500/10 rounded-lg">
                                             <Zap className="h-5 w-5 text-emerald-500" />
                                         </div>
                                         <div>
-                                            <p className="text-sm font-medium text-white">{t('settings.perf_title')}</p>
-                                            <p className="text-xs text-slate-500">{t('settings.perf_desc')}</p>
+                                            <p className="text-sm font-medium text-foreground">{t('settings.perf_title')}</p>
+                                            <p className="text-xs text-muted-foreground">{t('settings.perf_desc')}</p>
                                         </div>
                                     </div>
                                     <Button
                                         variant="outline"
-                                        className="w-full border-white/10 bg-transparent hover:bg-white/5 text-xs h-9 text-slate-300"
+                                        className="w-full border-border bg-background hover:bg-primary/10 hover:text-primary text-xs h-9 text-foreground"
                                         onClick={handleOptimizeSystem}
                                         disabled={isOptimizeLoading}
                                     >
@@ -727,11 +727,11 @@ const Settings: React.FC = () => {
                             </div>
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
-                                <Button variant="outline" className="justify-start border-white/10 bg-transparent text-white hover:bg-white/5 gap-3 h-12">
-                                    <Globe className="h-4 w-4 text-orange-400" /> {t('audit.network_info')}
+                                <Button variant="outline" className="justify-start border-border bg-background text-foreground hover:bg-primary/10 hover:text-primary gap-3 h-12">
+                                    <Globe className="h-4 w-4 text-primary" /> {t('audit.network_info')}
                                 </Button>
-                                <Button variant="outline" className="justify-start border-white/10 bg-transparent text-white hover:bg-white/5 gap-3 h-12">
-                                    <ShieldCheck className="h-4 w-4 text-emerald-400" /> SSL & Security
+                                <Button variant="outline" className="justify-start border-border bg-background text-foreground hover:bg-primary/10 hover:text-primary gap-3 h-12">
+                                    <ShieldCheck className="h-4 w-4 text-emerald-500" /> SSL & Security
                                 </Button>
                             </div>
                         </CardContent>
@@ -740,52 +740,52 @@ const Settings: React.FC = () => {
 
                 {/* Backups Settings */}
                 <TabsContent value="backups" className="space-y-4">
-                    <Card className="bg-slate-900/50 border-white/10 backdrop-blur-xl">
+                    <Card className="bg-background border-border">
                         <CardHeader className="flex flex-row items-center justify-between">
                             <div>
-                                <CardTitle className="text-white">{t('settings.tab_backups')}</CardTitle>
-                                <CardDescription className="text-slate-400">
+                                <CardTitle className="text-foreground">{t('settings.tab_backups')}</CardTitle>
+                                <CardDescription className="text-muted-foreground">
                                     {t('settings.backups_history_desc')}
                                 </CardDescription>
                             </div>
                             <Button
                                 onClick={handleBackupData}
                                 disabled={isBackupLoading}
-                                className="bg-orange-500 hover:bg-orange-600 text-white gap-2"
+                                className="bg-primary hover:bg-primary/90 text-white gap-2"
                             >
                                 {isBackupLoading ? <RotateCw className="h-4 w-4 animate-spin" /> : <Database className="h-4 w-4" />}
                                 {t('settings.backup_button')}
                             </Button>
                         </CardHeader>
                         <CardContent>
-                            <div className="rounded-md border border-white/10 overflow-hidden">
+                            <div className="rounded-md border border-border overflow-hidden">
                                 <Table>
-                                    <TableHeader className="bg-white/5 hover:bg-white/5">
-                                        <TableRow className="border-white/10 hover:bg-transparent">
-                                            <TableHead className="text-slate-300 font-medium">{t('settings.backup_date')}</TableHead>
-                                            <TableHead className="text-slate-300 font-medium">{t('settings.backup_file')}</TableHead>
-                                            <TableHead className="text-slate-300 font-medium">{t('settings.backup_status')}</TableHead>
-                                            <TableHead className="text-slate-300 font-medium text-right">{t('settings.backup_action')}</TableHead>
+                                    <TableHeader className="bg-muted">
+                                        <TableRow className="border-border hover:bg-transparent">
+                                            <TableHead className="text-foreground font-medium">{t('settings.backup_date')}</TableHead>
+                                            <TableHead className="text-foreground font-medium">{t('settings.backup_file')}</TableHead>
+                                            <TableHead className="text-foreground font-medium">{t('settings.backup_status')}</TableHead>
+                                            <TableHead className="text-foreground font-medium text-right">{t('settings.backup_action')}</TableHead>
                                         </TableRow>
                                     </TableHeader>
                                     <TableBody>
                                         {backupHistory.length === 0 ? (
-                                            <TableRow className="hover:bg-white/5 border-white/10">
-                                                <TableCell colSpan={4} className="h-24 text-center text-slate-400">
+                                            <TableRow className="hover:bg-primary/5 border-border">
+                                                <TableCell colSpan={4} className="h-24 text-center text-muted-foreground">
                                                     {t('settings.no_backups')}
                                                 </TableCell>
                                             </TableRow>
                                         ) : (
                                             backupHistory.map((backup) => (
-                                                <TableRow key={backup.id} className="hover:bg-white/5 border-white/10 group transition-colors">
-                                                    <TableCell className="text-slate-300">
+                                                <TableRow key={backup.id} className="hover:bg-primary/5 border-border group transition-colors">
+                                                    <TableCell className="text-foreground">
                                                         {new Date(backup.date).toLocaleString()}
                                                     </TableCell>
-                                                    <TableCell className="text-slate-300 font-medium">
+                                                    <TableCell className="text-foreground font-medium">
                                                         {backup.fileName}
                                                     </TableCell>
                                                     <TableCell>
-                                                        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-500 border border-emerald-500/20">
+                                                        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-600 border border-emerald-500/20">
                                                             {backup.status}
                                                         </span>
                                                     </TableCell>
@@ -795,7 +795,7 @@ const Settings: React.FC = () => {
                                                                 href={backup.url}
                                                                 target="_blank"
                                                                 rel="noopener noreferrer"
-                                                                className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-9 px-3 w-full border-white/10 bg-transparent hover:bg-white/5 lg:w-auto text-orange-500 hover:text-orange-400 gap-2 border-orange-500/20"
+                                                                className="inline-flex items-center justify-center rounded-md text-sm font-medium h-9 px-3 border border-border bg-background hover:bg-primary/10 lg:w-auto text-primary hover:text-primary/80 gap-2"
                                                             >
                                                                 <ExternalLink className="h-4 w-4" />
                                                                 {t('settings.download')}
@@ -814,20 +814,20 @@ const Settings: React.FC = () => {
 
                 {/* Template Receipt */}
                 <TabsContent value="template-receipt" className="space-y-4">
-                    <Card className="bg-slate-900/50 border-white/10 backdrop-blur-xl">
+                    <Card className="bg-background border-border">
                         <CardHeader>
-                            <CardTitle className="text-white">{t('settings.tab_billing')}</CardTitle>
+                            <CardTitle className="text-foreground">{t('settings.tab_billing')}</CardTitle>
                         </CardHeader>
                         <CardContent className="space-y-8">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                                 {/* Receipt Config Section */}
                                 <div className="space-y-6">
-                                    <h3 className="text-lg font-medium text-white border-b border-white/10 pb-2">{t('settings.receipt_config')}</h3>
+                                    <h3 className="text-lg font-medium text-foreground border-b border-border pb-2">{t('settings.receipt_config')}</h3>
                                     <div className="space-y-4">
                                         <div className="space-y-2">
-                                            <Label className="text-slate-300">{t('settings.footer_message')}</Label>
+                                            <Label className="text-foreground">{t('settings.footer_message')}</Label>
                                             <Input
-                                                className="bg-slate-800 border-white/10 text-white"
+                                                className="bg-background border-border text-foreground focus:ring-ring"
                                                 placeholder="Mèsi paske w te vizite nou!"
                                                 value={footerMessage}
                                                 onChange={(e) => setFooterMessage(e.target.value)}
@@ -835,7 +835,7 @@ const Settings: React.FC = () => {
                                         </div>
                                     </div>
                                     <div className="pt-2">
-                                        <Button className="bg-orange-500 hover:bg-orange-600 text-white gap-2" onClick={handleSaveBilling} disabled={isLoading}>
+                                        <Button className="bg-primary hover:bg-primary/90 text-white gap-2" onClick={handleSaveBilling} disabled={isLoading}>
                                             <Save className="h-4 w-4" /> {isLoading ? t('settings.saving') : t('common.save_button')}
                                         </Button>
                                     </div>
@@ -843,38 +843,38 @@ const Settings: React.FC = () => {
 
                                 {/* Template Assignment Section */}
                                 <div className="space-y-6">
-                                    <h3 className="text-lg font-medium text-white border-b border-white/10 pb-2">{t('settings.receipt_templates')}</h3>
-                                    <div className="space-y-4 p-4 bg-slate-950/40 border border-white/5 rounded-xl">
+                                    <h3 className="text-lg font-medium text-foreground border-b border-border pb-2">{t('settings.receipt_templates')}</h3>
+                                    <div className="space-y-4 p-4 bg-muted border border-border rounded-xl">
                                         <div className="space-y-2">
-                                            <Label className="text-slate-300">{t('settings.select_template')}</Label>
+                                            <Label className="text-foreground">{t('settings.select_template')}</Label>
                                             <Select value={selectedTemplate} onValueChange={setSelectedTemplate}>
-                                                <SelectTrigger className="bg-slate-800 border-white/10 text-white focus:ring-orange-500">
+                                                <SelectTrigger className="bg-background border-border text-foreground focus:ring-ring">
                                                     <SelectValue placeholder="Select template" />
                                                 </SelectTrigger>
-                                                <SelectContent className="bg-slate-800 border-white/10">
-                                                    <SelectItem value="standard" className="text-white hover:bg-slate-700">{t('settings.template_standard')}</SelectItem>
-                                                    <SelectItem value="minimal" className="text-white hover:bg-slate-700">{t('settings.template_minimal')}</SelectItem>
+                                                <SelectContent className="bg-background border-border">
+                                                    <SelectItem value="standard">{t('settings.template_standard')}</SelectItem>
+                                                    <SelectItem value="minimal">{t('settings.template_minimal')}</SelectItem>
                                                 </SelectContent>
                                             </Select>
                                         </div>
 
                                         <Dialog open={isPreviewOpen} onOpenChange={setIsPreviewOpen}>
                                             <DialogTrigger asChild>
-                                                <Button variant="outline" className="w-full border-white/10 bg-transparent text-slate-300 hover:bg-white/5 gap-2" onClick={handlePreviewReceipt}>
+                                                <Button variant="outline" className="w-full border-border bg-background text-foreground hover:bg-primary/10 hover:text-primary gap-2" onClick={handlePreviewReceipt}>
                                                     <Globe className="h-4 w-4" /> {t('settings.preview_template')}
                                                 </Button>
                                             </DialogTrigger>
-                                            <DialogContent className="md:max-w-3xl bg-slate-900 border-white/10 text-white">
+                                            <DialogContent className="md:max-w-3xl bg-background border-border text-foreground">
                                                 <DialogHeader>
                                                     <DialogTitle>{t('settings.preview_title')}</DialogTitle>
-                                                    <DialogDescription className="text-slate-400">
+                                                    <DialogDescription className="text-muted-foreground">
                                                         {t('settings.preview_desc')}
                                                     </DialogDescription>
                                                 </DialogHeader>
 
                                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
                                                     {/* Left: Preview Frame */}
-                                                    <div className="w-full h-[500px] rounded-md border border-white/10 bg-white/5 p-2 flex items-center justify-center relative overflow-hidden">
+                                                    <div className="w-full h-[500px] rounded-md border border-border bg-muted p-2 flex items-center justify-center relative overflow-hidden">
                                                         {isPreviewOpen && (
                                                             <iframe
                                                                 id="receipt-preview-iframe"
@@ -887,19 +887,19 @@ const Settings: React.FC = () => {
 
                                                     {/* Right: Actions */}
                                                     <div className="space-y-4 flex flex-col justify-end pb-2">
-                                                        <div className="space-y-4 p-4 bg-slate-950/40 border border-white/5 rounded-xl">
+                                                        <div className="space-y-4 p-4 bg-muted border border-border rounded-xl">
                                                             <div className="space-y-2">
-                                                                <Label className="text-slate-300">{t('settings.select_pos')}</Label>
+                                                                <Label className="text-foreground">{t('settings.select_pos')}</Label>
                                                                 <Select value={selectedPos} onValueChange={setSelectedPos}>
-                                                                    <SelectTrigger className="bg-slate-800 border-white/10 text-white focus:ring-orange-500">
+                                                                    <SelectTrigger className="bg-background border-border text-foreground focus:ring-ring">
                                                                         <SelectValue placeholder="Select Point of Sale" />
                                                                     </SelectTrigger>
-                                                                    <SelectContent className="bg-slate-800 border-white/10">
+                                                                    <SelectContent className="bg-background border-border">
                                                                         {terminals.length === 0 ? (
-                                                                            <SelectItem value="none" disabled className="text-slate-500">No Terminals Found</SelectItem>
+                                                                            <SelectItem value="none" disabled className="text-muted-foreground">No Terminals Found</SelectItem>
                                                                         ) : (
                                                                             terminals.map(pos => (
-                                                                                <SelectItem key={pos.id} value={pos.id} className="text-white hover:bg-slate-700">
+                                                                                <SelectItem key={pos.id} value={pos.id}>
                                                                                     {pos.name}
                                                                                 </SelectItem>
                                                                             ))
@@ -908,7 +908,7 @@ const Settings: React.FC = () => {
                                                                 </Select>
                                                             </div>
                                                             <Button
-                                                                className="w-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500/30 hover:text-emerald-300 gap-2"
+                                                                className="w-full bg-emerald-500/20 text-emerald-600 border border-emerald-500/30 hover:bg-emerald-500/30 gap-2"
                                                                 onClick={handleAssignTemplate}
                                                                 disabled={isAssigning || terminals.length === 0}
                                                             >
@@ -916,11 +916,11 @@ const Settings: React.FC = () => {
                                                                 {isAssigning ? t('settings.assigning') : t('settings.assign_template')}
                                                             </Button>
                                                         </div>
-                                                        <div className="flex justify-end gap-3 pt-4 border-t border-white/10">
-                                                            <Button variant="outline" className="border-white/10 bg-transparent hover:bg-white/5 text-slate-300" onClick={() => setIsPreviewOpen(false)}>
+                                                        <div className="flex justify-end gap-3 pt-4 border-t border-border">
+                                                            <Button variant="outline" className="border-border bg-background text-foreground hover:bg-primary/10 hover:text-primary" onClick={() => setIsPreviewOpen(false)}>
                                                                 {t('common.close')}
                                                             </Button>
-                                                            <Button onClick={handlePrintPreview} className="bg-orange-500 hover:bg-orange-600 text-white gap-2">
+                                                            <Button onClick={handlePrintPreview} className="bg-primary hover:bg-primary/90 text-white gap-2">
                                                                 {t('settings.print_receipt')}
                                                             </Button>
                                                         </div>

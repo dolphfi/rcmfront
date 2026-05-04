@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Card, CardContent } from '../../components/ui/card';
 import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
@@ -70,7 +70,7 @@ const Services: React.FC = () => {
     });
     const [posSearchTerm, setPosSearchTerm] = useState('');
 
-    const fetchData = async () => {
+    const fetchData = useCallback(async () => {
         try {
             setIsLoading(true);
             const [servicesData, categoriesData, posData] = await Promise.all([
@@ -86,11 +86,11 @@ const Services: React.FC = () => {
         } finally {
             setIsLoading(false);
         }
-    };
+    }, [t]);
 
     useEffect(() => {
         fetchData();
-    }, []);
+    }, [fetchData]);
 
     const handleOpenDialog = (service?: Service) => {
         if (service) {
@@ -171,17 +171,17 @@ const Services: React.FC = () => {
             {/* Page Header */}
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div>
-                    <h1 className="text-2xl font-bold text-white tracking-tight">{t('services.title')}</h1>
-                    <p className="text-sm text-slate-400">{t('services.description')}</p>
+                    <h1 className="text-2xl font-bold text-foreground tracking-tight">{t('services.title')}</h1>
+                    <p className="text-sm text-muted-foreground">{t('services.description')}</p>
                 </div>
 
                 <div className="flex items-center gap-2">
-                    <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:bg-white/10 hover:text-white" onClick={fetchData}>
-                        <RotateCw className={`h-4 w-4 ${isLoading ? 'animate-spin text-orange-500' : ''}`} />
+                    <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:bg-primary/10 hover:text-primary" onClick={fetchData}>
+                        <RotateCw className={`h-4 w-4 ${isLoading ? 'animate-spin text-primary' : ''}`} />
                     </Button>
                     <Button
                         onClick={() => handleOpenDialog()}
-                        className="bg-orange-500 hover:bg-orange-600 text-white gap-2"
+                        className="bg-primary hover:bg-primary/90 text-white gap-2"
                     >
                         <Plus className="h-4 w-4" />
                         {t('services.add_service')}
@@ -190,17 +190,17 @@ const Services: React.FC = () => {
             </div>
 
             {/* Main Content Card */}
-            <Card className="flex-1 bg-white/5 backdrop-blur-sm border border-white/10 text-white overflow-hidden flex flex-col">
+            <Card className="flex-1 border border-border overflow-hidden flex flex-col">
                 <CardContent className="p-0 flex flex-col h-full">
                     {/* Toolbar */}
-                    <div className="p-4 border-b border-white/10">
+                    <div className="p-4 border-b border-border">
                         <div className="relative w-full sm:w-72">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                             <Input
                                 placeholder={t('services.search_placeholder')}
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
-                                className="pl-9 bg-white/5 border-white/10 text-white placeholder:text-slate-500 focus-visible:ring-orange-500/50"
+                                className="pl-9 bg-background border-border text-foreground placeholder:text-muted-foreground focus-visible:ring-ring"
                             />
                         </div>
                     </div>
@@ -208,61 +208,61 @@ const Services: React.FC = () => {
                     {/* Table */}
                     <div className="flex-1 overflow-auto">
                         <Table>
-                            <TableHeader className="bg-slate-900 sticky top-0 z-10 border-b border-white/10">
-                                <TableRow className="hover:bg-transparent border-white/10">
-                                    <TableHead className="text-white">{t('services.name')}</TableHead>
-                                    <TableHead className="text-white">{t('services.category')}</TableHead>
-                                    <TableHead className="text-white">{t('services.price')}</TableHead>
-                                    <TableHead className="text-white">Lokal</TableHead>
-                                    <TableHead className="text-white">{t('services.status')}</TableHead>
-                                    <TableHead className="text-right text-white">{t('services.action')}</TableHead>
+                            <TableHeader className="bg-background sticky top-0 z-10 border-b border-border">
+                                <TableRow className="hover:bg-transparent border-border">
+                                    <TableHead className="text-foreground">{t('services.name')}</TableHead>
+                                    <TableHead className="text-foreground">{t('services.category')}</TableHead>
+                                    <TableHead className="text-foreground">{t('services.price')}</TableHead>
+                                    <TableHead className="text-foreground">Lokal</TableHead>
+                                    <TableHead className="text-foreground">{t('services.status')}</TableHead>
+                                    <TableHead className="text-right text-foreground">{t('services.action')}</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
                                 {isLoading ? (
                                     <TableRow>
-                                        <TableCell colSpan={6} className="text-center py-8 text-slate-400">
+                                        <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
                                             <div className="flex items-center justify-center gap-2">
-                                                <RotateCw className="h-5 w-5 animate-spin text-orange-500" />
+                                                <RotateCw className="h-5 w-5 animate-spin text-primary" />
                                                 <span>{t('common.loading')}</span>
                                             </div>
                                         </TableCell>
                                     </TableRow>
                                 ) : filteredServices.length > 0 ? (
                                     filteredServices.map((service) => (
-                                        <TableRow key={service.id} className="hover:bg-white/5 transition-colors border-white/5 group">
+                                        <TableRow key={service.id} className="hover:bg-primary/5 transition-colors border-border group">
                                             <TableCell>
                                                 <div className="flex items-center gap-3">
-                                                    <div className="h-9 w-9 rounded-lg bg-orange-500/10 border border-orange-500/20 flex items-center justify-center text-orange-500">
+                                                    <div className="h-9 w-9 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center text-primary">
                                                         <Briefcase className="h-5 w-5" />
                                                     </div>
                                                     <div className="flex flex-col">
-                                                        <span className="font-medium text-white">{service.name}</span>
-                                                        <span className="text-[10px] text-slate-500 line-clamp-1">{service.description || '-'}</span>
+                                                        <span className="font-medium text-foreground">{service.name}</span>
+                                                        <span className="text-[10px] text-muted-foreground line-clamp-1">{service.description || '-'}</span>
                                                     </div>
                                                 </div>
                                             </TableCell>
                                             <TableCell>
-                                                <Badge variant="outline" className="bg-white/5 border-white/10 text-slate-300 font-normal rounded-md">
+                                                <Badge variant="outline" className="bg-muted border-border text-foreground font-normal rounded-md">
                                                     {service.category?.name || '-'}
                                                 </Badge>
                                             </TableCell>
-                                            <TableCell className="font-medium text-emerald-400">${service.price}</TableCell>
+                                            <TableCell className="font-medium text-emerald-600">${service.price}</TableCell>
                                             <TableCell>
                                                 <div className="flex flex-wrap gap-1">
                                                     {service.pointOfSales && service.pointOfSales.length > 0 ? (
                                                         service.pointOfSales.map(pos => (
-                                                            <Badge key={pos.id} variant="outline" className=" bg-white/5 border-white/10 text-slate-300 font-normal rounded-md">
+                                                            <Badge key={pos.id} variant="outline" className="bg-muted border-border text-foreground font-normal rounded-md">
                                                                 {pos.name}
                                                             </Badge>
                                                         ))
                                                     ) : (
-                                                        <span className="text-[10px] text-slate-500 italic">Tout lokal</span>
+                                                        <span className="text-[10px] text-muted-foreground italic">Tout lokal</span>
                                                     )}
                                                 </div>
                                             </TableCell>
                                             <TableCell>
-                                                <Badge className={service.isActive ? "bg-emerald-500/20 text-emerald-400 border-emerald-500/30 rounded-md" : "rounded-md bg-slate-500/20 text-slate-400 border-slate-500/30"}>
+                                                <Badge className={service.isActive ? "bg-emerald-500/20 text-emerald-600 border-emerald-500/30 rounded-md" : "rounded-md bg-muted text-muted-foreground border-border"}>
                                                     {service.isActive ? t('pos.active') : t('pos.inactive')}
                                                 </Badge>
                                             </TableCell>
@@ -272,26 +272,26 @@ const Services: React.FC = () => {
                                                         variant="ghost"
                                                         size="icon"
                                                         onClick={() => handleOpenDialog(service)}
-                                                        className="h-8 w-8 text-slate-400 hover:text-orange-500 hover:bg-orange-500/10"
+                                                        className="h-8 w-8 text-muted-foreground hover:text-primary hover:bg-primary/10"
                                                     >
                                                         <Edit className="h-4 w-4" />
                                                     </Button>
                                                     <AlertDialog>
                                                         <AlertDialogTrigger asChild>
-                                                            <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-rose-400 hover:bg-rose-500/10">
+                                                            <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-rose-500 hover:bg-rose-500/10">
                                                                 <Trash2 className="h-4 w-4" />
                                                             </Button>
                                                         </AlertDialogTrigger>
-                                                        <AlertDialogContent className="bg-slate-900 border-white/10">
+                                                        <AlertDialogContent className="bg-background border-border">
                                                             <AlertDialogHeader>
-                                                                <AlertDialogTitle className="text-white">{t('services.delete_confirm_title')}</AlertDialogTitle>
-                                                                <AlertDialogDescription className="text-slate-400">
+                                                                <AlertDialogTitle className="text-foreground">{t('services.delete_confirm_title')}</AlertDialogTitle>
+                                                                <AlertDialogDescription className="text-muted-foreground">
                                                                     {t('services.delete_confirm_desc', { name: service.name })}
                                                                 </AlertDialogDescription>
                                                             </AlertDialogHeader>
                                                             <AlertDialogFooter>
-                                                                <AlertDialogCancel className="bg-transparent border-white/10 text-white hover:bg-white/10">{t('common.cancel')}</AlertDialogCancel>
-                                                                <AlertDialogAction onClick={() => handleDelete(service.id)} className="bg-rose-500 hover:bg-rose-600">
+                                                                <AlertDialogCancel className="bg-transparent border-border text-foreground hover:bg-primary/10 hover:text-primary">{t('common.cancel')}</AlertDialogCancel>
+                                                                <AlertDialogAction onClick={() => handleDelete(service.id)} className="bg-rose-500 hover:bg-rose-600 text-white">
                                                                     {t('common.delete')}
                                                                 </AlertDialogAction>
                                                             </AlertDialogFooter>
@@ -303,7 +303,7 @@ const Services: React.FC = () => {
                                     ))
                                 ) : (
                                     <TableRow>
-                                        <TableCell colSpan={6} className="text-center py-8 text-slate-400 italic text-sm">
+                                        <TableCell colSpan={6} className="text-center py-8 text-muted-foreground italic text-sm">
                                             {t('services.no_services_found')}
                                         </TableCell>
                                     </TableRow>
@@ -316,13 +316,13 @@ const Services: React.FC = () => {
 
             {/* Add/Edit Dialog */}
             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                <DialogContent className="bg-slate-900 border-white/10 text-white sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
+                <DialogContent className="bg-background border-border text-foreground sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
                     <DialogHeader>
                         <DialogTitle className="flex items-center gap-2">
-                            <Briefcase className="h-5 w-5 text-orange-500" />
+                            <Briefcase className="h-5 w-5 text-primary" />
                             {editingService ? t('services.edit_service') : t('services.add_service')}
                         </DialogTitle>
-                        <DialogDescription className="text-slate-400">
+                        <DialogDescription className="text-muted-foreground">
                             {t('services.form_info')}
                         </DialogDescription>
                     </DialogHeader>
@@ -335,7 +335,7 @@ const Services: React.FC = () => {
                                     id="name"
                                     value={formData.name}
                                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                                    className="bg-white/5 border-white/10 text-white focus-visible:ring-orange-500/50"
+                                    className="bg-background border-border text-foreground focus-visible:ring-ring"
                                 />
                             </div>
                             <div className="space-y-2">
@@ -345,7 +345,7 @@ const Services: React.FC = () => {
                                     type="number"
                                     value={formData.price}
                                     onChange={(e) => setFormData({ ...formData, price: Number(e.target.value) })}
-                                    className="bg-white/5 border-white/10 text-white focus-visible:ring-orange-500/50"
+                                    className="bg-background border-border text-foreground focus-visible:ring-ring"
                                 />
                             </div>
                         </div>
@@ -357,10 +357,10 @@ const Services: React.FC = () => {
                                     value={formData.categoryId}
                                     onValueChange={(v) => setFormData({ ...formData, categoryId: v })}
                                 >
-                                    <SelectTrigger className="bg-white/5 border-white/10 text-white">
+                                    <SelectTrigger className="bg-background border-border text-foreground">
                                         <SelectValue placeholder={t('category.select_cat')} />
                                     </SelectTrigger>
-                                    <SelectContent className="bg-slate-900 border-white/10 text-white">
+                                    <SelectContent className="bg-background border-border text-foreground">
                                         {Array.isArray(categories) && categories.map((cat) => (
                                             <SelectItem key={cat.id} value={cat.id}>
                                                 {cat.name}
@@ -369,13 +369,13 @@ const Services: React.FC = () => {
                                     </SelectContent>
                                 </Select>
                             </div>
-                            <div className="flex items-center justify-between p-3 rounded-lg border border-white/10 bg-white/5 mt-6">
+                            <div className="flex items-center justify-between p-3 rounded-lg border border-border bg-muted mt-6">
                                 <Label htmlFor="isActive" className="cursor-pointer">{t('services.status')}</Label>
                                 <Switch
                                     id="isActive"
                                     checked={formData.isActive}
                                     onCheckedChange={(v) => setFormData({ ...formData, isActive: v })}
-                                    className="data-[state=checked]:bg-orange-500"
+                                    className="data-[state=checked]:bg-primary"
                                 />
                             </div>
                         </div>
@@ -386,7 +386,7 @@ const Services: React.FC = () => {
                                 id="description"
                                 value={formData.description}
                                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                                className="bg-white/5 border-white/10 text-white focus-visible:ring-orange-500/50"
+                                className="bg-background border-border text-foreground focus-visible:ring-ring"
                             />
                         </div>
 
@@ -394,35 +394,35 @@ const Services: React.FC = () => {
                             <div className="flex items-center justify-between">
                                 <div>
                                     <Label className="text-sm font-semibold flex items-center gap-2">
-                                        <Globe className="h-4 w-4 text-orange-500" />
+                                        <Globe className="h-4 w-4 text-primary" />
                                         {t('services.form_locations')}
                                     </Label>
-                                    <p className="text-[10px] text-slate-500">{t('services.form_locations_desc')}</p>
+                                    <p className="text-[10px] text-muted-foreground">{t('services.form_locations_desc')}</p>
                                 </div>
                                 <Button
                                     type="button"
                                     variant="ghost"
                                     size="sm"
                                     onClick={handleToggleAllPOS}
-                                    className="h-7 text-[10px] text-orange-500 hover:text-orange-400 hover:bg-orange-500/10"
+                                    className="h-7 text-[10px] text-primary hover:text-primary/80 hover:bg-primary/10"
                                 >
                                     {formData.posIds.length > 0 ? t('common.all') : t('common.add')}
                                 </Button>
                             </div>
 
                             <div className="relative">
-                                <Search className="absolute left-2 top-2.5 h-3.5 w-3.5 text-slate-500" />
+                                <Search className="absolute left-2 top-2.5 h-3.5 w-3.5 text-muted-foreground" />
                                 <Input
                                     placeholder="Chache lokal..."
                                     value={posSearchTerm}
                                     onChange={(e) => setPosSearchTerm(e.target.value)}
-                                    className="pl-8 h-8 text-xs bg-white/5 border-white/10 text-white focus-visible:ring-orange-500/50 mb-2"
+                                    className="pl-8 h-8 text-xs bg-background border-border text-foreground focus-visible:ring-ring mb-2"
                                 />
                             </div>
 
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 p-3 rounded-lg border border-white/10 bg-white/5 max-h-[180px] overflow-y-auto custom-scrollbar">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 p-3 rounded-lg border border-border bg-muted max-h-[180px] overflow-y-auto custom-scrollbar">
                                 {Array.isArray(filteredPOS) && filteredPOS.map((pos) => (
-                                    <div key={pos.id} className="flex items-center space-x-2 bg-slate-900/50 p-2 rounded border border-white/5 hover:border-orange-500/30 transition-colors">
+                                    <div key={pos.id} className="flex items-center space-x-2 bg-background p-2 rounded border border-border hover:border-primary/30 transition-colors">
                                         <Checkbox
                                             id={`pos-${pos.id}`}
                                             checked={formData.posIds.includes(pos.id)}
@@ -433,11 +433,10 @@ const Services: React.FC = () => {
                                                     setFormData({ ...formData, posIds: formData.posIds.filter(id => id !== pos.id) });
                                                 }
                                             }}
-                                            className="border-white/20 data-[state=checked]:bg-orange-500 data-[state=checked]:border-orange-500"
                                         />
                                         <Label
                                             htmlFor={`pos-${pos.id}`}
-                                            className="text-xs text-slate-300 cursor-pointer flex-1 truncate"
+                                            className="text-xs text-foreground cursor-pointer flex-1 truncate"
                                             title={pos.name}
                                         >
                                             {pos.name}
@@ -445,17 +444,17 @@ const Services: React.FC = () => {
                                     </div>
                                 ))}
                                 {filteredPOS.length === 0 && (
-                                    <p className="text-xs text-slate-500 col-span-2 italic py-4 text-center">{t('pos.no_data')}</p>
+                                    <p className="text-xs text-muted-foreground col-span-2 italic py-4 text-center">{t('pos.no_data')}</p>
                                 )}
                             </div>
                         </div>
                     </div>
 
                     <DialogFooter>
-                        <Button variant="ghost" onClick={() => setIsDialogOpen(false)} className="text-white hover:bg-white/10">
+                        <Button variant="ghost" onClick={() => setIsDialogOpen(false)} className="text-foreground hover:bg-primary/10 hover:text-primary">
                             {t('common.cancel')}
                         </Button>
-                        <Button onClick={handleSubmit} className="bg-orange-500 hover:bg-orange-600 text-white min-w-[100px]">
+                        <Button onClick={handleSubmit} className="bg-primary hover:bg-primary/90 text-white min-w-[100px]">
                             {editingService ? t('common.save') : t('common.add')}
                         </Button>
                     </DialogFooter>

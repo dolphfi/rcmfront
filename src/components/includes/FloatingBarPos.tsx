@@ -13,7 +13,7 @@ import {
     Loader2
 } from 'lucide-react';
 import { UserNav } from './UserAvatar';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import {
     Sheet,
     SheetContent,
@@ -61,19 +61,7 @@ export default function FloatingBarPos() {
         setIsDetailsOpen(true);
     };
 
-    useEffect(() => {
-        if (isSalesOpen || isTransactionsOpen) {
-            fetchSales();
-        }
-    }, [isSalesOpen, isTransactionsOpen]);
-
-    useEffect(() => {
-        if (isHoldOpen) {
-            fetchProformas();
-        }
-    }, [isHoldOpen]);
-
-    const fetchSales = async () => {
+    const fetchSales = useCallback(async () => {
         setIsLoadingSales(true);
         try {
             const data = await salesService.findAll();
@@ -89,9 +77,9 @@ export default function FloatingBarPos() {
         } finally {
             setIsLoadingSales(false);
         }
-    };
+    }, [user?.posId]);
 
-    const fetchProformas = async () => {
+    const fetchProformas = useCallback(async () => {
         setIsLoadingProformas(true);
         try {
             const data = await proformaService.findAll();
@@ -111,7 +99,19 @@ export default function FloatingBarPos() {
         } finally {
             setIsLoadingProformas(false);
         }
-    };
+    }, [user?.posId]);
+
+    useEffect(() => {
+        if (isSalesOpen || isTransactionsOpen) {
+            fetchSales();
+        }
+    }, [isSalesOpen, isTransactionsOpen, fetchSales]);
+
+    useEffect(() => {
+        if (isHoldOpen) {
+            fetchProformas();
+        }
+    }, [isHoldOpen, fetchProformas]);
 
     const handleReprintReceipt = async () => {
         if (!selectedSale?.id) return;

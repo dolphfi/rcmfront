@@ -143,15 +143,15 @@ const PromotionPage: React.FC = () => {
     }).length;
 
     return (
-        <div className="p-2 sm:p-4 lg:p-6 space-y-6 bg-[#020817] min-h-screen text-slate-200">
+        <div className="p-6 space-y-6 bg-background min-h-screen">
             {/* Header */}
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div>
-                    <h1 className="text-2xl sm:text-3xl font-bold text-white tracking-tight flex items-center gap-2">
+                    <h1 className="text-2xl sm:text-3xl font-bold text-foreground tracking-tight flex items-center gap-2">
                         <Tag className="h-8 w-8 text-emerald-500" />
                         {t('promotions.title')}
                     </h1>
-                    <p className="text-slate-400 mt-1">{t('promotions.subtitle')}</p>
+                    <p className="text-muted-foreground mt-1">{t('promotions.subtitle')}</p>
                 </div>
                 <Button
                     onClick={() => handleOpenDialog()}
@@ -164,62 +164,62 @@ const PromotionPage: React.FC = () => {
 
             {/* Stats */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <Card className="bg-slate-900/50 border-white/10 backdrop-blur-sm">
+                <Card className="bg-background border-border">
                     <CardHeader className="flex flex-row items-center justify-between pb-2">
-                        <CardTitle className="text-sm font-medium text-slate-400">{t('promotions.active_promos')}</CardTitle>
+                        <CardTitle className="text-sm font-medium text-muted-foreground">{t('promotions.active_promos')}</CardTitle>
                         <CheckCircle2 className="h-4 w-4 text-emerald-500" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold text-white">{activeCount}</div>
+                        <div className="text-2xl font-bold text-foreground">{activeCount}</div>
                     </CardContent>
                 </Card>
-                <Card className="bg-slate-900/50 border-white/10 backdrop-blur-sm">
+                <Card className="bg-background border-border">
                     <CardHeader className="flex flex-row items-center justify-between pb-2">
-                        <CardTitle className="text-sm font-medium text-slate-400">{t('promotions.expiring_soon')}</CardTitle>
+                        <CardTitle className="text-sm font-medium text-muted-foreground">{t('promotions.expiring_soon')}</CardTitle>
                         <Timer className="h-4 w-4 text-amber-500" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold text-white">{expiringSoonCount}</div>
+                        <div className="text-2xl font-bold text-foreground">{expiringSoonCount}</div>
                     </CardContent>
                 </Card>
-                <Card className="bg-slate-900/50 border-white/10 backdrop-blur-sm">
+                <Card className="bg-background border-border">
                     <CardHeader className="flex flex-row items-center justify-between pb-2">
-                        <CardTitle className="text-sm font-medium text-slate-400">Campaigns</CardTitle>
+                        <CardTitle className="text-sm font-medium text-muted-foreground">Campaigns</CardTitle>
                         <Ticket className="h-4 w-4 text-blue-500" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold text-white">{promotions.length}</div>
+                        <div className="text-2xl font-bold text-foreground">{promotions.length}</div>
                     </CardContent>
                 </Card>
             </div>
 
             {/* Main Content */}
-            <Card className="bg-slate-900/50 border-white/10 backdrop-blur-sm overflow-hidden">
+            <Card className="bg-background border-border overflow-hidden">
                 <CardHeader>
                     <div className="flex flex-col sm:flex-row justify-between gap-4">
                         <div className="relative w-full sm:w-96">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" />
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                             <Input
                                 placeholder={t('products.search_placeholder')}
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
-                                className="pl-10 bg-slate-950/50 border-white/10 text-white focus-visible:ring-emerald-500"
+                                className="pl-10 bg-background/50 border-border text-foreground focus-visible:ring-emerald-500"
                             />
                         </div>
                     </div>
                 </CardHeader>
                 <CardContent className="p-0 sm:p-6 pt-0 sm:pt-0">
-                    <ScrollArea className="h-[500px] w-full border border-white/5 rounded-lg">
+                    <ScrollArea className="h-[500px] w-full border border-border rounded-lg">
                         <table className="w-full text-left border-collapse min-w-[800px]">
-                            <thead className="sticky top-0 bg-slate-900/80 backdrop-blur-md z-10 border-b border-white/10">
+                            <thead className="sticky top-0 bg-background z-10 border-b border-border">
                                 <tr>
-                                    <th className="p-4 text-xs font-semibold text-slate-400 uppercase tracking-wider">{t('promotions.campaign_name')}</th>
-                                    <th className="p-4 text-xs font-semibold text-slate-400 uppercase tracking-wider">{t('promotions.code')}</th>
-                                    <th className="p-4 text-xs font-semibold text-slate-400 uppercase tracking-wider">{t('promotions.value')}</th>
-                                    <th className="p-4 text-xs font-semibold text-slate-400 uppercase tracking-wider">{t('promotions.startDate')}</th>
-                                    <th className="p-4 text-xs font-semibold text-slate-400 uppercase tracking-wider">{t('promotions.endDate')}</th>
-                                    <th className="p-4 text-xs font-semibold text-slate-400 uppercase tracking-wider">{t('promotions.status')}</th>
-                                    <th className="p-4 text-xs font-semibold text-slate-400 uppercase tracking-wider text-right">{t('promotions.actions')}</th>
+                                    <th className="p-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider">{t('promotions.campaign_name')}</th>
+                                    <th className="p-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider">{t('promotions.code')}</th>
+                                    <th className="p-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider">{t('promotions.value')}</th>
+                                    <th className="p-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider">{t('promotions.startDate')}</th>
+                                    <th className="p-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider">{t('promotions.endDate')}</th>
+                                    <th className="p-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider">{t('promotions.status')}</th>
+                                    <th className="p-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider text-right">{t('promotions.actions')}</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-white/5">
@@ -231,13 +231,13 @@ const PromotionPage: React.FC = () => {
                                     ))
                                 ) : filteredPromos.length === 0 ? (
                                     <tr>
-                                        <td colSpan={7} className="p-10 text-center text-slate-500">{t('common.no_data')}</td>
+                                        <td colSpan={7} className="p-10 text-center text-muted-foreground">{t('common.no_data')}</td>
                                     </tr>
                                 ) : (
                                     filteredPromos.map((promo) => (
                                         <tr key={promo.id} className="hover:bg-white/[0.02] transition-colors group">
                                             <td className="p-4">
-                                                <div className="font-medium text-white">{promo.name}</div>
+                                                <div className="font-medium text-foreground">{promo.name}</div>
                                             </td>
                                             <td className="p-4">
                                                 <Badge variant="outline" className="bg-emerald-500/10 text-emerald-400 border-emerald-500/20 font-mono">
@@ -245,14 +245,14 @@ const PromotionPage: React.FC = () => {
                                                 </Badge>
                                             </td>
                                             <td className="p-4">
-                                                <div className="flex items-center gap-1 font-bold text-white">
+                                                <div className="flex items-center gap-1 font-bold text-foreground">
                                                     {promo.type === PromotionType.PERCENTAGE ? `${promo.value}%` : `$${promo.value}`}
                                                 </div>
                                             </td>
-                                            <td className="p-4 text-slate-400 text-sm">
+                                            <td className="p-4 text-muted-foreground text-sm">
                                                 {format(new Date(promo.startDate), 'dd/MM/yyyy')}
                                             </td>
-                                            <td className="p-4 text-slate-400 text-sm">
+                                            <td className="p-4 text-muted-foreground text-sm">
                                                 {format(new Date(promo.endDate), 'dd/MM/yyyy')}
                                             </td>
                                             <td className="p-4">
@@ -261,7 +261,7 @@ const PromotionPage: React.FC = () => {
                                                         {t('pos.active')}
                                                     </Badge>
                                                 ) : (
-                                                    <Badge className="bg-slate-800 text-slate-400 hover:bg-slate-700">
+                                                    <Badge className="bg-muted text-muted-foreground hover:bg-primary/10">
                                                         {t('pos.inactive')}
                                                     </Badge>
                                                 )}
@@ -269,11 +269,11 @@ const PromotionPage: React.FC = () => {
                                             <td className="p-4 text-right">
                                                 <DropdownMenu>
                                                     <DropdownMenuTrigger asChild>
-                                                        <Button variant="ghost" className="h-8 w-8 p-0 text-slate-400 hover:text-white">
+                                                        <Button variant="ghost" className="h-8 w-8 p-0 text-muted-foreground hover:text-primary">
                                                             <MoreHorizontal className="h-4 w-4" />
                                                         </Button>
                                                     </DropdownMenuTrigger>
-                                                    <DropdownMenuContent align="end" className="bg-slate-900 border-white/10 text-slate-200">
+                                                    <DropdownMenuContent align="end" className="bg-background border-border text-foreground">
                                                         <DropdownMenuItem onClick={() => handleOpenDialog(promo)}>
                                                             <Edit className="h-4 w-4 mr-2" />
                                                             {t('common.edit')}
@@ -296,10 +296,10 @@ const PromotionPage: React.FC = () => {
 
             {/* Management Dialog */}
             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                <DialogContent className="bg-slate-950 border-white/10 text-slate-200 sm:max-w-[500px]">
+                <DialogContent className="bg-background border-border text-foreground sm:max-w-[500px]">
                     <DialogHeader>
                         <DialogTitle>{editingPromo ? t('promotions.editPromo') : t('promotions.addPromo')}</DialogTitle>
-                        <DialogDescription className="text-slate-400">
+                        <DialogDescription className="text-muted-foreground">
                             {t('promotions.subtitle')}
                         </DialogDescription>
                     </DialogHeader>
@@ -311,7 +311,7 @@ const PromotionPage: React.FC = () => {
                                 value={formData.name}
                                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                                 placeholder={t('promotions.placeholder_name')}
-                                className="col-span-3 bg-slate-900 border-white/10"
+                                className="col-span-3 bg-background border-border"
                             />
                         </div>
                         <div className="grid grid-cols-4 items-center gap-4">
@@ -321,7 +321,7 @@ const PromotionPage: React.FC = () => {
                                 value={formData.code}
                                 onChange={(e) => setFormData({ ...formData, code: e.target.value.toUpperCase() })}
                                 placeholder={t('promotions.placeholder_code')}
-                                className="col-span-3 bg-slate-900 border-white/10 font-mono"
+                                className="col-span-3 bg-background border-border font-mono"
                             />
                         </div>
                         <div className="grid grid-cols-4 items-center gap-4">
@@ -330,10 +330,10 @@ const PromotionPage: React.FC = () => {
                                 value={formData.type}
                                 onValueChange={(val: PromotionType) => setFormData({ ...formData, type: val })}
                             >
-                                <SelectTrigger className="col-span-3 bg-slate-900 border-white/10">
+                                <SelectTrigger className="col-span-3 bg-background border-border">
                                     <SelectValue />
                                 </SelectTrigger>
-                                <SelectContent className="bg-slate-900 border-white/10 text-slate-200">
+                                <SelectContent className="bg-background border-border text-foreground">
                                     <SelectItem value={PromotionType.PERCENTAGE}>{t('promotions.percentage')}</SelectItem>
                                     <SelectItem value={PromotionType.FIXED}>{t('promotions.fixed')}</SelectItem>
                                 </SelectContent>
@@ -346,7 +346,7 @@ const PromotionPage: React.FC = () => {
                                 type="number"
                                 value={formData.value}
                                 onChange={(e) => setFormData({ ...formData, value: parseFloat(e.target.value) })}
-                                className="col-span-3 bg-slate-900 border-white/10"
+                                className="col-span-3 bg-background border-border"
                             />
                         </div>
                         <div className="grid grid-cols-4 items-center gap-4">
@@ -356,7 +356,7 @@ const PromotionPage: React.FC = () => {
                                 type="date"
                                 value={formData.startDate}
                                 onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
-                                className="col-span-3 bg-slate-900 border-white/10"
+                                className="col-span-3 bg-background border-border"
                             />
                         </div>
                         <div className="grid grid-cols-4 items-center gap-4">
@@ -366,7 +366,7 @@ const PromotionPage: React.FC = () => {
                                 type="date"
                                 value={formData.endDate}
                                 onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
-                                className="col-span-3 bg-slate-900 border-white/10"
+                                className="col-span-3 bg-background border-border"
                             />
                         </div>
                         <div className="grid grid-cols-4 items-center gap-4">
@@ -376,7 +376,7 @@ const PromotionPage: React.FC = () => {
                                     type="button"
                                     variant={formData.isActive ? "default" : "outline"}
                                     onClick={() => setFormData({ ...formData, isActive: true })}
-                                    className={formData.isActive ? "bg-emerald-600 hover:bg-emerald-700" : "border-white/10"}
+                                    className={formData.isActive ? "bg-emerald-600 hover:bg-emerald-700" : "border-border"}
                                 >
                                     {t('pos.active')}
                                 </Button>
@@ -384,7 +384,7 @@ const PromotionPage: React.FC = () => {
                                     type="button"
                                     variant={!formData.isActive ? "default" : "outline"}
                                     onClick={() => setFormData({ ...formData, isActive: false })}
-                                    className={!formData.isActive ? "bg-rose-600 hover:bg-rose-700" : "border-white/10"}
+                                    className={!formData.isActive ? "bg-rose-600 hover:bg-rose-700" : "border-border"}
                                 >
                                     {t('pos.inactive')}
                                 </Button>
@@ -392,7 +392,7 @@ const PromotionPage: React.FC = () => {
                         </div>
                     </div>
                     <DialogFooter>
-                        <Button variant="outline" onClick={() => setIsDialogOpen(false)} className="border-white/10 text-slate-400 hover:text-white">
+                        <Button variant="outline" onClick={() => setIsDialogOpen(false)} className="border-border text-muted-foreground hover:text-primary">
                             {t('common.cancel')}
                         </Button>
                         <Button onClick={handleSave} className="bg-emerald-600 hover:bg-emerald-700 text-white">

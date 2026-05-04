@@ -272,26 +272,26 @@ const PosAdmin: React.FC = () => {
     };
 
     return (
-        <div className="p-6 space-y-6 bg-slate-950 min-h-full">
-            <div className="flex justify-between items-center text-white">
+        <div className="p-6 space-y-6 bg-background min-h-full">
+            <div className="flex justify-between items-center text-foreground">
                 <div>
                     <h1 className="text-3xl font-bold tracking-tight">{t('pos.title')}</h1>
-                    <p className="text-slate-400">{t('pos.subtitle')}</p>
+                    <p className="text-muted-foreground">{t('pos.subtitle')}</p>
                 </div>
-                <Button onClick={handleAddClick} className="bg-orange-500 hover:bg-orange-600 text-white gap-2">
+                <Button onClick={handleAddClick} className="bg-primary hover:bg-primary/90 text-white gap-2">
                     <Plus className="h-4 w-4" />
                     {t('pos.add_pos')}
                 </Button>
             </div>
 
-            <Card className="bg-slate-900 border-white/10 text-white overflow-hidden">
-                <CardHeader className="border-b border-white/10">
+            <Card className="bg-background border-border text-foreground overflow-hidden">
+                <CardHeader className="border-b border-border">
                     <div className="flex items-center gap-4">
                         <div className="relative flex-1 max-w-sm">
-                            <Search className="absolute left-3 top-1/2 -transform -translate-y-1/2 h-4 w-4 text-slate-500" />
+                            <Search className="absolute left-3 top-1/2 -transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                             <Input
                                 placeholder={t('pos.search_placeholder')}
-                                className="pl-10 bg-slate-950 border-white/10 text-white placeholder:text-slate-500 focus-visible:ring-orange-500/50"
+                                className="pl-10 bg-background border-border text-foreground placeholder:text-muted-foreground focus-visible:ring-ring"
                                 value={searchTerm}
                                 onChange={handleSearchChange}
                             />
@@ -301,53 +301,53 @@ const PosAdmin: React.FC = () => {
                 <CardContent className="p-0">
                     <Table>
                         <TableHeader>
-                            <TableRow className="border-white/10 hover:bg-transparent">
-                                <TableHead className="text-slate-400">{t('pos.table_head_pos')}</TableHead>
-                                <TableHead className="text-slate-400">{t('pos.table_head_type')}</TableHead>
-                                <TableHead className="text-slate-400">{t('pos.table_head_contact')}</TableHead>
-                                <TableHead className="text-slate-400 text-center">{t('pos.table_head_status')}</TableHead>
-                                <TableHead className="text-right text-slate-400">{t('pos.table_head_actions')}</TableHead>
+                            <TableRow className="border-border hover:bg-transparent">
+                                <TableHead className="text-muted-foreground">{t('pos.table_head_pos')}</TableHead>
+                                <TableHead className="text-muted-foreground">{t('pos.table_head_type')}</TableHead>
+                                <TableHead className="text-muted-foreground">{t('pos.table_head_contact')}</TableHead>
+                                <TableHead className="text-muted-foreground text-center">{t('pos.table_head_status')}</TableHead>
+                                <TableHead className="text-right text-muted-foreground">{t('pos.table_head_actions')}</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
                             {loading ? (
                                 <TableRow>
-                                    <TableCell colSpan={5} className="text-center py-20 text-slate-500">
+                                    <TableCell colSpan={5} className="text-center py-20 text-muted-foreground">
                                         <div className="flex flex-col items-center gap-2">
-                                            <div className="h-6 w-6 border-2 border-orange-500 border-t-transparent rounded-full animate-spin" />
+                                            <div className="h-6 w-6 border-2 border-primary border-t-transparent rounded-full animate-spin" />
                                             {t('pos.loading')}
                                         </div>
                                     </TableCell>
                                 </TableRow>
                             ) : posData.length === 0 ? (
                                 <TableRow>
-                                    <TableCell colSpan={5} className="text-center py-20 text-slate-500">
+                                    <TableCell colSpan={5} className="text-center py-20 text-muted-foreground">
                                         {t('pos.no_data')}
                                     </TableCell>
                                 </TableRow>
                             ) : (
                                 posData.map((pos: any) => (
-                                    <TableRow key={pos.id} className="border-white/10 hover:bg-white/5 transition-colors">
+                                    <TableRow key={pos.id} className="border-border hover:bg-primary/10 transition-colors">
                                         <TableCell>
                                             <div className="flex items-center gap-3">
-                                                <div className={`h-10 w-10 rounded-lg flex items-center justify-center ${pos.type === 'warehouse' ? 'bg-blue-500/10 text-blue-500' : 'bg-orange-500/10 text-orange-500'}`}>
+                                                <div className={`h-10 w-10 rounded-lg flex items-center justify-center ${pos.type === 'warehouse' ? 'bg-blue-500/10 text-blue-500' : 'bg-primary/10 text-primary'}`}>
                                                     {pos.type === 'warehouse' ? <Warehouse className="h-5 w-5" /> : <Store className="h-5 w-5" />}
                                                 </div>
                                                 <div className="flex flex-col">
-                                                    <span className="text-white font-medium">{pos.name}</span>
-                                                    <span className="text-xs text-slate-500">ID: {pos.id.substring(0, 8)}...</span>
+                                                    <span className="text-foreground font-medium">{pos.name}</span>
+                                                    <span className="text-xs text-muted-foreground">ID: {pos.id.substring(0, 8)}...</span>
                                                 </div>
                                             </div>
                                         </TableCell>
                                         <TableCell>
-                                            <Badge variant="outline" className={`capitalize ${pos.type === 'warehouse' ? 'border-blue-500/20 text-blue-400 bg-blue-400/10 rounded-md' : 'border-orange-500/20 text-orange-400 bg-orange-400/10 rounded-md'}`}>
+                                            <Badge variant="outline" className={`capitalize ${pos.type === 'warehouse' ? 'border-blue-500/20 text-blue-400 bg-blue-400/10 rounded-md' : 'border-primary/20 text-primary bg-primary/10 rounded-md'}`}>
                                                 {pos.type || 'store'}
                                             </Badge>
                                         </TableCell>
                                         <TableCell>
                                             <div className="flex flex-col text-sm">
-                                                <span className="text-slate-300">{pos.address || t('pos.no_address')}</span>
-                                                <span className="text-slate-500">{pos.phone || t('pos.no_phone')}</span>
+                                                <span className="text-foreground">{pos.address || t('pos.no_address')}</span>
+                                                <span className="text-muted-foreground">{pos.phone || t('pos.no_phone')}</span>
                                             </div>
                                         </TableCell>
                                         <TableCell className="text-center">
@@ -358,22 +358,22 @@ const PosAdmin: React.FC = () => {
                                         <TableCell className="text-right">
                                             <DropdownMenu>
                                                 <DropdownMenuTrigger asChild>
-                                                    <Button variant="ghost" className="h-8 w-8 p-0 text-slate-400 hover:text-white hover:bg-white/10">
+                                                    <Button variant="ghost" className="h-8 w-8 p-0 text-muted-foreground hover:text-primary hover:bg-primary/10">
                                                         <MoreHorizontal className="h-4 w-4" />
                                                     </Button>
                                                 </DropdownMenuTrigger>
-                                                <DropdownMenuContent align="end" className="bg-slate-900 border-white/10 text-slate-300">
+                                                <DropdownMenuContent align="end" className="bg-background border-border text-foreground">
                                                     <DropdownMenuLabel>{t('common.actions')}</DropdownMenuLabel>
-                                                    <DropdownMenuItem onClick={() => handleViewClick(pos)} className="hover:bg-white/10 cursor-pointer focus:bg-white/10 focus:text-white">
+                                                    <DropdownMenuItem onClick={() => handleViewClick(pos)} className="hover:bg-primary/10 cursor-pointer focus:bg-primary/10 focus:text-foreground">
                                                         <Eye className="mr-2 h-4 w-4" />
                                                         {t('pos.view_details')}
                                                     </DropdownMenuItem>
-                                                    <DropdownMenuSeparator className="bg-white/10" />
-                                                    <DropdownMenuItem onClick={() => handleToggleStatus(pos)} className="hover:bg-white/10 cursor-pointer focus:bg-white/10 focus:text-white">
+                                                    <DropdownMenuSeparator className="bg-border" />
+                                                    <DropdownMenuItem onClick={() => handleToggleStatus(pos)} className="hover:bg-primary/10 cursor-pointer focus:bg-primary/10 focus:text-foreground">
                                                         {pos.isActive ? <Power className="mr-2 h-4 w-4 text-red-400" /> : <CheckCircle2 className="mr-2 h-4 w-4 text-emerald-400" />}
                                                         {pos.isActive ? t('pos.inactive') : t('pos.active')}
                                                     </DropdownMenuItem>
-                                                    <DropdownMenuSeparator className="bg-white/10" />
+                                                    <DropdownMenuSeparator className="bg-border" />
                                                     <DropdownMenuItem onClick={() => handleDeleteClick(pos)} className="text-red-400 hover:bg-red-400/10 cursor-pointer focus:bg-red-400/10 focus:text-red-400">
                                                         <Trash2 className="mr-2 h-4 w-4" />
                                                         {t('common.delete')}
@@ -388,8 +388,8 @@ const PosAdmin: React.FC = () => {
                     </Table>
                 </CardContent>
                 {totalPages > 1 && (
-                    <div className="p-4 border-t border-white/10 flex items-center justify-between">
-                        <div className="text-sm text-slate-500">
+                    <div className="p-4 border-t border-border flex items-center justify-between">
+                        <div className="text-sm text-muted-foreground">
                             {t('common.showing')} {((currentPage - 1) * itemsPerPage) + 1} - {Math.min(currentPage * itemsPerPage, totalItems)} {t('common.of')} {totalItems}
                         </div>
                         <Pagination className="mx-0 w-auto">
@@ -423,57 +423,57 @@ const PosAdmin: React.FC = () => {
 
             {/* Add/Edit Dialog */}
             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                <DialogContent className="bg-slate-900 border-white/10 text-white max-w-md">
+                <DialogContent className="bg-background border-border text-foreground max-w-md">
                     <DialogHeader>
                         <DialogTitle>{currentPOS ? t('pos.modify_title') : t('pos.add_title')}</DialogTitle>
-                        <DialogDescription className="text-slate-400">
+                        <DialogDescription className="text-muted-foreground">
                             {t('pos.form_description', { action: currentPOS ? t('common.edit').toLowerCase() : t('common.add').toLowerCase() })}
                         </DialogDescription>
                     </DialogHeader>
                     <div className="space-y-4 py-4">
                         <div className="space-y-2">
-                            <Label className="text-white">{t('pos.form_name')} <span className="text-red-500">*</span></Label>
+                            <Label className="text-foreground">{t('pos.form_name')} <span className="text-red-500">*</span></Label>
                             <Input
                                 value={formData.name}
                                 onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
                                 placeholder="Ex: Boutik Prensipal"
-                                className="bg-slate-950 border-white/10 text-white focus-visible:ring-orange-500/50"
+                                className="bg-background border-border text-foreground focus-visible:ring-ring"
                             />
                         </div>
                         <div className="space-y-2">
-                            <Label className="text-white">{t('pos.form_type')} <span className="text-red-500">*</span></Label>
+                            <Label className="text-foreground">{t('pos.form_type')} <span className="text-red-500">*</span></Label>
                             <Select value={formData.type} onValueChange={(v) => setFormData(prev => ({ ...prev, type: v }))}>
-                                <SelectTrigger className="bg-slate-950 border-white/10 text-white">
+                                <SelectTrigger className="bg-background border-border text-foreground">
                                     <SelectValue placeholder={t('pos.select_type_placeholder')} />
                                 </SelectTrigger>
-                                <SelectContent className="bg-slate-900 border-white/10 text-white">
-                                    <SelectItem value="store" className="focus:bg-white/10 focus:text-white">{t('pos.type_store')}</SelectItem>
-                                    <SelectItem value="warehouse" className="focus:bg-white/10 focus:text-white">{t('pos.type_warehouse')}</SelectItem>
+                                <SelectContent className="bg-background border-border text-foreground">
+                                    <SelectItem value="store" className="focus:bg-primary/10 focus:text-foreground">{t('pos.type_store')}</SelectItem>
+                                    <SelectItem value="warehouse" className="focus:bg-primary/10 focus:text-foreground">{t('pos.type_warehouse')}</SelectItem>
                                 </SelectContent>
                             </Select>
                         </div>
                         <div className="space-y-2">
-                            <Label className="text-white">{t('pos.form_address')}</Label>
+                            <Label className="text-foreground">{t('pos.form_address')}</Label>
                             <Input
                                 value={formData.address}
                                 onChange={(e) => setFormData(prev => ({ ...prev, address: e.target.value }))}
                                 placeholder="Ex: 123 Rue de la Paix"
-                                className="bg-slate-950 border-white/10 text-white focus-visible:ring-orange-500/50"
+                                className="bg-background border-border text-foreground focus-visible:ring-ring"
                             />
                         </div>
                         <div className="space-y-2">
-                            <Label className="text-white">{t('pos.form_phone')}</Label>
+                            <Label className="text-foreground">{t('pos.form_phone')}</Label>
                             <Input
                                 value={formData.phone}
                                 onChange={(e) => setFormData(prev => ({ ...prev, phone: e.target.value }))}
                                 placeholder="Ex: +509 3333 4444"
-                                className="bg-slate-950 border-white/10 text-white focus-visible:ring-orange-500/50"
+                                className="bg-background border-border text-foreground focus-visible:ring-ring"
                             />
                         </div>
                     </div>
                     <DialogFooter>
-                        <Button variant="ghost" onClick={() => setIsDialogOpen(false)} className="text-slate-400 hover:bg-white/10 hover:text-white">{t('common.cancel')}</Button>
-                        <Button onClick={handleSave} disabled={isSaving} className="bg-orange-500 hover:bg-orange-600 text-white min-w-[100px]">
+                        <Button variant="ghost" onClick={() => setIsDialogOpen(false)} className="text-muted-foreground hover:bg-primary/10 hover:text-primary">{t('common.cancel')}</Button>
+                        <Button onClick={handleSave} disabled={isSaving} className="bg-primary hover:bg-primary/90 text-white min-w-[100px]">
                             {isSaving ? (
                                 <div className="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
                             ) : null}
@@ -485,64 +485,64 @@ const PosAdmin: React.FC = () => {
 
             {/* View Details Dialog */}
             <Dialog open={isViewDialogOpen} onOpenChange={setIsViewDialogOpen}>
-                <DialogContent className="bg-slate-900 border-white/10 text-white max-w-2xl">
+                <DialogContent className="bg-background border-border text-foreground max-w-2xl">
                     <DialogHeader>
                         <DialogTitle className="flex items-center gap-2 text-xl">
-                            {viewPOS?.type === 'warehouse' ? <Warehouse className="h-6 w-6 text-blue-500" /> : <Store className="h-6 w-6 text-orange-500" />}
+                            {viewPOS?.type === 'warehouse' ? <Warehouse className="h-6 w-6 text-blue-500" /> : <Store className="h-6 w-6 text-primary" />}
                             {t('pos.view_title')}
                         </DialogTitle>
-                        <DialogDescription className="text-slate-400">
+                        <DialogDescription className="text-muted-foreground">
                             {t('pos.view_description')}
                         </DialogDescription>
                     </DialogHeader>
                     {viewPOS && (
                         <div className="space-y-6 py-4">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div className="p-4 rounded-lg bg-white/5 border border-white/10 space-y-4">
+                                <div className="p-4 rounded-lg bg-muted border border-border space-y-4">
                                     <div className="flex items-start gap-3">
-                                        <Hash className="h-4 w-4 text-slate-500 mt-1" />
+                                        <Hash className="h-4 w-4 text-muted-foreground mt-1" />
                                         <div className="flex flex-col">
-                                            <span className="text-[10px] text-slate-500 uppercase tracking-widest font-bold">{t('pos.detail_id')}</span>
-                                            <span className="text-sm font-mono text-slate-300 break-all">{viewPOS.id}</span>
+                                            <span className="text-[10px] text-muted-foreground uppercase tracking-widest font-bold">{t('pos.detail_id')}</span>
+                                            <span className="text-sm font-mono text-foreground break-all">{viewPOS.id}</span>
                                         </div>
                                     </div>
                                     <div className="flex items-start gap-3">
-                                        <Info className="h-4 w-4 text-slate-500 mt-1" />
+                                        <Info className="h-4 w-4 text-muted-foreground mt-1" />
                                         <div className="flex flex-col">
-                                            <span className="text-[10px] text-slate-500 uppercase tracking-widest font-bold">{t('pos.detail_name')}</span>
-                                            <span className="text-sm text-slate-300 font-medium">{viewPOS.name}</span>
+                                            <span className="text-[10px] text-muted-foreground uppercase tracking-widest font-bold">{t('pos.detail_name')}</span>
+                                            <span className="text-sm text-foreground font-medium">{viewPOS.name}</span>
                                         </div>
                                     </div>
                                     <div className="flex items-start gap-3">
-                                        {viewPOS.type === 'warehouse' ? <Warehouse className="h-4 w-4 text-slate-500 mt-1" /> : <Store className="h-4 w-4 text-slate-500 mt-1 rounded-md" />}
+                                        {viewPOS.type === 'warehouse' ? <Warehouse className="h-4 w-4 text-muted-foreground mt-1" /> : <Store className="h-4 w-4 text-muted-foreground mt-1 rounded-md" />}
                                         <div className="flex flex-col">
-                                            <span className="text-[10px] text-slate-500 uppercase tracking-widest font-bold">{t('pos.form_type')}</span>
-                                            <Badge variant="outline" className={`w-fit mt-1 capitalize font-normal ${viewPOS.type === 'warehouse' ? 'border-blue-500/20 text-blue-400 bg-blue-400/10 rounded-md' : 'border-orange-500/20 text-orange-400 bg-orange-400/10 rounded-md'}`}>
+                                            <span className="text-[10px] text-muted-foreground uppercase tracking-widest font-bold">{t('pos.form_type')}</span>
+                                            <Badge variant="outline" className={`w-fit mt-1 capitalize font-normal ${viewPOS.type === 'warehouse' ? 'border-blue-500/20 text-blue-400 bg-blue-400/10 rounded-md' : 'border-primary/20 text-primary bg-primary/10 rounded-md'}`}>
                                                 {viewPOS.type === 'warehouse' ? t('pos.type_warehouse') : t('pos.type_store')}
                                             </Badge>
                                         </div>
                                     </div>
                                 </div>
 
-                                <div className="p-4 rounded-lg bg-white/5 border border-white/10 space-y-4">
+                                <div className="p-4 rounded-lg bg-muted border border-border space-y-4">
                                     <div className="flex items-start gap-3">
-                                        <MapPin className="h-4 w-4 text-slate-500 mt-1" />
+                                        <MapPin className="h-4 w-4 text-muted-foreground mt-1" />
                                         <div className="flex flex-col">
-                                            <span className="text-[10px] text-slate-500 uppercase tracking-widest font-bold">{t('pos.form_address')}</span>
-                                            <span className="text-sm text-slate-300 leading-relaxed">{viewPOS.address || t('pos.no_address')}</span>
+                                            <span className="text-[10px] text-muted-foreground uppercase tracking-widest font-bold">{t('pos.form_address')}</span>
+                                            <span className="text-sm text-foreground leading-relaxed">{viewPOS.address || t('pos.no_address')}</span>
                                         </div>
                                     </div>
                                     <div className="flex items-start gap-3">
-                                        <Phone className="h-4 w-4 text-slate-500 mt-1" />
+                                        <Phone className="h-4 w-4 text-muted-foreground mt-1" />
                                         <div className="flex flex-col">
-                                            <span className="text-[10px] text-slate-500 uppercase tracking-widest font-bold">{t('pos.form_phone')}</span>
-                                            <span className="text-sm text-slate-300">{viewPOS.phone || t('pos.no_phone')}</span>
+                                            <span className="text-[10px] text-muted-foreground uppercase tracking-widest font-bold">{t('pos.form_phone')}</span>
+                                            <span className="text-sm text-foreground">{viewPOS.phone || t('pos.no_phone')}</span>
                                         </div>
                                     </div>
                                     <div className="flex items-start gap-3">
-                                        <Activity className="h-4 w-4 text-slate-500 mt-1" />
+                                        <Activity className="h-4 w-4 text-muted-foreground mt-1" />
                                         <div className="flex flex-col">
-                                            <span className="text-[10px] text-slate-500 uppercase tracking-widest font-bold">{t('pos.table_head_status')}</span>
+                                            <span className="text-[10px] text-muted-foreground uppercase tracking-widest font-bold">{t('pos.table_head_status')}</span>
                                             <Badge className={`w-fit mt-1 font-normal ${viewPOS.isActive ? "bg-emerald-500/10 text-emerald-500 border-emerald-500/20 rounded-md" : "bg-red-500/10 text-red-500 border-red-500/20 rounded-md"}`}>
                                                 {viewPOS.isActive ? t('pos.status_operational') : t('pos.status_deactivated')}
                                             </Badge>
@@ -550,12 +550,12 @@ const PosAdmin: React.FC = () => {
                                     </div>
                                 </div>
 
-                                <div className="md:col-span-2 p-4 rounded-lg bg-orange-500/5 border border-orange-500/10 flex items-center justify-between">
+                                <div className="md:col-span-2 p-4 rounded-lg bg-primary/5 border border-primary/10 flex items-center justify-between">
                                     <div className="flex items-center gap-3">
-                                        <Calendar className="h-4 w-4 text-orange-500" />
+                                        <Calendar className="h-4 w-4 text-primary" />
                                         <div className="flex flex-col">
-                                            <span className="text-[10px] text-slate-500 uppercase tracking-widest font-bold">{t('pos.detail_created_at')}</span>
-                                            <span className="text-sm text-slate-300">{new Date(viewPOS.createdAt).toLocaleString(i18n.language === 'ht' ? 'ht-HT' : i18n.language, { dateStyle: 'full', timeStyle: 'short' })}</span>
+                                            <span className="text-[10px] text-muted-foreground uppercase tracking-widest font-bold">{t('pos.detail_created_at')}</span>
+                                            <span className="text-sm text-foreground">{new Date(viewPOS.createdAt).toLocaleString(i18n.language === 'ht' ? 'ht-HT' : i18n.language, { dateStyle: 'full', timeStyle: 'short' })}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -563,10 +563,10 @@ const PosAdmin: React.FC = () => {
                         </div>
                     )}
                     <DialogFooter className="gap-2 sm:gap-0">
-                        <Button variant="ghost" onClick={() => setIsViewDialogOpen(false)} className="text-slate-400 hover:bg-white/10 hover:text-white">
+                        <Button variant="ghost" onClick={() => setIsViewDialogOpen(false)} className="text-muted-foreground hover:bg-primary/10 hover:text-primary">
                             {t('common.cancel')}
                         </Button>
-                        <Button onClick={handleEditFromView} className="bg-orange-500 hover:bg-orange-600 text-white gap-2 flex-1 sm:flex-none">
+                        <Button onClick={handleEditFromView} className="bg-primary hover:bg-primary/90 text-white gap-2 flex-1 sm:flex-none">
                             <Edit className="h-4 w-4" />
                             {t('pos.edit_from_view')}
                         </Button>
@@ -576,19 +576,19 @@ const PosAdmin: React.FC = () => {
 
             {/* Delete Confirmation Dialog */}
             <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-                <AlertDialogContent className="bg-slate-900 border-white/10 text-white">
+                <AlertDialogContent className="bg-background border-border text-foreground">
                     <AlertDialogHeader>
-                        <AlertDialogTitle className="text-white">{t('pos.delete_title')}</AlertDialogTitle>
-                        <AlertDialogDescription className="text-slate-400 ">
+                        <AlertDialogTitle className="text-foreground">{t('pos.delete_title')}</AlertDialogTitle>
+                        <AlertDialogDescription className="text-muted-foreground ">
                             <Trans
                                 i18nKey="pos.delete_description"
                                 values={{ name: posToDelete?.name }}
-                                components={[<span className="font-bold uppercase text-white" />]}
+                                components={[<span className="font-bold uppercase text-foreground" />]}
                             />
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                        <AlertDialogCancel className="bg-slate-800 border-white/10 text-slate-300 hover:bg-slate-700 hover:text-white">{t('common.cancel')}</AlertDialogCancel>
+                        <AlertDialogCancel className="bg-background border-border text-foreground hover:bg-primary/10 hover:text-primary">{t('common.cancel')}</AlertDialogCancel>
                         <AlertDialogAction onClick={confirmDelete} className="bg-red-500 hover:bg-red-600 text-white">
                             {t('pos.delete_confirm')}
                         </AlertDialogAction>

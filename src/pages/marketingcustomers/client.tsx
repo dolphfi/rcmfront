@@ -164,19 +164,19 @@ const Client: React.FC = () => {
     });
 
     return (
-        <div className="p-6 space-y-6 bg-slate-950 min-h-screen">
+        <div className="p-6 space-y-6 bg-background min-h-screen">
             {/* Header */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
-                    <h1 className="text-2xl font-bold text-white tracking-tight flex items-center gap-2">
-                        <User className="h-6 w-6 text-orange-500" />
+                    <h1 className="text-2xl font-bold text-foreground tracking-tight flex items-center gap-2">
+                        <User className="h-6 w-6 text-primary" />
                         {t('clients.title')}
                     </h1>
-                    <p className="text-slate-400 mt-1">{t('clients.description')}</p>
+                    <p className="text-muted-foreground mt-1">{t('clients.description')}</p>
                 </div>
                 <Button
                     onClick={() => handleOpenDialog()}
-                    className="bg-orange-500 hover:bg-orange-600 text-white shadow-lg shadow-orange-500/20"
+                    className="bg-primary hover:bg-primary/90 text-white shadow-lg shadow-orange-500/20"
                 >
                     <Plus className="mr-2 h-4 w-4" />
                     {t('clients.add_client')}
@@ -184,23 +184,23 @@ const Client: React.FC = () => {
             </div>
 
             {/* Filters */}
-            <Card className="bg-slate-900 border-white/10 shadow-xl backdrop-blur-sm">
+            <Card className="bg-background border-border shadow-xl">
                 <CardContent className="p-4">
                     <div className="flex flex-col md:flex-row gap-4">
                         <div className="relative flex-1">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" />
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                             <Input
                                 placeholder={t('clients.search_placeholder')}
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
-                                className="pl-10 bg-white/5 border-white/10 text-white placeholder:text-slate-500 focus:ring-orange-500 focus:border-orange-500"
+                                className="pl-10 bg-muted border-border text-foreground placeholder:text-muted-foreground focus:ring-ring focus:border-primary"
                             />
                         </div>
                         <Select value={statusFilter} onValueChange={setStatusFilter}>
-                            <SelectTrigger className="w-full md:w-[180px] bg-white/5 border-white/10 text-white">
+                            <SelectTrigger className="w-full md:w-[180px] bg-muted border-border text-foreground">
                                 <SelectValue placeholder={t('common.status')} />
                             </SelectTrigger>
-                            <SelectContent className="bg-slate-900 border-white/10 text-white">
+                            <SelectContent className="bg-background border-border text-foreground">
                                 <SelectItem value="all">{t('common.all')}</SelectItem>
                                 <SelectItem value="active">{t('pos.active')}</SelectItem>
                                 <SelectItem value="inactive">{t('pos.inactive')}</SelectItem>
@@ -209,7 +209,7 @@ const Client: React.FC = () => {
                         <Button
                             variant="outline"
                             onClick={fetchData}
-                            className="bg-white/5 border-white/10 text-white hover:bg-white/10"
+                            className="bg-muted border-border text-foreground hover:bg-muted"
                         >
                             <RotateCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
                         </Button>
@@ -218,46 +218,46 @@ const Client: React.FC = () => {
             </Card>
 
             {/* Client List */}
-            <Card className="bg-slate-900 border-white/10 shadow-xl overflow-hidden">
+            <Card className="bg-background border-border shadow-xl overflow-hidden">
                 <Table>
-                    <TableHeader className="bg-white/5">
-                        <TableRow className="border-white/10 hover:bg-transparent">
-                            <TableHead className="text-slate-300 font-semibold">{t('clients.lastName')}</TableHead>
-                            <TableHead className="text-slate-300 font-semibold">{t('clients.firstName')}</TableHead>
-                            <TableHead className="text-slate-300 font-semibold">{t('clients.contact') || 'Contact'}</TableHead>
-                            <TableHead className="text-slate-300 font-semibold">{t('clients.loyalty_points')}</TableHead>
-                            <TableHead className="text-slate-300 font-semibold">{t('clients.status')}</TableHead>
-                            <TableHead className="text-right text-slate-300 font-semibold">{t('clients.action')}</TableHead>
+                    <TableHeader className="bg-muted">
+                        <TableRow className="border-border hover:bg-transparent">
+                            <TableHead className="text-foreground font-semibold">{t('clients.lastName')}</TableHead>
+                            <TableHead className="text-foreground font-semibold">{t('clients.firstName')}</TableHead>
+                            <TableHead className="text-foreground font-semibold">{t('clients.contact') || 'Contact'}</TableHead>
+                            <TableHead className="text-foreground font-semibold">{t('clients.loyalty_points')}</TableHead>
+                            <TableHead className="text-foreground font-semibold">{t('clients.status')}</TableHead>
+                            <TableHead className="text-right text-foreground font-semibold">{t('clients.action')}</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
                         {isLoading ? (
                             <TableRow>
                                 <TableCell colSpan={6} className="h-24 text-center">
-                                    <RotateCw className="h-6 w-6 animate-spin mx-auto text-orange-500" />
+                                    <RotateCw className="h-6 w-6 animate-spin mx-auto text-primary" />
                                 </TableCell>
                             </TableRow>
                         ) : filteredCustomers.length === 0 ? (
                             <TableRow>
-                                <TableCell colSpan={6} className="h-24 text-center text-slate-500">
+                                <TableCell colSpan={6} className="h-24 text-center text-muted-foreground">
                                     {t('clients.no_clients_found')}
                                 </TableCell>
                             </TableRow>
                         ) : (
                             filteredCustomers.map((customer) => (
-                                <TableRow key={customer.id} className="border-white/5 hover:bg-white/5 transition-colors group">
-                                    <TableCell className="font-medium text-white">{customer.lastName}</TableCell>
-                                    <TableCell className="text-slate-300">{customer.firstName}</TableCell>
+                                <TableRow key={customer.id} className="border-border hover:bg-muted transition-colors group">
+                                    <TableCell className="font-medium text-foreground">{customer.lastName}</TableCell>
+                                    <TableCell className="text-foreground">{customer.firstName}</TableCell>
                                     <TableCell>
                                         <div className="flex flex-col gap-1">
                                             {customer.email && (
-                                                <span className="flex items-center gap-1.5 text-xs text-slate-400">
-                                                    <Mail className="h-3 w-3 text-orange-500/70" />
+                                                <span className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                                                    <Mail className="h-3 w-3 text-primary/70" />
                                                     {customer.email}
                                                 </span>
                                             )}
                                             {customer.phone && (
-                                                <span className="flex items-center gap-1.5 text-xs text-slate-400">
+                                                <span className="flex items-center gap-1.5 text-xs text-muted-foreground">
                                                     <Phone className="h-3 w-3 text-emerald-500/70" />
                                                     {customer.phone}
                                                 </span>
@@ -266,9 +266,9 @@ const Client: React.FC = () => {
                                     </TableCell>
                                     <TableCell>
                                         <div className="flex items-center gap-2">
-                                            <div className="flex items-center gap-1 bg-orange-500/10 px-2 py-0.5 rounded-full border border-orange-500/20">
-                                                <Star className="h-3 w-3 text-orange-400 fill-orange-400" />
-                                                <span className="text-xs font-bold text-orange-400">{customer.loyaltyPoints}</span>
+                                            <div className="flex items-center gap-1 bg-primary/10 px-2 py-0.5 rounded-full border border-primary/20">
+                                                <Star className="h-3 w-3 text-primary fill-orange-400" />
+                                                <span className="text-xs font-bold text-primary">{customer.loyaltyPoints}</span>
                                             </div>
                                             {customer.bonusPoints > 0 && (
                                                 <div className="flex items-center gap-1 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">
@@ -279,7 +279,7 @@ const Client: React.FC = () => {
                                         </div>
                                     </TableCell>
                                     <TableCell>
-                                        <Badge variant="outline" className={customer.isActive ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20 rounded-md" : "bg-slate-500/10 text-slate-400 border-slate-500/20 rounded-md"}>
+                                        <Badge variant="outline" className={customer.isActive ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20 rounded-md" : "bg-slate-500/10 text-muted-foreground border-slate-500/20 rounded-md"}>
                                             {customer.isActive ? t('pos.active') : t('pos.inactive')}
                                         </Badge>
                                     </TableCell>
@@ -289,7 +289,7 @@ const Client: React.FC = () => {
                                                 variant="ghost"
                                                 size="icon"
                                                 onClick={() => handleOpenDialog(customer)}
-                                                className="h-8 w-8 text-slate-400 hover:text-orange-400 hover:bg-orange-500/10"
+                                                className="h-8 w-8 text-muted-foreground hover:text-primary hover:bg-primary/10"
                                             >
                                                 <Edit className="h-4 w-4" />
                                             </Button>
@@ -298,23 +298,23 @@ const Client: React.FC = () => {
                                                     <Button
                                                         variant="ghost"
                                                         size="icon"
-                                                        className="h-8 w-8 text-slate-400 hover:text-rose-400 hover:bg-rose-500/10"
+                                                        className="h-8 w-8 text-muted-foreground hover:text-rose-400 hover:bg-rose-500/10"
                                                     >
                                                         <Trash2 className="h-4 w-4" />
                                                     </Button>
                                                 </AlertDialogTrigger>
-                                                <AlertDialogContent className="bg-slate-900 border-white/10 text-white">
+                                                <AlertDialogContent className="bg-background border-border text-foreground">
                                                     <AlertDialogHeader>
                                                         <AlertDialogTitle>{t('clients.delete_confirm_title')}</AlertDialogTitle>
-                                                        <AlertDialogDescription className="text-slate-400">
+                                                        <AlertDialogDescription className="text-muted-foreground">
                                                             {t('clients.delete_confirm_desc', { name: `${customer.firstName} ${customer.lastName}` })}
                                                         </AlertDialogDescription>
                                                     </AlertDialogHeader>
                                                     <AlertDialogFooter>
-                                                        <AlertDialogCancel className="bg-slate-800 border-white/10 text-white hover:bg-slate-700">{t('common.cancel')}</AlertDialogCancel>
+                                                        <AlertDialogCancel className="bg-muted border-border text-white hover:bg-primary/10">{t('common.cancel')}</AlertDialogCancel>
                                                         <AlertDialogAction
                                                             onClick={() => handleDelete(customer.id)}
-                                                            className="bg-rose-600 hover:bg-rose-700 text-white"
+                                                            className="bg-rose-600 hover:bg-rose-700 text-foreground"
                                                         >
                                                             {t('common.delete')}
                                                         </AlertDialogAction>
@@ -332,12 +332,12 @@ const Client: React.FC = () => {
 
             {/* Add/Edit Dialog */}
             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                <DialogContent className="bg-slate-900 border-white/10 text-white max-w-2xl">
+                <DialogContent className="bg-background border-border text-foreground max-w-2xl">
                     <DialogHeader>
                         <DialogTitle className="text-xl font-bold">
                             {editingCustomer ? t('clients.edit_client') : t('clients.add_client')}
                         </DialogTitle>
-                        <DialogDescription className="text-slate-400 text-sm">
+                        <DialogDescription className="text-muted-foreground text-sm">
                             {editingCustomer ? 'Modify customer details below.' : 'Add a new customer to your database.'}
                         </DialogDescription>
                     </DialogHeader>
@@ -345,32 +345,32 @@ const Client: React.FC = () => {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 py-4">
                         <div className="space-y-4">
                             <div className="space-y-2">
-                                <Label className="text-slate-300 text-sm">{t('clients.firstName')} <span className="text-rose-500">*</span></Label>
+                                <Label className="text-foreground text-sm">{t('clients.firstName')} <span className="text-rose-500">*</span></Label>
                                 <Input
                                     value={formData.firstName}
                                     onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
-                                    className="bg-white/5 border-white/10 text-white focus:ring-orange-500"
+                                    className="bg-muted border-border text-foreground focus:ring-ring"
                                     placeholder="e.g. Jean"
                                 />
                             </div>
                             <div className="space-y-2">
-                                <Label className="text-slate-300 text-sm">{t('clients.lastName')} <span className="text-rose-500">*</span></Label>
+                                <Label className="text-foreground text-sm">{t('clients.lastName')} <span className="text-rose-500">*</span></Label>
                                 <Input
                                     value={formData.lastName}
                                     onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
-                                    className="bg-white/5 border-white/10 text-white focus:ring-orange-500"
+                                    className="bg-muted border-border text-foreground focus:ring-ring"
                                     placeholder="e.g. Dupont"
                                 />
                             </div>
                             <div className="space-y-2">
-                                <Label className="text-slate-300 text-sm">{t('clients.email')}</Label>
+                                <Label className="text-foreground text-sm">{t('clients.email')}</Label>
                                 <div className="relative">
-                                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" />
+                                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                                     <Input
                                         type="email"
                                         value={formData.email}
                                         onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                                        className="pl-10 bg-white/5 border-white/10 text-white focus:ring-orange-500"
+                                        className="pl-10 bg-muted border-border text-foreground focus:ring-ring"
                                         placeholder="jean.dupont@email.com"
                                     />
                                 </div>
@@ -379,33 +379,33 @@ const Client: React.FC = () => {
 
                         <div className="space-y-4">
                             <div className="space-y-2">
-                                <Label className="text-slate-300 text-sm">{t('clients.phone')}</Label>
+                                <Label className="text-foreground text-sm">{t('clients.phone')}</Label>
                                 <div className="relative">
-                                    <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" />
+                                    <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                                     <Input
                                         value={formData.phone}
                                         onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                                        className="pl-10 bg-white/5 border-white/10 text-white focus:ring-orange-500"
+                                        className="pl-10 bg-muted border-border text-foreground focus:ring-ring"
                                         placeholder="+509 1234 5678"
                                     />
                                 </div>
                             </div>
                             <div className="space-y-2">
-                                <Label className="text-slate-300 text-sm">{t('clients.address')}</Label>
+                                <Label className="text-foreground text-sm">{t('clients.address')}</Label>
                                 <div className="relative">
-                                    <MapPin className="absolute left-3 top-3 h-4 w-4 text-slate-500" />
+                                    <MapPin className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                                     <textarea
                                         value={formData.address}
                                         onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                                        className="w-full pl-10 pt-2 bg-white/5 border border-white/10 rounded-md text-white text-sm focus:ring-2 focus:ring-orange-500 focus:outline-none min-h-[80px]"
+                                        className="w-full pl-10 pt-2 bg-muted border border-border rounded-md text-foreground text-sm focus:ring-2 focus:ring-ring focus:outline-none min-h-[80px]"
                                         placeholder="Pétion-Ville, Haiti"
                                     />
                                 </div>
                             </div>
-                            <div className="flex items-center justify-between p-3 bg-white/5 rounded-lg border border-white/10">
+                            <div className="flex items-center justify-between p-3 bg-muted rounded-lg border border-border">
                                 <div className="space-y-0.5">
-                                    <Label className="text-sm font-medium text-white">{t('clients.status')}</Label>
-                                    <p className="text-xs text-slate-500">{formData.isActive ? 'Active customer' : 'Inactive customer'}</p>
+                                    <Label className="text-sm font-medium text-foreground">{t('clients.status')}</Label>
+                                    <p className="text-xs text-muted-foreground">{formData.isActive ? 'Active customer' : 'Inactive customer'}</p>
                                 </div>
                                 <Switch
                                     checked={formData.isActive}
@@ -416,17 +416,17 @@ const Client: React.FC = () => {
                         </div>
                     </div>
 
-                    <DialogFooter className="bg-slate-900/50 -mx-6 -mb-6 p-4 border-t border-white/10">
+                    <DialogFooter className="bg-background -mx-6 -mb-6 p-4 border-t border-border">
                         <Button
                             variant="outline"
                             onClick={() => setIsDialogOpen(false)}
-                            className="bg-transparent border-white/10 text-white hover:bg-white/5"
+                            className="bg-transparent border-border text-foreground hover:bg-muted"
                         >
                             {t('common.cancel')}
                         </Button>
                         <Button
                             onClick={handleSave}
-                            className="bg-orange-500 hover:bg-orange-600 text-white"
+                            className="bg-primary hover:bg-primary/90 text-foreground"
                         >
                             {t('common.save')}
                         </Button>

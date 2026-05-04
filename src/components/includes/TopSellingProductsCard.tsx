@@ -13,7 +13,7 @@ import {
 } from "../ui/dropdown-menu";
 
 interface TopSellingProductsCardProps {
-    products?: any[]; // Initial data from summary
+    products?: any[];
 }
 
 export const TopSellingProductsCard: React.FC<TopSellingProductsCardProps> = ({ products: initialProducts }) => {
@@ -38,13 +38,11 @@ export const TopSellingProductsCard: React.FC<TopSellingProductsCardProps> = ({ 
         fetchTopProducts(period);
     }, [period]);
 
-    // Use initial products if stats changes in parent and we are still on the first load?
-    // Actually, useReports manages stats, but we want this card to be independent for its period.
     useEffect(() => {
         if (initialProducts && period === 'today' && products.length === 0) {
             setProducts(initialProducts);
         }
-    }, [initialProducts]);
+    }, [initialProducts, period, products.length]);
 
     const formatCurrency = (amount: number) => {
         return new Intl.NumberFormat('en-US', {
@@ -63,30 +61,29 @@ export const TopSellingProductsCard: React.FC<TopSellingProductsCardProps> = ({ 
     const currentPeriodLabel = periods.find(p => p.value === period)?.label || t('dashboard.today');
 
     return (
-        <Card className="shadow-sm h-full bg-white/5 backdrop-blur-sm border border-white/10 text-white flex flex-col">
+        <Card className="shadow-sm h-full border border-border flex flex-col">
             <CardContent className="p-6 flex flex-col h-full relative">
-                {/* Header */}
-                <div className="flex items-center justify-between pb-4 border-b border-white/10 mb-4 px-6 -mx-6">
+                <div className="flex items-center justify-between pb-4 border-b border-border mb-4 px-6 -mx-6">
                     <div className="flex items-center gap-2">
                         <div className="p-2 bg-pink-500/10 rounded-lg">
                             <Package className="h-5 w-5 text-pink-500" />
                         </div>
-                        <h3 className="text-lg font-bold text-white">{t('dashboard.top_selling_products')}</h3>
+                        <h3 className="text-lg font-bold text-foreground">{t('dashboard.top_selling_products')}</h3>
                     </div>
 
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                            <Button variant="outline" size="sm" className="h-8 text-xs bg-white/5 border-white/10 text-slate-300 hover:bg-white/10 hover:text-white gap-2">
+                            <Button variant="outline" size="sm" className="h-8 text-xs border-border text-gray-500 hover:bg-primary/10 hover:text-primary gap-2">
                                 {isLoading ? <Loader2 className="h-3 w-3 animate-spin" /> : currentPeriodLabel}
                                 <ChevronDown className="h-3 w-3" />
                             </Button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent className="bg-slate-900 border-white/10 text-white">
+                        <DropdownMenuContent>
                             {periods.map((p) => (
-                                <DropdownMenuItem 
-                                    key={p.value} 
+                                <DropdownMenuItem
+                                    key={p.value}
                                     onClick={() => setPeriod(p.value)}
-                                    className="hover:bg-white/10 cursor-pointer"
+                                    className="hover:bg-primary/10 cursor-pointer"
                                 >
                                     {p.label}
                                 </DropdownMenuItem>
@@ -95,32 +92,30 @@ export const TopSellingProductsCard: React.FC<TopSellingProductsCardProps> = ({ 
                     </DropdownMenu>
                 </div>
 
-                {/* List */}
                 <div className={`flex flex-col gap-4 ${isLoading ? "opacity-50 pointer-events-none transition-opacity" : "transition-opacity"}`}>
                     {products.map((product, index) => (
                         <div key={index} className="flex items-center justify-between group">
                             <div className="flex items-center gap-3 overflow-hidden">
-                                {/* Product Image */}
-                                <Avatar className="h-10 w-10 rounded-lg bg-white/10">
+                                <Avatar className="h-10 w-10 rounded-lg bg-gray-100">
                                     {product.imageUrl && <AvatarImage src={product.imageUrl} alt={product.productName} className="object-cover" />}
-                                    <AvatarFallback className="bg-transparent text-white/50 text-xs font-bold">
+                                    <AvatarFallback className="bg-transparent text-gray-500 text-xs font-bold">
                                         <Package className="h-4 w-4" />
                                     </AvatarFallback>
                                 </Avatar>
                                 <div className="flex flex-col min-w-0">
-                                    <span className="text-sm font-bold text-white group-hover:text-blue-400 transition-colors truncate">
+                                    <span className="text-sm font-bold text-foreground group-hover:text-primary transition-colors truncate">
                                         {product.productName}
                                     </span>
-                                    <div className="flex items-center gap-2 text-xs text-slate-400">
+                                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
                                         <span className="text-orange-500 font-bold">{formatCurrency(parseFloat(product.totalAmount))}</span>
-                                        <span className="w-1 h-1 rounded-full bg-slate-600 shrink-0"></span>
+                                        <span className="w-1 h-1 rounded-full bg-gray-300 shrink-0"></span>
                                         <span className="truncate">{product.soldQty} {t('dashboard.sales')}</span>
                                     </div>
                                 </div>
                             </div>
 
                             <div className="flex flex-col items-end gap-1 shrink-0 pl-2">
-                                <div className={`flex items-center gap-1 text-[10px] font-bold px-1.5 py-0.5 rounded ${product.growth >= 0 ? 'text-emerald-500 bg-emerald-500/10' : 'text-rose-500 bg-rose-500/10'}`}>
+                                <div className={`flex items-center gap-1 text-[10px] font-bold px-1.5 py-0.5 rounded ${product.growth >= 0 ? 'text-emerald-600 bg-emerald-500/10' : 'text-rose-600 bg-rose-500/10'}`}>
                                     {product.growth >= 0 ? <TrendingUp className="h-3 w-3" /> : <TrendingDown className="h-3 w-3" />}
                                     {product.growth >= 0 ? '+' : ''}{product.growth}%
                                 </div>
@@ -128,7 +123,7 @@ export const TopSellingProductsCard: React.FC<TopSellingProductsCardProps> = ({ 
                         </div>
                     ))}
                     {products.length === 0 && !isLoading && (
-                        <div className="text-center py-8 text-slate-500 text-sm">
+                        <div className="text-center py-8 text-muted-foreground text-sm">
                             {t('dashboard.no_records_found')}
                         </div>
                     )}

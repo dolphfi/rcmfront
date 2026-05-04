@@ -189,8 +189,8 @@ const UserList: React.FC = () => {
         <div className="p-6 space-y-6">
             <div className="flex justify-between items-center">
                 <div>
-                    <h1 className="text-3xl font-bold text-white tracking-tight">{t('users.title')}</h1>
-                    <p className="text-slate-400">{t('users.description')}</p>
+                    <h1 className="text-3xl font-bold text-foreground tracking-tight">{t('users.title')}</h1>
+                    <p className="text-muted-foreground">{t('users.description')}</p>
                 </div>
                 <Button
                     className="bg-blue-600 hover:bg-blue-700 text-white gap-2"
@@ -201,14 +201,14 @@ const UserList: React.FC = () => {
                 </Button>
             </div>
 
-            <Card className="bg-slate-900 border-slate-800">
+            <Card className="bg-background border-border">
                 <CardHeader>
                     <div className="flex items-center gap-4">
                         <div className="relative flex-1 max-w-sm">
-                            <Search className="absolute left-3 top-1/2 -transform -translate-y-1/2 h-4 w-4 text-slate-500" />
+                            <Search className="absolute left-3 top-1/2 -transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                             <Input
                                 placeholder={t('users.search_placeholder')}
-                                className="pl-10 bg-slate-950 border-slate-800 text-white placeholder:text-slate-500"
+                                className="pl-10 bg-background border-border text-foreground placeholder:text-muted-foreground"
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
                             />
@@ -218,43 +218,43 @@ const UserList: React.FC = () => {
                 <CardContent>
                     <Table>
                         <TableHeader className="hover:bg-transparent">
-                            <TableRow className="border-slate-800">
-                                <TableHead className="text-slate-400">{t('users.table_user')}</TableHead>
-                                <TableHead className="text-slate-400">{t('users.table_role')}</TableHead>
-                                <TableHead className="text-slate-400">{t('users.table_pos')}</TableHead>
-                                <TableHead className="text-slate-400">{t('users.table_status')}</TableHead>
-                                <TableHead className="text-slate-400">{t('users.table_last_login')}</TableHead>
-                                <TableHead className="text-right text-slate-400">{t('users.table_actions')}</TableHead>
+                            <TableRow className="border-border">
+                                <TableHead className="text-muted-foreground">{t('users.table_user')}</TableHead>
+                                <TableHead className="text-muted-foreground">{t('users.table_role')}</TableHead>
+                                <TableHead className="text-muted-foreground">{t('users.table_pos')}</TableHead>
+                                <TableHead className="text-muted-foreground">{t('users.table_status')}</TableHead>
+                                <TableHead className="text-muted-foreground">{t('users.table_last_login')}</TableHead>
+                                <TableHead className="text-right text-muted-foreground">{t('users.table_actions')}</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
                             {loading ? (
                                 <TableRow>
-                                    <TableCell colSpan={6} className="text-center py-10 text-slate-500">
+                                    <TableCell colSpan={6} className="text-center py-10 text-muted-foreground">
                                         {t('users.loading')}
                                     </TableCell>
                                 </TableRow>
                             ) : filteredUsers.length === 0 ? (
                                 <TableRow>
-                                    <TableCell colSpan={6} className="text-center py-10 text-slate-500">
+                                    <TableCell colSpan={6} className="text-center py-10 text-muted-foreground">
                                         {t('users.no_users')}
                                     </TableCell>
                                 </TableRow>
                             ) : (
                                 filteredUsers.map((user) => (
-                                    <TableRow key={user.id} className="border-slate-800 hover:bg-white/5 transition-colors">
+                                    <TableRow key={user.id} className="border-border hover:bg-primary/5 transition-colors">
                                         <TableCell>
                                             <div className="flex flex-col">
-                                                <span className="text-white font-medium">{user.firstName} {user.lastName}</span>
-                                                <span className="text-xs text-slate-500">{user.email}</span>
+                                                <span className="text-foreground font-medium">{user.firstName} {user.lastName}</span>
+                                                <span className="text-xs text-muted-foreground">{user.email}</span>
                                             </div>
                                         </TableCell>
                                         <TableCell>
-                                            <Badge variant="outline" className="border-slate-700 text-blue-400 bg-blue-400/10 rounded-md">
+                                            <Badge variant="outline" className="border-border text-blue-400 bg-blue-400/10 rounded-md">
                                                 {user.role.label}
                                             </Badge>
                                         </TableCell>
-                                        <TableCell className="text-slate-300">
+                                        <TableCell className="text-foreground">
                                             {pointsOfSale.find(pos => pos.id === user.posId)?.name || t('users.all_systems')}
                                         </TableCell>
                                         <TableCell>
@@ -262,38 +262,38 @@ const UserList: React.FC = () => {
                                                 {user.isActive ? t('users.active') : t('users.inactive')}
                                             </Badge>
                                             {(user.loginAttempts ?? 0) >= 5 && (
-                                                <Badge className="ml-2 bg-orange-500/10 text-orange-500 border-orange-500/20 rounded-md">
+                                                <Badge className="ml-2 bg-primary/10 text-primary border-primary/20 rounded-md">
                                                     {t('users.blocked')}
                                                 </Badge>
                                             )}
                                         </TableCell>
-                                        <TableCell className="text-slate-400 text-sm">
+                                        <TableCell className="text-muted-foreground text-sm">
                                             {user.lastLoginAt ? format(new Date(user.lastLoginAt), 'dd MMM yyyy, HH:mm', { locale: getDateLocale() }) : t('users.never')}
                                         </TableCell>
                                         <TableCell className="text-right">
                                             <DropdownMenu>
                                                 <DropdownMenuTrigger asChild>
-                                                    <Button variant="ghost" className="h-8 w-8 p-0 text-slate-400 hover:text-white">
+                                                    <Button variant="ghost" className="h-8 w-8 p-0 text-muted-foreground hover:text-foreground">
                                                         <MoreHorizontal className="h-4 w-4" />
                                                     </Button>
                                                 </DropdownMenuTrigger>
-                                                <DropdownMenuContent align="end" className="bg-slate-900 border-slate-800 text-slate-300">
+                                                <DropdownMenuContent align="end" className="bg-background border-border text-foreground">
                                                     <DropdownMenuLabel>{t('users.table_actions')}</DropdownMenuLabel>
-                                                    <DropdownMenuItem onClick={() => handleEditClick(user)} className="hover:bg-slate-800 cursor-pointer">
+                                                    <DropdownMenuItem onClick={() => handleEditClick(user)} className="hover:bg-primary/10 cursor-pointer">
                                                         <Edit className="mr-2 h-4 w-4" />
                                                         {t('users.action_edit')}
                                                     </DropdownMenuItem>
-                                                    <DropdownMenuItem onClick={() => handleToggleStatus(user)} className="hover:bg-slate-800 cursor-pointer">
+                                                    <DropdownMenuItem onClick={() => handleToggleStatus(user)} className="hover:bg-primary/10 cursor-pointer">
                                                         {user.isActive ? <UserX className="mr-2 h-4 w-4" /> : <UserCheck className="mr-2 h-4 w-4" />}
                                                         {user.isActive ? t('users.action_deactivate') : t('users.action_activate')}
                                                     </DropdownMenuItem>
                                                     {(user.loginAttempts ?? 0) >= 3 && (
-                                                        <DropdownMenuItem onClick={() => handleUnlock(user)} className="hover:bg-slate-800 cursor-pointer text-orange-400">
+                                                        <DropdownMenuItem onClick={() => handleUnlock(user)} className="hover:bg-primary/10 cursor-pointer text-primary">
                                                             <Unlock className="mr-2 h-4 w-4" />
                                                             {t('users.action_unlock')}
                                                         </DropdownMenuItem>
                                                     )}
-                                                    <DropdownMenuSeparator className="bg-slate-800" />
+                                                    <DropdownMenuSeparator className="bg-muted" />
                                                     <DropdownMenuItem className="text-red-400 hover:bg-red-400/10 cursor-pointer focus:bg-red-400/10">
                                                         <Trash2 className="mr-2 h-4 w-4" />
                                                         {t('users.action_delete')}
@@ -311,10 +311,10 @@ const UserList: React.FC = () => {
 
             {/* Edit Dialog */}
             <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-                <DialogContent className="bg-slate-900 border-slate-800 text-white">
+                <DialogContent className="bg-background border-border text-foreground">
                     <DialogHeader>
                         <DialogTitle>{t('users.edit_title')}</DialogTitle>
-                        <DialogDescription className="text-slate-400">
+                        <DialogDescription className="text-muted-foreground">
                             {t('users.edit_description')} {selectedUser?.firstName} {selectedUser?.lastName}.
                         </DialogDescription>
                     </DialogHeader>
@@ -322,7 +322,7 @@ const UserList: React.FC = () => {
                         <div className="space-y-2">
                             <label className="text-sm font-medium">{t('users.form_first_name')}</label>
                             <Input
-                                className="bg-slate-950 border-slate-800 text-white"
+                                className="bg-background border-border text-foreground"
                                 value={editFirstName}
                                 onChange={e => setEditFirstName(e.target.value)}
                             />
@@ -330,7 +330,7 @@ const UserList: React.FC = () => {
                         <div className="space-y-2">
                             <label className="text-sm font-medium">{t('users.form_last_name')}</label>
                             <Input
-                                className="bg-slate-950 border-slate-800 text-white"
+                                className="bg-background border-border text-foreground"
                                 value={editLastName}
                                 onChange={e => setEditLastName(e.target.value)}
                             />
@@ -339,7 +339,7 @@ const UserList: React.FC = () => {
                             <label className="text-sm font-medium">{t('users.form_phone')}</label>
                             <Input
                                 type="tel"
-                                className="bg-slate-950 border-slate-800 text-white"
+                                className="bg-background border-border text-foreground"
                                 value={editPhone}
                                 onChange={e => setEditPhone(e.target.value)}
                             />
@@ -347,10 +347,10 @@ const UserList: React.FC = () => {
                         <div className="space-y-2">
                             <label className="text-sm font-medium">{t('users.form_role')}</label>
                             <Select value={editRole} onValueChange={setEditRole}>
-                                <SelectTrigger className="bg-slate-950 border-slate-800">
+                                <SelectTrigger className="bg-background border-border">
                                     <SelectValue placeholder={t('users.select_role')} />
                                 </SelectTrigger>
-                                <SelectContent className="bg-slate-900 border-slate-800 text-white">
+                                <SelectContent className="bg-background border-border text-foreground">
                                     {roles.map(role => (
                                         <SelectItem key={role.id} value={role.id}>{role.label}</SelectItem>
                                     ))}
@@ -360,10 +360,10 @@ const UserList: React.FC = () => {
                         <div className="space-y-2">
                             <label className="text-sm font-medium">{t('users.form_pos')}</label>
                             <Select value={editPOS} onValueChange={setEditPOS}>
-                                <SelectTrigger className="bg-slate-950 border-slate-800">
+                                <SelectTrigger className="bg-background border-border">
                                     <SelectValue placeholder={t('users.select_pos')} />
                                 </SelectTrigger>
-                                <SelectContent className="bg-slate-900 border-slate-800 text-white">
+                                <SelectContent className="bg-background border-border text-foreground">
                                     <SelectItem value="none">{t('users.all_systems_global')}</SelectItem>
                                     {pointsOfSale.map(pos => (
                                         <SelectItem key={pos.id} value={pos.id}>{pos.name}</SelectItem>
@@ -373,7 +373,7 @@ const UserList: React.FC = () => {
                         </div>
                     </div>
                     <DialogFooter>
-                        <Button variant="ghost" onClick={() => setIsEditDialogOpen(false)} className="text-slate-400 hover:text-white">{t('users.cancel')}</Button>
+                        <Button variant="ghost" onClick={() => setIsEditDialogOpen(false)} className="text-muted-foreground hover:text-foreground">{t('users.cancel')}</Button>
                         <Button onClick={handleSaveEdit} disabled={isSaving} className="bg-blue-600 hover:bg-blue-700">
                             {isSaving ? t('users.saving') : t('users.save_changes')}
                         </Button>
@@ -383,10 +383,10 @@ const UserList: React.FC = () => {
 
             {/* Add User Dialog */}
             <Dialog open={isAddUserDialogOpen} onOpenChange={setIsAddUserDialogOpen}>
-                <DialogContent className="bg-slate-900 border-slate-800 text-white max-w-2xl">
+                <DialogContent className="bg-background border-border text-foreground max-w-2xl">
                     <DialogHeader>
                         <DialogTitle>{t('users.create_title')}</DialogTitle>
-                        <DialogDescription className="text-slate-400">
+                        <DialogDescription className="text-muted-foreground">
                             {t('users.create_description')}
                         </DialogDescription>
                     </DialogHeader>
@@ -394,7 +394,7 @@ const UserList: React.FC = () => {
                         <div className="space-y-2">
                             <label className="text-sm font-medium">{t('users.form_first_name')}</label>
                             <Input
-                                className="bg-slate-950 border-slate-800 text-white"
+                                className="bg-background border-border text-foreground"
                                 value={newUserState.firstName}
                                 onChange={e => setNewUserState({ ...newUserState, firstName: e.target.value })}
                             />
@@ -402,7 +402,7 @@ const UserList: React.FC = () => {
                         <div className="space-y-2">
                             <label className="text-sm font-medium">{t('users.form_last_name')}</label>
                             <Input
-                                className="bg-slate-950 border-slate-800 text-white"
+                                className="bg-background border-border text-foreground"
                                 value={newUserState.lastName}
                                 onChange={e => setNewUserState({ ...newUserState, lastName: e.target.value })}
                             />
@@ -411,7 +411,7 @@ const UserList: React.FC = () => {
                             <label className="text-sm font-medium">{t('users.form_email')}</label>
                             <Input
                                 type="email"
-                                className="bg-slate-950 border-slate-800 text-white"
+                                className="bg-background border-border text-foreground"
                                 value={newUserState.email}
                                 onChange={e => setNewUserState({ ...newUserState, email: e.target.value })}
                             />
@@ -420,7 +420,7 @@ const UserList: React.FC = () => {
                             <label className="text-sm font-medium">{t('users.form_phone')}</label>
                             <Input
                                 type="tel"
-                                className="bg-slate-950 border-slate-800 text-white"
+                                className="bg-background border-border text-foreground"
                                 value={newUserState.phone}
                                 onChange={e => setNewUserState({ ...newUserState, phone: e.target.value })}
                             />
@@ -428,10 +428,10 @@ const UserList: React.FC = () => {
                         <div className="space-y-2 col-span-1">
                             <label className="text-sm font-medium">{t('users.form_role')}</label>
                             <Select value={newUserState.roleId} onValueChange={v => setNewUserState({ ...newUserState, roleId: v })}>
-                                <SelectTrigger className="bg-slate-950 border-slate-800">
+                                <SelectTrigger className="bg-background border-border">
                                     <SelectValue placeholder={t('users.select_role')} />
                                 </SelectTrigger>
-                                <SelectContent className="bg-slate-900 border-slate-800 text-white">
+                                <SelectContent className="bg-background border-border text-foreground">
                                     {roles.map(role => (
                                         <SelectItem key={role.id} value={role.id}>{role.label}</SelectItem>
                                     ))}
@@ -441,10 +441,10 @@ const UserList: React.FC = () => {
                         <div className="space-y-2 col-span-1">
                             <label className="text-sm font-medium">{t('users.form_pos')}</label>
                             <Select value={newUserState.posId} onValueChange={v => setNewUserState({ ...newUserState, posId: v })}>
-                                <SelectTrigger className="bg-slate-950 border-slate-800">
+                                <SelectTrigger className="bg-background border-border">
                                     <SelectValue placeholder={t('users.select_pos')} />
                                 </SelectTrigger>
-                                <SelectContent className="bg-slate-900 border-slate-800 text-white">
+                                <SelectContent className="bg-background border-border text-foreground">
                                     <SelectItem value="none">{t('users.all_systems_global')}</SelectItem>
                                     {pointsOfSale.map(pos => (
                                         <SelectItem key={pos.id} value={pos.id}>{pos.name}</SelectItem>
@@ -454,7 +454,7 @@ const UserList: React.FC = () => {
                         </div>
                     </div>
                     <DialogFooter>
-                        <Button variant="ghost" onClick={() => setIsAddUserDialogOpen(false)} className="text-slate-400 hover:text-white">
+                        <Button variant="ghost" onClick={() => setIsAddUserDialogOpen(false)} className="text-muted-foreground hover:text-foreground">
                             {t('users.cancel')}
                         </Button>
                         <Button onClick={handleCreateUser} disabled={isCreating} className="bg-blue-600 hover:bg-blue-700">

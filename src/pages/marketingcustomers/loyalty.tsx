@@ -100,22 +100,22 @@ const Loyalty: React.FC = () => {
     const topCustomer = filteredCustomers.length > 0 ? filteredCustomers[0] : null;
 
     return (
-        <div className="p-6 space-y-6 bg-slate-950 min-h-screen">
+        <div className="p-6 space-y-6 bg-background min-h-screen">
             {/* Header */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
-                    <h1 className="text-2xl font-bold text-white tracking-tight flex items-center gap-2">
-                        <Gift className="h-6 w-6 text-orange-500" />
+                    <h1 className="text-2xl font-bold text-foreground tracking-tight flex items-center gap-2">
+                        <Gift className="h-6 w-6 text-primary" />
                         {t('loyalty.title')}
                     </h1>
-                    <p className="text-slate-400 mt-1">{t('loyalty.description')}</p>
+                    <p className="text-muted-foreground mt-1">{t('loyalty.description')}</p>
                 </div>
                 <div className="flex items-center gap-2">
-                    <Button variant="outline" className="bg-white/5 border-white/10 text-white hover:bg-white/10">
+                    <Button variant="outline" className="bg-muted border-border text-foreground hover:bg-muted">
                         <HistoryIcon className="mr-2 h-4 w-4" />
                         {t('loyalty.history')}
                     </Button>
-                    <Button variant="outline" className="bg-white/5 border-white/10 text-white hover:bg-white/10">
+                    <Button variant="outline" className="bg-muted border-border text-foreground hover:bg-muted">
                         <Settings className="mr-2 h-4 w-4" />
                         {t('loyalty.rules')}
                     </Button>
@@ -124,12 +124,12 @@ const Loyalty: React.FC = () => {
 
             {/* Stats Grid */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <Card className="bg-slate-900 border-white/10 shadow-xl overflow-hidden group">
+                <Card className="bg-background border-border shadow-xl overflow-hidden group">
                     <CardContent className="p-6">
                         <div className="flex items-center justify-between">
                             <div>
-                                <p className="text-sm font-medium text-slate-400 uppercase tracking-wider">{t('loyalty.total_points')}</p>
-                                <h3 className="text-3xl font-bold text-white mt-1 group-hover:text-orange-500 transition-colors">
+                                <p className="text-sm font-medium text-muted-foreground uppercase tracking-wider">{t('loyalty.total_points')}</p>
+                                <h3 className="text-3xl font-bold text-foreground mt-1 group-hover:text-primary transition-colors">
                                     {totalPoints.toLocaleString()}
                                 </h3>
                                 <div className="flex items-center gap-1 text-emerald-400 text-xs mt-2">
@@ -137,22 +137,22 @@ const Loyalty: React.FC = () => {
                                     <span>+12% this month</span>
                                 </div>
                             </div>
-                            <div className="h-12 w-12 bg-orange-500/10 rounded-xl flex items-center justify-center border border-orange-500/20">
-                                <Star className="h-6 w-6 text-orange-500 fill-orange-500" />
+                            <div className="h-12 w-12 bg-primary/10 rounded-xl flex items-center justify-center border border-primary/20">
+                                <Star className="h-6 w-6 text-primary fill-orange-500" />
                             </div>
                         </div>
                     </CardContent>
                 </Card>
 
-                <Card className="bg-slate-900 border-white/10 shadow-xl overflow-hidden group">
+                <Card className="bg-background border-border shadow-xl overflow-hidden group">
                     <CardContent className="p-6">
                         <div className="flex items-center justify-between">
                             <div>
-                                <p className="text-sm font-medium text-slate-400 uppercase tracking-wider">{t('loyalty.active_customers')}</p>
-                                <h3 className="text-3xl font-bold text-white mt-1 group-hover:text-emerald-500 transition-colors">
+                                <p className="text-sm font-medium text-muted-foreground uppercase tracking-wider">{t('loyalty.active_customers')}</p>
+                                <h3 className="text-3xl font-bold text-foreground mt-1 group-hover:text-emerald-500 transition-colors">
                                     {customers.filter(c => c.isActive).length}
                                 </h3>
-                                <p className="text-xs text-slate-500 mt-2">Out of {customers.length} total clients</p>
+                                <p className="text-xs text-muted-foreground mt-2">Out of {customers.length} total clients</p>
                             </div>
                             <div className="h-12 w-12 bg-emerald-500/10 rounded-xl flex items-center justify-center border border-emerald-500/20">
                                 <Users className="h-6 w-6 text-emerald-500" />
@@ -161,15 +161,15 @@ const Loyalty: React.FC = () => {
                     </CardContent>
                 </Card>
 
-                <Card className="bg-slate-900 border-white/10 shadow-xl overflow-hidden group">
+                <Card className="bg-background border-border shadow-xl overflow-hidden group">
                     <CardContent className="p-6">
                         <div className="flex items-center justify-between">
                             <div>
-                                <p className="text-sm font-medium text-slate-400 uppercase tracking-wider">{t('loyalty.points_redeemed')}</p>
-                                <h3 className="text-3xl font-bold text-white mt-1 group-hover:text-amber-500 transition-colors">
+                                <p className="text-sm font-medium text-muted-foreground uppercase tracking-wider">{t('loyalty.points_redeemed')}</p>
+                                <h3 className="text-3xl font-bold text-foreground mt-1 group-hover:text-amber-500 transition-colors">
                                     450
                                 </h3>
-                                <p className="text-xs text-slate-500 mt-2">Points used for rewards today</p>
+                                <p className="text-xs text-muted-foreground mt-2">Points used for rewards today</p>
                             </div>
                             <div className="h-12 w-12 bg-amber-500/10 rounded-xl flex items-center justify-center border border-amber-500/20">
                                 <ShieldCheck className="h-6 w-6 text-amber-500" />
@@ -182,17 +182,17 @@ const Loyalty: React.FC = () => {
             {/* Main Section */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {/* Ranking / List */}
-                <Card className="lg:col-span-2 bg-slate-900 border-white/10 shadow-xl">
-                    <CardHeader className="border-b border-white/10 pb-4">
+                <Card className="lg:col-span-2 bg-background border-border shadow-xl">
+                    <CardHeader className="border-b border-border pb-4">
                         <div className="flex items-center justify-between">
-                            <CardTitle className="text-lg text-white font-semibold">Ranking & Points</CardTitle>
+                            <CardTitle className="text-lg text-foreground font-semibold">Ranking & Points</CardTitle>
                             <div className="relative w-full max-w-[250px]">
-                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" />
+                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                                 <Input
                                     placeholder={t('clients.search_placeholder')}
                                     value={searchTerm}
                                     onChange={(e) => setSearchTerm(e.target.value)}
-                                    className="pl-10 h-9 bg-white/5 border-white/10 text-white placeholder:text-slate-500"
+                                    className="pl-10 h-9 bg-muted border-border text-foreground placeholder:text-muted-foreground"
                                 />
                             </div>
                         </div>
@@ -201,38 +201,38 @@ const Loyalty: React.FC = () => {
                         <div className="overflow-x-auto">
                             <Table>
                                 <TableHeader>
-                                    <TableRow className="border-white/10 hover:bg-transparent">
-                                        <TableHead className="text-slate-400">{t('clients.lastName')}</TableHead>
-                                        <TableHead className="text-slate-400">{t('clients.firstName')}</TableHead>
-                                        <TableHead className="text-slate-400">{t('loyalty.total_points')}</TableHead>
-                                        <TableHead className="text-right text-slate-400">{t('clients.action')}</TableHead>
+                                    <TableRow className="border-border hover:bg-transparent">
+                                        <TableHead className="text-muted-foreground">{t('clients.lastName')}</TableHead>
+                                        <TableHead className="text-muted-foreground">{t('clients.firstName')}</TableHead>
+                                        <TableHead className="text-muted-foreground">{t('loyalty.total_points')}</TableHead>
+                                        <TableHead className="text-right text-muted-foreground">{t('clients.action')}</TableHead>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
                                     {isLoading ? (
                                         <TableRow>
                                             <TableCell colSpan={4} className="h-24 text-center">
-                                                <RotateCw className="h-6 w-6 animate-spin mx-auto text-orange-500" />
+                                                <RotateCw className="h-6 w-6 animate-spin mx-auto text-primary" />
                                             </TableCell>
                                         </TableRow>
                                     ) : filteredCustomers.length === 0 ? (
                                         <TableRow>
-                                            <TableCell colSpan={4} className="h-24 text-center text-slate-500">
+                                            <TableCell colSpan={4} className="h-24 text-center text-muted-foreground">
                                                 {t('clients.no_clients_found')}
                                             </TableCell>
                                         </TableRow>
                                     ) : (
                                         filteredCustomers.map((customer, index) => (
-                                            <TableRow key={customer.id} className="border-white/5 hover:bg-white/5 group">
-                                                <TableCell className="font-medium text-white">
+                                            <TableRow key={customer.id} className="border-border hover:bg-muted group">
+                                                <TableCell className="font-medium text-foreground">
                                                     <div className="flex items-center gap-3">
                                                         {index === 0 && <span className="text-amber-400">👑</span>}
                                                         {customer.lastName}
                                                     </div>
                                                 </TableCell>
-                                                <TableCell className="text-slate-300">{customer.firstName}</TableCell>
+                                                <TableCell className="text-foreground">{customer.firstName}</TableCell>
                                                 <TableCell>
-                                                    <Badge variant="outline" className="bg-orange-500/10 text-orange-400 border-orange-500/20 hover:bg-orange-500/20 transition-colors rounded-md">
+                                                    <Badge variant="outline" className="bg-primary/10 text-primary border-primary/20 hover:bg-primary/10 transition-colors rounded-md">
                                                         <Star className="h-3 w-3 mr-1 fill-orange-400" />
                                                         {customer.loyaltyPoints}
                                                     </Badge>
@@ -273,21 +273,21 @@ const Loyalty: React.FC = () => {
                 <div className="space-y-6">
                     {/* Top Customer Card */}
                     {topCustomer && topCustomer.loyaltyPoints > 0 && (
-                        <Card className="bg-gradient-to-br from-orange-500/20 to-amber-500/10 border-orange-500/20 shadow-lg">
+                        <Card className="bg-gradient-to-br from-orange-500/20 to-amber-500/10 border-primary/20 shadow-lg">
                             <CardHeader className="pb-2">
-                                <CardTitle className="text-sm font-bold text-orange-400 uppercase tracking-widest flex items-center gap-2">
+                                <CardTitle className="text-sm font-bold text-primary uppercase tracking-widest flex items-center gap-2">
                                     <TrendingUp className="h-4 w-4" />
                                     Top Loyal Client
                                 </CardTitle>
                             </CardHeader>
                             <CardContent className="pt-2">
                                 <div className="flex items-center gap-4">
-                                    <div className="h-14 w-14 rounded-full bg-orange-500 flex items-center justify-center text-white text-xl font-bold border-4 border-slate-950">
+                                    <div className="h-14 w-14 rounded-full bg-primary flex items-center justify-center text-white text-xl font-bold border-4 border-slate-950">
                                         {topCustomer.firstName.charAt(0)}{topCustomer.lastName.charAt(0)}
                                     </div>
                                     <div>
-                                        <h4 className="text-white font-bold text-lg">{topCustomer.firstName} {topCustomer.lastName}</h4>
-                                        <div className="flex items-center gap-1 text-orange-400 font-bold">
+                                        <h4 className="text-foreground font-bold text-lg">{topCustomer.firstName} {topCustomer.lastName}</h4>
+                                        <div className="flex items-center gap-1 text-primary font-bold">
                                             <Star className="h-4 w-4 fill-orange-400" />
                                             {topCustomer.loyaltyPoints} Points
                                         </div>
@@ -298,24 +298,24 @@ const Loyalty: React.FC = () => {
                     )}
 
                     {/* Rules Summary */}
-                    <Card className="bg-slate-900 border-white/10 shadow-xl">
+                    <Card className="bg-background border-border shadow-xl">
                         <CardHeader>
-                            <CardTitle className="text-lg text-white font-semibold flex items-center gap-2">
-                                <Settings className="h-5 w-5 text-slate-400" />
+                            <CardTitle className="text-lg text-foreground font-semibold flex items-center gap-2">
+                                <Settings className="h-5 w-5 text-muted-foreground" />
                                 {t('loyalty.rules')}
                             </CardTitle>
                         </CardHeader>
                         <CardContent className="space-y-4">
-                            <div className="p-3 bg-white/5 rounded-lg border border-white/5 space-y-1">
-                                <p className="text-xs text-slate-500 uppercase font-bold tracking-tighter">Default Earn Rule</p>
-                                <div className="flex justify-between items-center text-white font-medium">
+                            <div className="p-3 bg-muted rounded-lg border border-border space-y-1">
+                                <p className="text-xs text-muted-foreground uppercase font-bold tracking-tighter">Default Earn Rule</p>
+                                <div className="flex justify-between items-center text-foreground font-medium">
                                     <span>{t('loyalty.points_per_dollar')}</span>
                                     <span className="text-emerald-400 font-bold text-right">1 pt / $1</span>
                                 </div>
                             </div>
-                            <div className="p-3 bg-white/5 rounded-lg border border-white/5 space-y-1">
-                                <p className="text-xs text-slate-500 uppercase font-bold tracking-tighter">Redemption Rule</p>
-                                <div className="flex justify-between items-center text-white font-medium">
+                            <div className="p-3 bg-muted rounded-lg border border-border space-y-1">
+                                <p className="text-xs text-muted-foreground uppercase font-bold tracking-tighter">Redemption Rule</p>
+                                <div className="flex justify-between items-center text-foreground font-medium">
                                     <span>{t('loyalty.min_redemption')}</span>
                                     <span className="text-amber-400 font-bold text-right">100 pts</span>
                                 </div>
@@ -327,34 +327,34 @@ const Loyalty: React.FC = () => {
 
             {/* Action Dialog */}
             <Dialog open={isActionDialogOpen} onOpenChange={setIsActionDialogOpen}>
-                <DialogContent className="bg-slate-900 border-white/10 text-white max-w-md">
+                <DialogContent className="bg-background border-border text-foreground max-w-md">
                     <DialogHeader>
                         <DialogTitle className="text-xl font-bold flex items-center gap-2">
                             {actionType === 'award' ? <ArrowUpCircle className="h-6 w-6 text-emerald-500" /> : <ArrowDownCircle className="h-6 w-6 text-amber-500" />}
                             {actionType === 'award' ? t('loyalty.award_points') : t('loyalty.redeem_points')}
                         </DialogTitle>
-                        <DialogDescription className="text-slate-400">
+                        <DialogDescription className="text-muted-foreground">
                             {selectedCustomer?.firstName} {selectedCustomer?.lastName}
                         </DialogDescription>
                     </DialogHeader>
 
                     <div className="space-y-4 py-4">
                         <div className="space-y-2">
-                            <Label className="text-slate-300">{t('loyalty.amount')}</Label>
+                            <Label className="text-foreground">{t('loyalty.amount')}</Label>
                             <Input
                                 type="number"
                                 value={pointAmount}
                                 onChange={(e) => setPointAmount(Number(e.target.value))}
-                                className="bg-white/5 border-white/10 text-white focus:ring-orange-500"
+                                className="bg-muted border-border text-foreground focus:ring-ring"
                                 placeholder="Enter points amount..."
                             />
                         </div>
                         <div className="space-y-2">
-                            <Label className="text-slate-300">{t('loyalty.reason')}</Label>
+                            <Label className="text-foreground">{t('loyalty.reason')}</Label>
                             <textarea
                                 value={reason}
                                 onChange={(e) => setReason(e.target.value)}
-                                className="w-full bg-white/5 border border-white/10 rounded-md p-3 text-white text-sm focus:ring-2 focus:ring-orange-500 focus:outline-none min-h-[80px]"
+                                className="w-full bg-muted border border-border rounded-md p-3 text-foreground text-sm focus:ring-2 focus:ring-ring focus:outline-none min-h-[80px]"
                                 placeholder="e.g. Purchase bonus, Refund, Correction..."
                             />
                         </div>
@@ -364,13 +364,13 @@ const Loyalty: React.FC = () => {
                         <Button
                             variant="outline"
                             onClick={() => setIsActionDialogOpen(false)}
-                            className="bg-transparent border-white/10 text-white hover:bg-white/5"
+                            className="bg-transparent border-border text-foreground hover:bg-muted"
                         >
                             {t('common.cancel')}
                         </Button>
                         <Button
                             onClick={handleProcessAction}
-                            className={actionType === 'award' ? "bg-emerald-600 hover:bg-emerald-700 text-white" : "bg-amber-600 hover:bg-amber-700 text-white"}
+                            className={actionType === 'award' ? "bg-emerald-600 hover:bg-emerald-700 text-foreground" : "bg-amber-600 hover:bg-amber-700 text-white"}
                         >
                             {actionType === 'award' ? t('loyalty.award_points') : t('loyalty.redeem_points')}
                         </Button>

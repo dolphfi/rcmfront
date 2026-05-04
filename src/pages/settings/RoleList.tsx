@@ -159,8 +159,8 @@ const RoleList: React.FC = () => {
         <div className="p-6 space-y-6">
             <div className="flex justify-between items-center">
                 <div>
-                    <h1 className="text-3xl font-bold text-white tracking-tight">{t('roles.title')}</h1>
-                    <p className="text-slate-400">{t('roles.description')}</p>
+                    <h1 className="text-3xl font-bold text-foreground tracking-tight">{t('roles.title')}</h1>
+                    <p className="text-muted-foreground">{t('roles.description')}</p>
                 </div>
                 <Button className="bg-blue-600 hover:bg-blue-700 text-white gap-2" onClick={handleOpenAddModal}>
                     <Plus className="h-4 w-4" />
@@ -168,9 +168,9 @@ const RoleList: React.FC = () => {
                 </Button>
             </div>
 
-            <Card className="bg-slate-900 border-slate-800">
+            <Card className="bg-background border-border">
                 <CardHeader>
-                    <CardTitle className="text-white flex items-center gap-2">
+                    <CardTitle className="text-foreground flex items-center gap-2">
                         <Lock className="h-5 w-5 text-blue-500" />
                         {t('roles.list_title')}
                     </CardTitle>
@@ -178,63 +178,63 @@ const RoleList: React.FC = () => {
                 <CardContent>
                     <Table>
                         <TableHeader className="hover:bg-transparent">
-                            <TableRow className="border-slate-800">
-                                <TableHead className="text-slate-400">{t('roles.table_name')}</TableHead>
-                                <TableHead className="text-slate-400">{t('roles.table_label')}</TableHead>
-                                <TableHead className="text-slate-400">{t('roles.table_description')}</TableHead>
-                                <TableHead className="text-slate-400">{t('roles.table_permissions')}</TableHead>
-                                <TableHead className="text-right text-slate-400">{t('roles.table_action')}</TableHead>
+                            <TableRow className="border-border">
+                                <TableHead className="text-muted-foreground">{t('roles.table_name')}</TableHead>
+                                <TableHead className="text-muted-foreground">{t('roles.table_label')}</TableHead>
+                                <TableHead className="text-muted-foreground">{t('roles.table_description')}</TableHead>
+                                <TableHead className="text-muted-foreground">{t('roles.table_permissions')}</TableHead>
+                                <TableHead className="text-right text-muted-foreground">{t('roles.table_action')}</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
                             {loading ? (
                                 <TableRow>
-                                    <TableCell colSpan={5} className="text-center py-10 text-slate-500">
+                                    <TableCell colSpan={5} className="text-center py-10 text-muted-foreground">
                                         {t('roles.loading')}
                                     </TableCell>
                                 </TableRow>
                             ) : (
                                 roles.map((role) => (
-                                    <TableRow key={role.id} className="border-slate-800 hover:bg-white/5 transition-colors">
+                                    <TableRow key={role.id} className="border-border hover:bg-primary/10 transition-colors">
                                         <TableCell>
-                                            <code className="bg-slate-950 px-2 py-1 rounded text-blue-400">
+                                            <code className="bg-muted px-2 py-1 rounded text-blue-400">
                                                 {role.name}
                                             </code>
                                         </TableCell>
-                                        <TableCell className="text-white font-medium">
+                                        <TableCell className="text-foreground font-medium">
                                             {role.label}
                                         </TableCell>
-                                        <TableCell className="text-slate-400 max-w-xs">
+                                        <TableCell className="text-muted-foreground max-w-xs">
                                             {role.description || t('roles.no_description')}
                                         </TableCell>
                                         <TableCell>
                                             <div className="flex flex-wrap gap-1">
                                                 {role.name === 'SUPER_ADMIN' || role.name === 'ADMIN' ? (
-                                                    <Badge variant="outline" className="border-slate-700 text-emerald-400 bg-emerald-500/10 rounded-md">
+                                                    <Badge variant="outline" className="border-border text-emerald-400 bg-emerald-500/10 rounded-md">
                                                         {t('roles.full_access')}
                                                     </Badge>
                                                 ) : role.permissions && role.permissions.length > 0 ? (
                                                     role.permissions.map(perm => (
-                                                        <Badge key={perm} variant="outline" className="border-slate-700 text-slate-400 bg-slate-800/50 rounded-md">
+                                                        <Badge key={perm} variant="outline" className="border-border text-muted-foreground bg-muted rounded-md">
                                                             {availablePermissions.find(p => p.id === perm)?.label || perm}
                                                         </Badge>
                                                     ))
                                                 ) : (
-                                                    <span className="text-slate-600 text-xs italic">{t('roles.no_permissions')}</span>
+                                                    <span className="text-muted-foreground text-xs italic">{t('roles.no_permissions')}</span>
                                                 )}
                                             </div>
                                         </TableCell>
                                         <TableCell className="text-right">
                                             <Popover>
                                                 <PopoverTrigger asChild>
-                                                    <Button variant="ghost" className="h-8 w-8 p-0 text-slate-400 hover:text-white hover:bg-white/10">
+                                                    <Button variant="ghost" className="h-8 w-8 p-0 text-muted-foreground hover:text-primary hover:bg-primary/10">
                                                         <MoreVertical className="h-4 w-4" />
                                                         <span className="sr-only">{t('roles.open_menu')}</span>
                                                     </Button>
                                                 </PopoverTrigger>
-                                                <PopoverContent align="end" className="w-40 bg-slate-900 border-slate-800 p-1">
+                                                <PopoverContent align="end" className="w-40 bg-background border-border p-1">
                                                     <div className="flex flex-col gap-1">
-                                                        <Button variant="ghost" className="w-full justify-start h-8 gap-2 text-slate-300 hover:text-white hover:bg-white/10" onClick={() => handleOpenEditModal(role)}>
+                                                        <Button variant="ghost" className="w-full justify-start h-8 gap-2 text-foreground hover:text-primary hover:bg-primary/10" onClick={() => handleOpenEditModal(role)}>
                                                             <Edit className="h-3.5 w-3.5" />
                                                             {t('roles.edit')}
                                                         </Button>
@@ -256,14 +256,14 @@ const RoleList: React.FC = () => {
 
             {/* Modal Ajoutez/Modifiez Rôle */}
             <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-                <DialogContent className="sm:max-w-[425px] bg-slate-900 border-slate-800 text-white">
+                <DialogContent className="sm:max-w-[425px] bg-background border-border text-foreground">
                     <DialogHeader>
                         <DialogTitle>{modalMode === 'add' ? t('roles.add_title') : t('roles.edit_title')}</DialogTitle>
                     </DialogHeader>
                     <div className="grid gap-4 py-4">
                         <div className='grid grid-cols-2 gap-3'>
                             <div className="grid gap-2">
-                                <Label htmlFor="name" className="text-slate-300">
+                                <Label htmlFor="name" className="text-foreground">
                                     {t('roles.form_name')}
                                 </Label>
                                 <Input
@@ -271,12 +271,12 @@ const RoleList: React.FC = () => {
                                     value={formData.name}
                                     onChange={(e) => setFormData({ ...formData, name: e.target.value.toUpperCase().replace(/\s+/g, '_') })}
                                     placeholder={t('roles.form_name_placeholder')}
-                                    className="bg-slate-950 border-slate-800"
+                                    className="bg-background border-border"
                                     disabled={modalMode === 'edit' && (formData.name === 'SUPER_ADMIN' || formData.name === 'ADMIN')}
                                 />
                             </div>
                             <div className="grid gap-2">
-                                <Label htmlFor="label" className="text-slate-300">
+                                <Label htmlFor="label" className="text-foreground">
                                     {t('roles.form_label')}
                                 </Label>
                                 <Input
@@ -284,12 +284,12 @@ const RoleList: React.FC = () => {
                                     value={formData.label}
                                     onChange={(e) => setFormData({ ...formData, label: e.target.value })}
                                     placeholder={t('roles.form_label_placeholder')}
-                                    className="bg-slate-950 border-slate-800"
+                                    className="bg-background border-border"
                                 />
                             </div>
                         </div>
                         <div className="grid gap-2">
-                            <Label htmlFor="description" className="text-slate-300">
+                            <Label htmlFor="description" className="text-foreground">
                                 {t('roles.form_description')}
                             </Label>
                             <Textarea
@@ -297,20 +297,20 @@ const RoleList: React.FC = () => {
                                 value={formData.description}
                                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                                 placeholder={t('roles.form_description_placeholder')}
-                                className="bg-slate-950 border-slate-800"
+                                className="bg-background border-border"
                             />
                         </div>
 
                         {/* Permissions Section */}
                         {formData.name !== 'SUPER_ADMIN' && formData.name !== 'ADMIN' && (
-                            <div className="space-y-3 mt-2 border-t border-slate-800 pt-4">
-                                <Label className="text-slate-300">{t('roles.system_permissions')}</Label>
+                            <div className="space-y-3 mt-2 border-t border-border pt-4">
+                                <Label className="text-foreground">{t('roles.system_permissions')}</Label>
                                 <div className="grid grid-cols-2 gap-3">
                                     {availablePermissions.map(permission => (
                                         <div key={permission.id} className="flex items-center space-x-2">
                                             <Checkbox
                                                 id={`perm-${permission.id}`}
-                                                className="border-slate-700 data-[state=checked]:bg-blue-600 data-[state=checked]:text-white"
+                                                className="border-border data-[state=checked]:bg-blue-600 data-[state=checked]:text-white"
                                                 checked={formData.permissions.includes(permission.id)}
                                                 onCheckedChange={(checked) => {
                                                     if (checked) {
@@ -328,7 +328,7 @@ const RoleList: React.FC = () => {
                                             />
                                             <label
                                                 htmlFor={`perm-${permission.id}`}
-                                                className="text-sm font-medium leading-none text-slate-300 peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                                                className="text-sm font-medium leading-none text-foreground peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                                             >
                                                 {permission.label}
                                             </label>
@@ -339,7 +339,7 @@ const RoleList: React.FC = () => {
                         )}
                     </div>
                     <DialogFooter>
-                        <Button variant="outline" onClick={() => setIsModalOpen(false)} className="border-slate-700 bg-transparent text-slate-300 hover:bg-slate-800">
+                        <Button variant="outline" onClick={() => setIsModalOpen(false)} className="border-border bg-transparent text-foreground hover:bg-primary/10">
                             {t('roles.cancel')}
                         </Button>
                         <Button onClick={handleSaveRole} disabled={isSaving} className="bg-blue-600 hover:bg-blue-700 text-white">
@@ -351,17 +351,17 @@ const RoleList: React.FC = () => {
 
             {/* Modal Supression Rôle */}
             <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-                <AlertDialogContent className="bg-slate-900 border-slate-800 text-white">
+                <AlertDialogContent className="bg-background border-border text-foreground">
                     <AlertDialogHeader>
                         <AlertDialogTitle>{t('roles.delete_confirm_title')}</AlertDialogTitle>
-                        <AlertDialogDescription className="text-slate-400">
+                        <AlertDialogDescription className="text-muted-foreground">
                             {t('roles.delete_confirm_desc').split('<0>')[0]}
-                            <span className="font-bold text-slate-200">{roleToDelete?.label}</span>
+                            <span className="font-bold text-foreground">{roleToDelete?.label}</span>
                             {t('roles.delete_confirm_desc').split('</0>')[1]}
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                        <AlertDialogCancel className="border-slate-700 bg-transparent text-slate-300 hover:bg-slate-800 hover:text-white">{t('roles.cancel')}</AlertDialogCancel>
+                        <AlertDialogCancel className="border-border bg-transparent text-foreground hover:bg-primary/10">{t('roles.cancel')}</AlertDialogCancel>
                         <AlertDialogAction onClick={handleDeleteRole} className="bg-rose-600 text-white hover:bg-rose-700">
                             {t('roles.delete_sure')}
                         </AlertDialogAction>

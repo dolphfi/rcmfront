@@ -47,17 +47,17 @@ const Login: React.FC = () => {
     };
 
     return (
-        <div className="min-h-screen w-full flex items-center justify-center bg-slate-50 p-4">
-            <Card className="w-full max-w-sm bg-white border-slate-200 shadow-xl overflow-hidden">
+        <div className="min-h-screen w-full flex items-center justify-center bg-background p-4">
+            <Card className="w-full max-w-sm bg-background border-border shadow-xl overflow-hidden">
                 <div className="h-2 bg-primary w-full" />
                 <CardHeader>
                     <div className="flex items-center justify-between pb-2">
                         <div className="space-y-1">
-                            <CardTitle className="text-2xl font-bold text-slate-900">Konekte</CardTitle>
-                            <CardDescription className="text-slate-500">Konekte nan kont ou</CardDescription>
+                            <CardTitle className="text-2xl font-bold text-foreground">Konekte</CardTitle>
+                            <CardDescription className="text-muted-foreground">Konekte nan kont ou</CardDescription>
                         </div>
                         <div className="flex items-center">
-                            <span className="bg-slate-50 p-2 rounded-full border border-slate-100 shadow-sm">
+                            <span className="bg-background p-2 rounded-full border border-border shadow-sm">
                                 <img
                                     src={logoUrl || '/logo.jpeg'}
                                     alt="Logo"
@@ -70,25 +70,25 @@ const Login: React.FC = () => {
                             </span>
                         </div>
                     </div>
-                    <Separator className="bg-slate-100" />
+                    <Separator className="bg-muted" />
                 </CardHeader>
                 <CardContent>
                     <form onSubmit={onLoginSubmit}>
                         <div className="space-y-4">
                             <div className="space-y-2">
-                                <Label htmlFor="email" className="text-slate-700 font-medium">Email</Label>
+                                <Label htmlFor="email" className="text-foreground font-medium">Email</Label>
                                 <Input
                                     id="email"
                                     type="email"
                                     placeholder="email@example.com"
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
-                                    className="w-full bg-slate-50 border-slate-200 text-slate-900 placeholder:text-slate-400 focus:ring-primary"
+                                    className="w-full bg-background border-border text-foreground placeholder:text-muted-foreground focus:ring-primary"
                                     required
                                 />
                             </div>
                             <div className="space-y-2">
-                                <Label htmlFor="password" className="text-slate-700 font-medium">Modpas</Label>
+                                <Label htmlFor="password" className="text-foreground font-medium">Modpas</Label>
                                 <div className="relative">
                                     <Input
                                         id="password"
@@ -96,12 +96,12 @@ const Login: React.FC = () => {
                                         placeholder="••••••••"
                                         value={password}
                                         onChange={(e) => setPassword(e.target.value)}
-                                        className="w-full bg-slate-50 border-slate-200 text-slate-900 placeholder:text-slate-400 focus:ring-primary pr-12"
+                                        className="w-full bg-background border-border text-foreground placeholder:text-muted-foreground focus:ring-primary pr-12"
                                     />
                                     <button
                                         type="button"
                                         onClick={() => setShowPassword(!showPassword)}
-                                        className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
+                                        className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
                                     >
                                         {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                                     </button>

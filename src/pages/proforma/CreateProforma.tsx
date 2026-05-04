@@ -233,13 +233,13 @@ const CreateProforma: React.FC = () => {
             <div className="flex items-center gap-4 mb-6">
                 <Button
                     variant="ghost"
-                    className="text-slate-400 hover:text-white"
+                    className="text-muted-foreground hover:text-primary"
                     onClick={() => navigate('/proforma/list')}
                 >
                     <ArrowRight className="h-4 w-4 rotate-180 mr-2" />
                     {t('common.back')}
                 </Button>
-                <h1 className="text-3xl font-bold text-white">{t('proforma.title_create')}</h1>
+                <h1 className="text-3xl font-bold text-foreground">{t('proforma.title_create')}</h1>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -247,19 +247,19 @@ const CreateProforma: React.FC = () => {
                 <div className="lg:col-span-1 space-y-6">
                     {/* POS Selection for Admins */}
                     {(user?.role?.name === UserRoleName.SUPER_ADMIN || user?.role?.name === UserRoleName.ADMIN) && (
-                        <Card className="bg-slate-900/50 border-white/10 backdrop-blur-xl shrink-0">
+                        <Card className="bg-background border-border shrink-0">
                             <CardHeader className="pb-4">
-                                <CardTitle className="text-white text-lg flex items-center gap-2">
+                                <CardTitle className="text-foreground text-lg flex items-center gap-2">
                                     <MapPin className="h-5 w-5 text-emerald-400" />
                                     {t('proforma.select_pos')}
                                 </CardTitle>
                             </CardHeader>
                             <CardContent>
                                 <Select onValueChange={setSelectedPosId} value={selectedPosId}>
-                                    <SelectTrigger className="bg-slate-800/50 border-white/10 text-white">
+                                    <SelectTrigger className="bg-muted border-border text-foreground">
                                         <SelectValue placeholder={t('proforma.placeholder_pos')} />
                                     </SelectTrigger>
-                                    <SelectContent className="bg-slate-900 border-white/10 text-white">
+                                    <SelectContent className="bg-background border-border text-foreground">
                                         {posLocations.map(pos => (
                                             <SelectItem key={pos.id} value={pos.id}>
                                                 {pos.name}
@@ -271,18 +271,18 @@ const CreateProforma: React.FC = () => {
                         </Card>
                     )}
 
-                    <Card className="bg-slate-900/50 border-white/10 backdrop-blur-xl">
+                    <Card className="bg-background border-border">
                         <CardHeader>
-                            <CardTitle className="text-white">{t('proforma.select_customer')}</CardTitle>
+                            <CardTitle className="text-foreground">{t('proforma.select_customer')}</CardTitle>
                             <div className="pt-2">
                                 <Select onValueChange={setSelectedCustomerId} value={selectedCustomerId}>
-                                    <SelectTrigger className="bg-slate-800/50 border-white/10 text-white">
+                                    <SelectTrigger className="bg-muted border-border text-foreground">
                                         <div className="flex items-center gap-2">
-                                            <User className="h-4 w-4 text-slate-400" />
+                                            <User className="h-4 w-4 text-muted-foreground" />
                                             <SelectValue placeholder={t('proforma.placeholder_customer')} />
                                         </div>
                                     </SelectTrigger>
-                                    <SelectContent className="bg-slate-900 border-white/10 text-white">
+                                    <SelectContent className="bg-background border-border text-foreground">
                                         <SelectItem value="walk-in">{t('proforma.walk_in')}</SelectItem>
                                         {customers.map(c => (
                                             <SelectItem key={c.id} value={c.id}>{c.firstName} {c.lastName}</SelectItem>
@@ -293,49 +293,49 @@ const CreateProforma: React.FC = () => {
                         </CardHeader>
                     </Card>
 
-                    <Card className="bg-slate-900/50 border-white/10 backdrop-blur-xl h-full">
+                    <Card className="bg-background border-border h-full">
                         <CardHeader>
-                            <CardTitle className="text-white">{t('proforma.search_items', { type: sellType === 'product' ? t('sidebar.products') : t('sidebar.services') })}</CardTitle>
+                            <CardTitle className="text-foreground">{t('proforma.search_items', { type: sellType === 'product' ? t('sidebar.products') : t('sidebar.services') })}</CardTitle>
                             <div className="relative pt-2">
-                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 mt-1" />
+                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground mt-1" />
                                 <Input
                                     placeholder={sellType === 'product' ? t('products.search_placeholder') : t('services.search_placeholder')}
-                                    className="pl-9 bg-slate-800/50 border-white/10 text-white"
+                                    className="pl-9 bg-muted border-border text-foreground"
                                     value={searchTerm}
                                     onChange={(e) => setSearchTerm(e.target.value)}
                                 />
                             </div>
                         </CardHeader>
-                        <CardContent className="max-h-[500px] overflow-y-auto space-y-2 scrollbar-thin scrollbar-thumb-white/10">
+                        <CardContent className="max-h-[500px] overflow-y-auto space-y-2 scrollbar-thin scrollbar-thumb-border">
                             {filteredItems.length === 0 ? (
-                                <p className="text-center text-slate-500 italic py-8 text-sm">
+                                <p className="text-center text-muted-foreground italic py-8 text-sm">
                                     {t('common.no_data')}
                                 </p>
                             ) : filteredItems.map(item => (
                                 <div
                                     key={item.id}
                                     onClick={() => addToCart(item)}
-                                    className="p-3 bg-white/5 border border-white/10 rounded-lg hover:bg-white/10 cursor-pointer transition-all group"
+                                    className="p-3 bg-muted border border-border rounded-lg hover:bg-primary/10 cursor-pointer transition-all group"
                                 >
                                     <div className="flex justify-between items-start gap-3">
                                         {/* Left — name + description/SKU */}
                                         <div className="flex-1 min-w-0">
-                                            <p className="text-white font-medium group-hover:text-blue-400 truncate">
+                                            <p className="text-foreground font-medium group-hover:text-blue-400 truncate">
                                                 {item.name}
                                             </p>
                                             {sellType === 'service' && item.description && (
-                                                <p className="text-xs text-slate-500 mt-0.5 line-clamp-2 leading-relaxed">
+                                                <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2 leading-relaxed">
                                                     {item.description}
                                                 </p>
                                             )}
                                             {sellType === 'product' && item.sku && (
-                                                <p className="text-xs text-slate-500 mt-0.5">{item.sku}</p>
+                                                <p className="text-xs text-muted-foreground mt-0.5">{item.sku}</p>
                                             )}
                                         </div>
                                         {/* Right — price + category/stock */}
                                         <div className="text-right flex-shrink-0 space-y-1">
-                                            <p className="text-white font-bold text-sm">
-                                                {Number(item.price).toLocaleString('en-US', { minimumFractionDigits: 2 })}{'\u00a0'}{currency}
+                                            <p className="text-foreground font-bold text-sm">
+                                                {Number(item.price).toLocaleString('en-US', { minimumFractionDigits: 2 })}{' '}{currency}
                                             </p>
                                             {sellType === 'service' && item.category?.name && (
                                                 <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-[10px] font-medium bg-purple-500/10 text-purple-400 border border-purple-500/20">
@@ -343,7 +343,7 @@ const CreateProforma: React.FC = () => {
                                                 </span>
                                             )}
                                             {sellType === 'product' && (
-                                                <Badge variant="outline" className="text-[10px] py-0 border-white/10 text-slate-400">
+                                                <Badge variant="outline" className="text-[10px] py-0 border-border text-muted-foreground">
                                                     {t('common.stock')}: {item.qty || 0}
                                                 </Badge>
                                             )}
@@ -357,20 +357,20 @@ const CreateProforma: React.FC = () => {
 
                 {/* Cart / Items List */}
                 <div className="lg:col-span-2 space-y-6">
-                    <Card className="bg-slate-900/50 border-white/10 backdrop-blur-xl">
+                    <Card className="bg-background border-border">
                         <CardHeader className="flex flex-row items-center justify-between">
                             <div>
-                                <CardTitle className="text-white flex items-center gap-2">
+                                <CardTitle className="text-foreground flex items-center gap-2">
                                     <ShoppingCart className="h-5 w-5 text-blue-400" />
                                     {t('proforma.item_list')}
                                 </CardTitle>
-                                <CardDescription className="text-slate-400">{t('proforma.items_to_appear_in_proforma')}</CardDescription>
+                                <CardDescription className="text-muted-foreground">{t('proforma.items_to_appear_in_proforma')}</CardDescription>
                             </div>
-                            <div className="flex bg-slate-800 rounded-lg p-1 border border-white/10">
+                            <div className="flex bg-muted rounded-lg p-1 border border-border">
                                 <Button
                                     size="sm"
                                     variant={sellType === 'product' ? 'secondary' : 'ghost'}
-                                    className={sellType === 'product' ? 'bg-blue-600 text-white hover:bg-blue-700' : 'text-slate-400'}
+                                    className={sellType === 'product' ? 'bg-blue-600 text-white hover:bg-blue-700' : 'text-muted-foreground'}
                                     onClick={() => {
                                         setSellType('product');
                                         setCart([]);
@@ -381,7 +381,7 @@ const CreateProforma: React.FC = () => {
                                 <Button
                                     size="sm"
                                     variant={sellType === 'service' ? 'secondary' : 'ghost'}
-                                    className={sellType === 'service' ? 'bg-blue-600 text-white hover:bg-blue-700' : 'text-slate-400'}
+                                    className={sellType === 'service' ? 'bg-blue-600 text-white hover:bg-blue-700' : 'text-muted-foreground'}
                                     onClick={() => {
                                         setSellType('service');
                                         setCart([]);
@@ -392,44 +392,44 @@ const CreateProforma: React.FC = () => {
                             </div>
                         </CardHeader>
                         <CardContent>
-                            <div className="rounded-md border border-white/10 overflow-hidden">
+                            <div className="rounded-md border border-border overflow-hidden">
                                 <Table>
-                                    <TableHeader className="bg-slate-800/50">
-                                        <TableRow className="border-white/10">
-                                            <TableHead className="text-slate-300">{t('common.item')}</TableHead>
-                                            <TableHead className="text-slate-300 w-24">{t('common.price')}</TableHead>
-                                            <TableHead className="text-slate-300 w-32">{t('common.quantity')}</TableHead>
-                                            <TableHead className="text-slate-300">{t('common.total')}</TableHead>
-                                            <TableHead className="text-right text-slate-300 w-16"></TableHead>
+                                    <TableHeader className="bg-muted">
+                                        <TableRow className="border-border">
+                                            <TableHead className="text-foreground">{t('common.item')}</TableHead>
+                                            <TableHead className="text-foreground w-24">{t('common.price')}</TableHead>
+                                            <TableHead className="text-foreground w-32">{t('common.quantity')}</TableHead>
+                                            <TableHead className="text-foreground">{t('common.total')}</TableHead>
+                                            <TableHead className="text-right text-foreground w-16"></TableHead>
                                         </TableRow>
                                     </TableHeader>
                                     <TableBody>
                                         {cart.length === 0 ? (
-                                            <TableRow className="border-white/10 hover:bg-transparent">
-                                                <TableCell colSpan={5} className="h-32 text-center text-slate-500 italic">
+                                            <TableRow className="border-border hover:bg-transparent">
+                                                <TableCell colSpan={5} className="h-32 text-center text-muted-foreground italic">
                                                     {t('proforma.no_items_added')}
                                                 </TableCell>
                                             </TableRow>
                                         ) : (
                                             cart.map((item, index) => (
-                                                <TableRow key={index} className="border-white/10 hover:bg-white/5 transition-colors">
-                                                    <TableCell className="text-white font-medium">{item.name}</TableCell>
-                                                    <TableCell className="text-slate-300">{item.price}</TableCell>
+                                                <TableRow key={index} className="border-border hover:bg-primary/10 transition-colors">
+                                                    <TableCell className="text-foreground font-medium">{item.name}</TableCell>
+                                                    <TableCell className="text-foreground">{item.price}</TableCell>
                                                     <TableCell>
                                                         <div className="flex items-center gap-2">
                                                             <Button
                                                                 variant="outline"
                                                                 size="icon"
-                                                                className="h-7 w-7 bg-slate-800 border-white/10 text-white"
+                                                                className="h-7 w-7 bg-background border-border text-foreground"
                                                                 onClick={() => updateQty(index, item.qty - 1)}
                                                             >
                                                                 <Minus className="h-4 w-4" />
                                                             </Button>
-                                                            <span className="w-8 text-center text-white">{item.qty}</span>
+                                                            <span className="w-8 text-center text-foreground">{item.qty}</span>
                                                             <Button
                                                                 variant="outline"
                                                                 size="icon"
-                                                                className="h-7 w-7 bg-slate-800 border-white/10 text-white"
+                                                                className="h-7 w-7 bg-background border-border text-foreground"
                                                                 onClick={() => updateQty(index, item.qty + 1)}
                                                             >
                                                                 +
@@ -439,7 +439,7 @@ const CreateProforma: React.FC = () => {
                                                     <TableCell className="text-emerald-400 font-bold">
                                                         {(item.price * item.qty).toFixed(2)}
                                                     </TableCell>
-                                                    <TableCell className="text-right text-slate-300">
+                                                    <TableCell className="text-right text-foreground">
                                                         <Button
                                                             variant="ghost"
                                                             size="icon"
@@ -459,18 +459,18 @@ const CreateProforma: React.FC = () => {
                             {/* Summary & Config */}
                             <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-8">
                                 <div className="space-y-4">
-                                    <div className="p-4 bg-white/5 border border-white/10 rounded-xl space-y-4">
-                                        <h4 className="text-white font-medium text-sm uppercase tracking-wider opacity-50">Paramèt Devis</h4>
+                                    <div className="p-4 bg-muted border border-border rounded-xl space-y-4">
+                                        <h4 className="text-foreground font-medium text-sm uppercase tracking-wider opacity-50">Paramèt Devis</h4>
                                         <div className="grid grid-cols-2 gap-4">
                                             <div className="space-y-2">
-                                                <label className="text-xs text-slate-400 flex items-center gap-1">
+                                                <label className="text-xs text-muted-foreground flex items-center gap-1">
                                                     <Search className="h-3 w-3" /> {t('proforma.discount')} ({currency})
                                                 </label>
                                                 <Input
                                                     type="number"
                                                     min="0"
                                                     step="0.01"
-                                                    className="bg-slate-800 border-white/10 text-white"
+                                                    className="bg-background border-border text-foreground"
                                                     value={discount === 0 ? '' : discount}
                                                     placeholder="0.00"
                                                     onChange={(e) => {
@@ -481,12 +481,12 @@ const CreateProforma: React.FC = () => {
                                                 />
                                             </div>
                                             <div className="space-y-2">
-                                                <label className="text-xs text-slate-400 flex items-center gap-1">
+                                                <label className="text-xs text-muted-foreground flex items-center gap-1">
                                                     <Calendar className="h-3 w-3" /> Ekspire (Jou)
                                                 </label>
                                                 <Input
                                                     type="number"
-                                                    className="bg-slate-800 border-white/10 text-white"
+                                                    className="bg-background border-border text-foreground"
                                                     value={expiresInDays}
                                                     onChange={(e) => setExpiresInDays(parseInt(e.target.value) || 7)}
                                                 />
@@ -496,29 +496,29 @@ const CreateProforma: React.FC = () => {
                                 </div>
 
                                 <div className="space-y-3">
-                                    <div className="flex justify-between text-slate-400 items-center">
+                                    <div className="flex justify-between text-muted-foreground items-center">
                                         <span>{t('proforma.subtotal')}</span>
-                                        <span className="text-white font-medium">{subtotal.toFixed(2)} {currency}</span>
+                                        <span className="text-foreground font-medium">{subtotal.toFixed(2)} {currency}</span>
                                     </div>
                                     {tax > 0 && (
-                                        <div className="flex justify-between text-slate-400 items-center">
+                                        <div className="flex justify-between text-muted-foreground items-center">
                                             <span>{t('proforma.tax')} (10%)</span>
-                                            <span className="text-white font-medium">{tax.toFixed(2)} {currency}</span>
+                                            <span className="text-foreground font-medium">{tax.toFixed(2)} {currency}</span>
                                         </div>
                                     )}
                                     {safeDiscount > 0 && (
-                                        <div className="flex justify-between text-slate-400 items-center">
+                                        <div className="flex justify-between text-muted-foreground items-center">
                                             <span>{t('proforma.discount')}</span>
                                             <span className="text-rose-400 font-medium">-{safeDiscount.toFixed(2)} {currency}</span>
                                         </div>
                                     )}
-                                    <div className="h-px bg-white/10 my-2" />
+                                    <div className="h-px bg-border my-2" />
                                     <div className="flex justify-between items-center bg-blue-500/10 p-4 rounded-xl border border-blue-500/20">
                                         <span className="text-blue-400 font-bold uppercase tracking-widest text-lg">Total</span>
-                                        <span className="text-2xl font-black text-white">{total.toFixed(2)} {currency}</span>
+                                        <span className="text-2xl font-black text-foreground">{total.toFixed(2)} {currency}</span>
                                     </div>
                                     <Button
-                                        className="w-full h-12 text-lg bg-blue-600 hover:bg-blue-700 text-white font-bold"
+                                        className="w-full h-12 text-lg bg-blue-600 hover:bg-blue-700 text-foreground font-bold"
                                         onClick={handleSave}
                                         disabled={isLoading || cart.length === 0}
                                     >

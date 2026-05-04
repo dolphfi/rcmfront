@@ -18,12 +18,10 @@ interface TopCategoriesCardProps {
     categories?: any[];
 }
 
-const COLORS = ['#6366f1', '#10b981', '#f59e0b', '#ec4899', '#8b5cf6'];
+const COLORS = ['#0052cc', '#10b981', '#f59e0b', '#ec4899', '#8b5cf6'];
 
 const chartConfig = {
-    totalSales: {
-        label: "Total Sales",
-    }
+    totalSales: { label: "Total Sales" }
 } satisfies ChartConfig;
 
 export const TopCategoriesCard: React.FC<TopCategoriesCardProps> = ({ categories: initialData }) => {
@@ -57,7 +55,7 @@ export const TopCategoriesCard: React.FC<TopCategoriesCardProps> = ({ categories
         } else if (initialData) {
             setCategoriesData(initialData);
         }
-    }, [selectedPeriod]);
+    }, [selectedPeriod, initialData]);
 
     const formatCurrency = (amount: number | string) => {
         const value = typeof amount === 'string' ? parseFloat(amount) : amount;
@@ -73,30 +71,29 @@ export const TopCategoriesCard: React.FC<TopCategoriesCardProps> = ({ categories
     };
 
     return (
-        <Card className="shadow-sm h-full bg-white/5 backdrop-blur-sm border border-white/10 text-white flex flex-col">
+        <Card className="shadow-sm h-full border border-border flex flex-col">
             <CardContent className="p-6 flex flex-col h-full relative">
-                {/* Header */}
-                <div className="flex items-center justify-between pb-4 border-b border-white/10 mb-4 px-6 -mx-6">
+                <div className="flex items-center justify-between pb-4 border-b border-border mb-4 px-6 -mx-6">
                     <div className="flex items-center gap-2">
                         <div className="p-2 bg-indigo-500/10 rounded-lg">
                             <Layers className="h-5 w-5 text-indigo-500" />
                         </div>
-                        <h3 className="text-lg font-bold text-white">{t('dashboard.top_categories')}</h3>
+                        <h3 className="text-lg font-bold text-foreground">{t('dashboard.top_categories')}</h3>
                     </div>
 
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                            <Button variant="outline" size="sm" className="h-8 text-xs bg-white/5 border-white/10 text-slate-300 hover:bg-white/10 hover:text-white gap-2">
+                            <Button variant="outline" size="sm" className="h-8 text-xs border-border text-gray-500 hover:bg-primary/10 hover:text-primary gap-2">
                                 {isLoading ? <Loader2 className="h-3 w-3 animate-spin" /> : periods.find(p => p.id === selectedPeriod)?.label || t('dashboard.today')}
                                 <ChevronDown className="h-3 w-3" />
                             </Button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent className="bg-slate-900 border-white/10 text-white">
+                        <DropdownMenuContent>
                             {periods.map((p) => (
-                                <DropdownMenuItem 
-                                    key={p.id} 
+                                <DropdownMenuItem
+                                    key={p.id}
                                     onSelect={() => setSelectedPeriod(p.id)}
-                                    className="hover:bg-white/10 cursor-pointer"
+                                    className="hover:bg-primary/10 cursor-pointer"
                                 >
                                     {p.label}
                                 </DropdownMenuItem>
@@ -106,7 +103,6 @@ export const TopCategoriesCard: React.FC<TopCategoriesCardProps> = ({ categories
                 </div>
 
                 <div className={`flex flex-col sm:flex-row gap-6 h-full transition-opacity ${isLoading ? "opacity-50" : "opacity-100"}`}>
-                    {/* Pie Chart */}
                     <div className="w-full sm:w-1/2 h-48 flex items-center justify-center">
                         {categoriesData.length > 0 ? (
                             <ChartContainer config={chartConfig} className="h-full w-full">
@@ -133,7 +129,7 @@ export const TopCategoriesCard: React.FC<TopCategoriesCardProps> = ({ categories
                                                     hideLabel
                                                     nameKey="categoryName"
                                                     indicator="dot"
-                                                    className="bg-black/60 backdrop-blur-xl border border-white/10 text-white min-w-[120px] shadow-2xl [&_.text-foreground]:text-white"
+                                                    className="bg-white border border-border text-foreground min-w-[120px] shadow-sm"
                                                 />
                                             }
                                         />
@@ -141,36 +137,35 @@ export const TopCategoriesCard: React.FC<TopCategoriesCardProps> = ({ categories
                                 </ResponsiveContainer>
                             </ChartContainer>
                         ) : (
-                            <div className="flex flex-col items-center justify-center text-slate-500 gap-2 opacity-50">
+                            <div className="flex flex-col items-center justify-center text-muted-foreground gap-2 opacity-50">
                                 <Layers className="h-8 w-8" />
                                 <span className="text-[10px]">{t('common.no_data')}</span>
                             </div>
                         )}
                     </div>
 
-                    {/* List */}
                     <div className="w-full sm:w-1/2 flex flex-col gap-3 justify-center">
                         {categoriesData.map((category, index) => (
                             <div key={index} className="flex items-center justify-between group">
                                 <div className="flex items-center gap-3 overflow-hidden">
                                     <Avatar className="h-8 w-8 rounded-lg" style={{ backgroundColor: `${COLORS[index % COLORS.length]}20` }}>
-                                        <AvatarFallback className="bg-transparent text-white/70 text-[10px] font-bold">
+                                        <AvatarFallback className="bg-transparent text-gray-600 text-[10px] font-bold">
                                             {getInitials(category.categoryName)}
                                         </AvatarFallback>
                                     </Avatar>
                                     <div className="flex flex-col min-w-0">
-                                        <span className="text-xs font-bold text-white group-hover:text-indigo-400 transition-colors truncate">
+                                        <span className="text-xs font-bold text-foreground group-hover:text-primary transition-colors truncate">
                                             {category.categoryName}
                                         </span>
-                                        <span className="text-[10px] text-slate-400 font-bold">
+                                        <span className="text-[10px] text-muted-foreground font-bold">
                                             {formatCurrency(category.totalSales)}
                                         </span>
                                     </div>
                                 </div>
                                 <div className={`flex items-center gap-0.5 text-[10px] font-bold px-1.5 py-0.5 rounded shrink-0 ${
-                                    category.growth >= 0 
-                                    ? "text-emerald-500 bg-emerald-500/10" 
-                                    : "text-rose-500 bg-rose-500/10"
+                                    category.growth >= 0
+                                    ? "text-emerald-600 bg-emerald-500/10"
+                                    : "text-rose-600 bg-rose-500/10"
                                 }`}>
                                     {category.growth >= 0 ? <TrendingUp className="h-3 w-3" /> : <TrendingDown className="h-3 w-3" />}
                                     {category.growth >= 0 ? "+" : ""}{category.growth}%

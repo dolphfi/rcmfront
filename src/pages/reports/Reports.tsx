@@ -23,32 +23,13 @@ import {
     ShoppingCart,
     Calendar as CalendarIcon,
     Download,
-    FileStack,
-    Truck,
     X,
     Loader2,
     FileSpreadsheet,
     FileText,
     ChevronDown,
-    Gift,
-    Percent,
-    Settings,
-    Store,
-    Receipt,
-    ClockFading,
-    Tags,
-    LayoutList,
-    ShieldCheck,
-    History,
-    ReceiptText,
-    CornerDownLeft,
-    ShoppingBasket,
-    ShoppingBag,
-    HandCoins,
-    Book,
-    ChartLine,
-    MonitorCog,
-    Toolbox
+    Truck,
+    ChartLine
 } from 'lucide-react';
 import { Button } from 'components/ui/button';
 import reportService from 'context/api/reportService';
@@ -79,7 +60,6 @@ const Reports: React.FC = () => {
     const [chartData, setChartData] = useState<any[]>([]);
     const [posData, setPosData] = useState<any[]>([]);
     const [productPosData, setProductPosData] = useState<any[]>([]);
-    const [salesDates, setSalesDates] = useState<string[]>([]);
     const [businessName, setBusinessName] = useState('Kolabo POS');
     const [logoUrl, setLogoUrl] = useState('');
     const { currency: globalCurrency } = useSettings();
@@ -115,20 +95,10 @@ const Reports: React.FC = () => {
 
     const handleDateSelect = (range: DateRange | undefined) => {
         setDateRange(range);
-        // If the user has finished selecting a range (both from and to), close the popover
         if (range?.from && range?.to) {
             setIsCalendarOpen(false);
         }
     };
-
-    const fetchAvailableDates = useCallback(async () => {
-        try {
-            const dates = await reportService.getSalesDates();
-            setSalesDates(dates);
-        } catch (error) {
-            console.error('Error fetching sales dates:', error);
-        }
-    }, []);
 
     const fetchData = useCallback(async () => {
         if (!dateRange?.from || !dateRange?.to) return;
@@ -157,10 +127,6 @@ const Reports: React.FC = () => {
     useEffect(() => {
         fetchData();
     }, [fetchData]);
-
-    useEffect(() => {
-        fetchAvailableDates();
-    }, [fetchAvailableDates]);
 
     const formatCurrency = (amount: number) => {
         try {
@@ -234,6 +200,7 @@ const Reports: React.FC = () => {
         if (!stats && posData.length === 0) return;
 
         const doc = new jsPDF();
+        let yPos = 115;
         const pageWidth = doc.internal.pageSize.getWidth();
         const dateStr = format(new Date(), "yyyy-MM-dd HH:mm");
         const periodStr = `${dateRange?.from ? format(dateRange.from, "yyyy-MM-dd") : 'Tout tan'} ${dateRange?.to ? '- ' + format(dateRange.to, "yyyy-MM-dd") : ''}`;
@@ -291,7 +258,7 @@ const Reports: React.FC = () => {
 
         // POS Performance Table
         if (posData.length > 0) {
-            let yPos = 115;
+            yPos = 115;
             doc.setFontSize(14);
             doc.text("2. PEFOMANS PA PWEN DE VANT", 15, yPos);
             doc.line(15, yPos + 3, 100, yPos + 3);
@@ -325,6 +292,68 @@ const Reports: React.FC = () => {
             });
         }
 
+        // Product by POS Table
+        if (productPosData.length > 0) {
+            // Add new page if not enough space
+            if (yPos > 240) {
+                doc.addPage();
+                yPos = 20;
+            } else {
+                yPos += 20;
+            }
+
+            doc.setFontSize(14);
+            doc.setTextColor(30, 41, 59);
+            doc.setFont("helvetica", "bold");
+            doc.text("3. VANT PA PWODWI AK PWEN DE VANT", 15, yPos);
+            doc.setDrawColor(226, 232, 240);
+            doc.line(15, yPos + 3, 110, yPos + 3);
+
+            yPos += 15;
+            // Table Header
+            doc.setFillColor(241, 245, 249);
+            doc.rect(15, yPos - 5, pageWidth - 30, 8, 'F');
+            doc.setFontSize(9);
+            doc.setFont("helvetica", "bold");
+            doc.text("Pwodwi", 20, yPos);
+            doc.text("Pwen de Vant", 80, yPos);
+            doc.text("Kantite", 150, yPos, { align: 'right' });
+            doc.text(`Total (${globalCurrency})`, 190, yPos, { align: 'right' });
+
+            doc.setFont("helvetica", "normal");
+            doc.setFontSize(9);
+            yPos += 10;
+            productPosData.forEach((item, idx) => {
+                if (yPos > 275) {
+                    doc.addPage();
+                    yPos = 20;
+                    // Repeat Header on new page
+                    doc.setFillColor(241, 245, 249);
+                    doc.rect(15, yPos - 5, pageWidth - 30, 8, 'F');
+                    doc.setFont("helvetica", "bold");
+                    doc.text("Pwodwi", 20, yPos);
+                    doc.text("Pwen de Vant", 80, yPos);
+                    doc.text("Kantite", 150, yPos, { align: 'right' });
+                    doc.text(`Total (${globalCurrency})`, 190, yPos, { align: 'right' });
+                    doc.setFont("helvetica", "normal");
+                    yPos += 10;
+                }
+
+                // Product name might be long, truncate if necessary or use smaller font
+                const prodName = item.productName.length > 30 ? item.productName.substring(0, 27) + '...' : item.productName;
+                doc.text(prodName, 20, yPos);
+                doc.text(item.posName, 80, yPos);
+                doc.setFont("helvetica", "bold");
+                doc.text((item.totalQty || 0).toString(), 150, yPos, { align: 'right' });
+                doc.setFont("helvetica", "normal");
+                doc.text(formatCurrency(item.totalAmount || 0).replace(globalCurrency, '').trim(), 190, yPos, { align: 'right' });
+
+                doc.setDrawColor(241, 245, 249);
+                doc.line(15, yPos + 2, pageWidth - 15, yPos + 2);
+                yPos += 8;
+            });
+        }
+
         doc.save(`rapo_${businessName}_${format(new Date(), "yyyyMMdd_HHmm")}.pdf`);
     };
 
@@ -352,8 +381,8 @@ const Reports: React.FC = () => {
             value: stats?.totalOrders || 0,
             description: t('dashboard.orders_desc', "Total resi ki bay"),
             icon: ShoppingCart,
-            color: "text-orange-500",
-            bg: "bg-orange-500/10",
+            color: "text-primary",
+            bg: "bg-primary/10",
             growth: dateRange?.from && dateRange?.to ? null : stats?.ordersPercentage
         },
         {
@@ -370,11 +399,11 @@ const Reports: React.FC = () => {
         <div className="space-y-6">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
-                    <h2 className="text-3xl font-bold tracking-tight text-slate-900 flex items-center gap-3">
+                    <h2 className="text-3xl font-bold tracking-tight text-foreground flex items-center gap-3">
                         <ChartLine className="h-8 w-8 text-primary" />
                         {t('reports.title', "Rapò Analitik")}
                     </h2>
-                    <p className="text-slate-500">
+                    <p className="text-muted-foreground">
                         {t('reports.subtitle', "Track pèfòmans biznis ou an tan reyèl")}
                     </p>
                 </div>
@@ -383,7 +412,7 @@ const Reports: React.FC = () => {
                         <PopoverTrigger asChild>
                             <Button
                                 variant="outline"
-                                className="bg-white border-slate-200 text-slate-700 min-w-[240px] justify-start text-left font-normal"
+                                className="bg-white border-slate-200 text-foreground min-w-[240px] justify-start text-left font-normal"
                             >
                                 <CalendarIcon className="mr-2 h-4 w-4" />
                                 {dateRange?.from ? (
@@ -402,7 +431,7 @@ const Reports: React.FC = () => {
                         </PopoverTrigger>
                         <PopoverContent className="w-auto p-0 bg-white border-slate-200" align="end">
                             <div className="p-3 border-b border-slate-100 flex items-center justify-between">
-                                <span className="text-xs text-slate-500">{t('reports.select_period', "Chwazi peryòd")}</span>
+                                <span className="text-xs text-muted-foreground">{t('reports.select_period', "Chwazi peryòd")}</span>
                                 <Button
                                     variant="ghost"
                                     size="sm"
@@ -420,7 +449,7 @@ const Reports: React.FC = () => {
                                 onSelect={handleDateSelect}
                                 numberOfMonths={2}
                                 locale={getDateLocale()}
-                                className="bg-white border-none text-slate-900"
+                                className="bg-white border-none text-foreground"
                             />
                         </PopoverContent>
                     </Popover>
@@ -433,7 +462,7 @@ const Reports: React.FC = () => {
                                 from: subDays(new Date(), 7),
                                 to: new Date(),
                             })}
-                            className="text-slate-500 hover:text-slate-900"
+                            className="text-muted-foreground hover:text-foreground"
                         >
                             <X className="h-4 w-4" />
                         </Button>
@@ -472,7 +501,7 @@ const Reports: React.FC = () => {
                 {analyticsCards.map((card, i) => (
                     <Card key={i} className="bg-white border-slate-200 shadow-sm border-l-4" style={{ borderLeftColor: card.color.includes('emerald') ? '#10b981' : card.color.includes('blue') ? '#3b82f6' : card.color.includes('orange') ? '#f59e0b' : '#f43f5e' }}>
                         <CardHeader className="flex flex-row items-center justify-between pb-2">
-                            <CardTitle className="text-sm font-medium text-slate-500">
+                            <CardTitle className="text-sm font-medium text-muted-foreground">
                                 {card.title}
                             </CardTitle>
                             <div className={`p-2 rounded-lg ${card.bg}`}>
@@ -480,10 +509,10 @@ const Reports: React.FC = () => {
                             </div>
                         </CardHeader>
                         <CardContent>
-                            <div className="text-2xl font-bold text-slate-900">
-                                {isLoading ? <Loader2 className="h-6 w-6 animate-spin text-slate-400" /> : card.value}
+                            <div className="text-2xl font-bold text-foreground">
+                                {isLoading ? <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" /> : card.value}
                             </div>
-                            <p className="text-xs text-slate-400 mt-1 flex items-center gap-1">
+                            <p className="text-xs text-muted-foreground mt-1 flex items-center gap-1">
                                 {card.description}
                                 {card.growth !== undefined && card.growth !== null && (
                                     <span className={cn(
@@ -502,19 +531,19 @@ const Reports: React.FC = () => {
             {/* Sales Chart */}
             <Card className="bg-white border-slate-200 shadow-sm">
                 <CardHeader className="flex flex-row items-center justify-between pb-2">
-                    <CardTitle className="text-slate-900 text-lg font-bold flex items-center gap-2">
+                    <CardTitle className="text-foreground text-lg font-bold flex items-center gap-2">
                         {t('reports.sales_trend', "Tandans Lavant (Vant pa Jou)")}
                     </CardTitle>
-                    <CardDescription className="text-slate-400">{t('reports.sales_trend_desc', "Montre evolisyon lavant ou sou peryòd chwazi a")}</CardDescription>
+                    <CardDescription className="text-muted-foreground">{t('reports.sales_trend_desc', "Montre evolisyon lavant ou sou peryòd chwazi a")}</CardDescription>
                 </CardHeader>
                 <CardContent className="h-[400px] pt-4">
                     {isLoading ? (
-                        <div className="h-full w-full flex items-center justify-center text-slate-500 italic">
+                        <div className="h-full w-full flex items-center justify-center text-muted-foreground italic">
                             <Loader2 className="h-8 w-8 animate-spin mr-2" />
                             {t('common.loading', "Ap chaje done yo...")}
                         </div>
                     ) : chartData.length === 0 ? (
-                        <div className="h-full w-full flex items-center justify-center text-slate-500 italic">
+                        <div className="h-full w-full flex items-center justify-center text-muted-foreground italic">
                             {t('common.no_data_period', "Okenn done poko disponib pou peryòd sa")}
                         </div>
                     ) : (
@@ -561,17 +590,17 @@ const Reports: React.FC = () => {
             {/* POS Performance */}
             <Card className="bg-white border-slate-200 shadow-sm">
                 <CardHeader>
-                    <CardTitle className="text-slate-900 text-lg font-bold flex items-center gap-2">
+                    <CardTitle className="text-foreground text-lg font-bold flex items-center gap-2">
                         <Package className="h-5 w-5 text-primary" />
                         {t('reports.pos_performance', "Pèfòmans pa Pwen de Vant")}
                     </CardTitle>
-                    <CardDescription className="text-slate-500">{t('reports.pos_performance_desc', "Konparezon lavant ak pwofi pou chak filyal")}</CardDescription>
+                    <CardDescription className="text-muted-foreground">{t('reports.pos_performance_desc', "Konparezon lavant ak pwofi pou chak filyal")}</CardDescription>
                 </CardHeader>
                 <CardContent>
                     <div className="overflow-x-auto">
                         <table className="w-full text-left border-collapse">
                             <thead>
-                                <tr className="border-b border-slate-100 text-slate-500 text-xs uppercase tracking-wider">
+                                <tr className="border-b border-slate-100 text-muted-foreground text-xs uppercase tracking-wider">
                                     <th className="px-4 py-3 font-medium">{t('reports.pos_name', "Pwen de Vant")}</th>
                                     <th className="px-4 py-3 font-medium text-right">{t('reports.pos_orders', "Lòd")}</th>
                                     <th className="px-4 py-3 font-medium text-right">{t('reports.pos_sales', "Lavant")}</th>
@@ -581,22 +610,22 @@ const Reports: React.FC = () => {
                             <tbody>
                                 {isLoading ? (
                                     <tr>
-                                        <td colSpan={4} className="px-4 py-8 text-center text-slate-500 italic">
+                                        <td colSpan={4} className="px-4 py-8 text-center text-muted-foreground italic">
                                             <Loader2 className="h-4 w-4 animate-spin inline mr-2" />
                                             {t('common.loading', "Ap chaje...")}
                                         </td>
                                     </tr>
                                 ) : posData.length === 0 ? (
                                     <tr>
-                                        <td colSpan={4} className="px-4 py-8 text-center text-slate-500 italic">
+                                        <td colSpan={4} className="px-4 py-8 text-center text-muted-foreground italic">
                                             {t('common.no_data', "Okenn done poko disponib")}
                                         </td>
                                     </tr>
                                 ) : (
                                     posData.map((pos, idx) => (
                                         <tr key={idx} className="border-b border-slate-50 hover:bg-slate-50 transition-colors">
-                                            <td className="px-4 py-4 text-sm font-medium text-slate-900">{pos.name}</td>
-                                            <td className="px-4 py-4 text-sm text-right text-slate-600">{pos.totalOrders}</td>
+                                            <td className="px-4 py-4 text-sm font-medium text-foreground">{pos.name}</td>
+                                            <td className="px-4 py-4 text-sm text-right text-muted-foreground">{pos.totalOrders}</td>
                                             <td className="px-4 py-4 text-sm text-right text-emerald-600 font-medium">{formatCurrency(pos.totalSales)}</td>
                                             <td className="px-4 py-4 text-sm text-right text-blue-600 font-medium">{formatCurrency(pos.totalProfit)}</td>
                                         </tr>
@@ -611,17 +640,17 @@ const Reports: React.FC = () => {
             {/* Sales by Product and POS */}
             <Card className="bg-white border-slate-200 shadow-sm">
                 <CardHeader>
-                    <CardTitle className="text-slate-900 text-lg font-bold flex items-center gap-2">
+                    <CardTitle className="text-foreground text-lg font-bold flex items-center gap-2">
                         <FileText className="h-5 w-5 text-primary" />
                         Vant pa Pwodwi ak Pwen de Vant
                     </CardTitle>
-                    <CardDescription className="text-slate-500">Kantite chak pwodwi vann nan chak branch pwen de vant</CardDescription>
+                    <CardDescription className="text-muted-foreground">Kantite chak pwodwi vann nan chak branch pwen de vant</CardDescription>
                 </CardHeader>
                 <CardContent>
                     <div className="overflow-x-auto">
                         <table className="w-full text-left border-collapse">
                             <thead>
-                                <tr className="border-b border-slate-100 text-slate-500 text-xs uppercase tracking-wider">
+                                <tr className="border-b border-slate-100 text-muted-foreground text-xs uppercase tracking-wider">
                                     <th className="px-4 py-3 font-medium">Pwodwi</th>
                                     <th className="px-4 py-3 font-medium">Pwen de Vant</th>
                                     <th className="px-4 py-3 font-medium text-right">Kantite</th>
@@ -631,22 +660,22 @@ const Reports: React.FC = () => {
                             <tbody>
                                 {isLoading ? (
                                     <tr>
-                                        <td colSpan={4} className="px-4 py-8 text-center text-slate-500 italic">
+                                        <td colSpan={4} className="px-4 py-8 text-center text-muted-foreground italic">
                                             <Loader2 className="h-4 w-4 animate-spin inline mr-2" />
                                             Ap chaje...
                                         </td>
                                     </tr>
                                 ) : productPosData.length === 0 ? (
                                     <tr>
-                                        <td colSpan={4} className="px-4 py-8 text-center text-slate-500 italic">
+                                        <td colSpan={4} className="px-4 py-8 text-center text-muted-foreground italic">
                                             Okenn done poko disponib
                                         </td>
                                     </tr>
                                 ) : (
                                     productPosData.map((item, idx) => (
                                         <tr key={idx} className="border-b border-slate-50 hover:bg-slate-50 transition-colors">
-                                            <td className="px-4 py-4 text-sm font-medium text-slate-900">{item.productName}</td>
-                                            <td className="px-4 py-4 text-sm text-slate-600">{item.posName}</td>
+                                            <td className="px-4 py-4 text-sm font-medium text-foreground">{item.productName}</td>
+                                            <td className="px-4 py-4 text-sm text-muted-foreground">{item.posName}</td>
                                             <td className="px-4 py-4 text-sm text-right text-orange-600 font-bold">{item.totalQty}</td>
                                             <td className="px-4 py-4 text-sm text-right text-emerald-600 font-medium">{formatCurrency(item.totalAmount)}</td>
                                         </tr>
@@ -662,22 +691,22 @@ const Reports: React.FC = () => {
                 {/* Detailed Reports Access */}
                 <Card className="bg-white border-slate-200 shadow-sm">
                     <CardHeader>
-                        <CardTitle className="text-slate-900">{t('reports.detailed_reports', "Aksè Rapò Detaye")}</CardTitle>
+                        <CardTitle className="text-foreground">{t('reports.detailed_reports', "Aksè Rapò Detaye")}</CardTitle>
                     </CardHeader>
                     <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <Button variant="outline" className="border-slate-200 text-slate-700 hover:bg-slate-50 h-24 flex flex-col gap-2">
+                        <Button variant="outline" className="border-slate-200 text-foreground hover:bg-slate-50 h-24 flex flex-col gap-2">
                             <ShoppingCart className="h-6 w-6 text-emerald-600" />
                             <span>{t('reports.sales_report', "Rapò Lavant")}</span>
                         </Button>
-                        <Button variant="outline" className="border-slate-200 text-slate-700 hover:bg-slate-50 h-24 flex flex-col gap-2">
+                        <Button variant="outline" className="border-slate-200 text-foreground hover:bg-slate-50 h-24 flex flex-col gap-2">
                             <Truck className="h-6 w-6 text-orange-600" />
                             <span>{t('reports.purchase_report', "Rapò Acha")}</span>
                         </Button>
-                        <Button variant="outline" className="border-slate-200 text-slate-700 hover:bg-slate-50 h-24 flex flex-col gap-2">
+                        <Button variant="outline" className="border-slate-200 text-foreground hover:bg-slate-50 h-24 flex flex-col gap-2">
                             <Package className="h-6 w-6 text-blue-600" />
                             <span>{t('reports.stock_report', "Rapò Stock")}</span>
                         </Button>
-                        <Button variant="outline" className="border-slate-200 text-slate-700 hover:bg-slate-50 h-24 flex flex-col gap-2">
+                        <Button variant="outline" className="border-slate-200 text-foreground hover:bg-slate-50 h-24 flex flex-col gap-2">
                             <Users className="h-6 w-6 text-primary" />
                             <span>{t('reports.customer_report', "Rapò Kliyan")}</span>
                         </Button>
@@ -689,7 +718,7 @@ const Reports: React.FC = () => {
                     <CardHeader>
                         <CardTitle className="text-primary font-bold">{t('reports.note_data', "Note sou Done yo")}</CardTitle>
                     </CardHeader>
-                    <CardContent className="text-slate-600 space-y-4 text-sm">
+                    <CardContent className="text-muted-foreground space-y-4 text-sm">
                         <p>{t('reports.profit_disclaimer', "Done pwofi yo se yon estimasyon baze sou dènye pri ou antre nan sistèm nan. Pou gen yon rapò ki pi presi, asire ou toujou antre pri acha (Cost Price) kòrèk lè w ap resevwa stock.")}</p>
                         <p>{t('reports.date_range_info', "Ou ka chwazi nenpòt peryòd dat ou vle pou w wè rezilta biznis ou sou tèm sa.")}</p>
                     </CardContent>

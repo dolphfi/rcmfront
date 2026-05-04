@@ -190,37 +190,37 @@ const Brand = () => {
             {/* Page Header */}
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div>
-                    <h1 className="text-2xl font-bold text-white tracking-tight">{t('brands.title', 'Brand List')}</h1>
-                    <p className="text-sm text-slate-400">{t('brands.subtitle', 'Manage your brands')}</p>
+                    <h1 className="text-2xl font-bold text-foreground tracking-tight">{t('brands.title', 'Brand List')}</h1>
+                    <p className="text-sm text-muted-foreground">{t('brands.subtitle', 'Manage your brands')}</p>
                 </div>
 
                 <div className="flex flex-wrap items-center gap-2">
                     {/* Action Icons */}
-                    <div className="flex items-center gap-1 bg-white/5 p-1 rounded-lg border border-white/10 mr-2">
-                        <Button variant="ghost" size="icon" className="h-8 w-8 text-rose-500 hover:bg-white/10 hover:text-rose-400" title="PDF">
+                    <div className="flex items-center gap-1 bg-muted p-1 rounded-lg border border-border mr-2">
+                        <Button variant="ghost" size="icon" className="h-8 w-8 text-rose-500 hover:bg-primary/10 hover:text-rose-400" title="PDF">
                             <FileText className="h-4 w-4" />
                         </Button>
-                        <Button variant="ghost" size="icon" className="h-8 w-8 text-emerald-500 hover:bg-white/10 hover:text-emerald-400" title="Excel">
+                        <Button variant="ghost" size="icon" className="h-8 w-8 text-emerald-500 hover:bg-primary/10 hover:text-emerald-400" title="Excel">
                             <FileSpreadsheet className="h-4 w-4" />
                         </Button>
-                        <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:bg-white/10 hover:text-white" title="Print">
+                        <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:bg-primary/10 hover:text-primary" title="Print">
                             <Printer className="h-4 w-4" />
                         </Button>
-                        <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:bg-white/10 hover:text-white" title="Refresh">
+                        <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:bg-primary/10 hover:text-primary" title="Refresh">
                             <RotateCw className="h-4 w-4" />
                         </Button>
-                        <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:bg-white/10 hover:text-white" title="Toggle">
+                        <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:bg-primary/10 hover:text-primary" title="Toggle">
                             <ChevronDown className="h-4 w-4" />
                         </Button>
                     </div>
                     <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
                         <DialogTrigger asChild>
-                            <Button className="bg-orange-500 hover:bg-orange-600 text-white gap-2">
+                            <Button className="bg-primary hover:bg-primary/90 text-white gap-2">
                                 <Plus className="h-4 w-4" />
                                 <span className="hidden sm:inline">{t('brands.add_brand', 'Add Brand')}</span>
                             </Button>
                         </DialogTrigger>
-                        <DialogContent className="bg-slate-900 border-white/10 text-white sm:max-w-[425px]">
+                        <DialogContent className="bg-background border-border text-foreground sm:max-w-[425px]">
                             <DialogHeader>
                                 <DialogTitle>{t('brands.add_brand', 'Add Brand')}</DialogTitle>
                                 <DialogDescription>
@@ -240,13 +240,13 @@ const Brand = () => {
                                         />
                                         <div
                                             onClick={() => fileInputRef.current?.click()}
-                                            className="h-24 w-24 rounded-lg border border-dashed border-white/20 hover:border-orange-500/50 hover:bg-white/5 flex flex-col items-center justify-center cursor-pointer transition-all group"
+                                            className="h-24 w-24 rounded-lg border border-dashed border-border hover:border-primary/50 hover:bg-muted flex flex-col items-center justify-center cursor-pointer transition-all group"
                                         >
-                                            <CirclePlus className="h-4 w-4 text-slate-400 group-hover:text-orange-500 transition-colors" />
-                                            <span className="text-[10px] font-semibold text-slate-500 group-hover:text-orange-500 mt-2">{t('brands.add_images', 'Add Images')}</span>
+                                            <CirclePlus className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
+                                            <span className="text-[10px] font-semibold text-muted-foreground group-hover:text-primary mt-2">{t('brands.add_images', 'Add Images')}</span>
                                         </div>
                                         {images.map((image, index) => (
-                                            <div key={index} className="h-24 w-24 rounded-lg border border-white/10 p-1 relative group">
+                                            <div key={index} className="h-24 w-24 rounded-lg border border-border p-1 relative group">
                                                 <img src={image} alt={`Brand ${index + 1}`} className="h-full w-full object-contain rounded-md" />
                                                 <Button
                                                     variant="destructive"
@@ -266,41 +266,41 @@ const Brand = () => {
                                     </div>
                                     <div className="grid gap-4">
                                         <div>
-                                            <Label htmlFor="name" className="text-white">Name <span className="text-rose-500">*</span></Label>
+                                            <Label htmlFor="name" className="text-foreground">Name <span className="text-rose-500">*</span></Label>
                                             <Input
                                                 id="name"
                                                 value={newBrand.name}
                                                 onChange={(e) => setNewBrand({ ...newBrand, name: e.target.value })}
-                                                className="bg-white/5 border border-white/10 backdrop-blur-sm text-white focus:ring-orange-500 mt-2"
+                                                className="bg-muted border border-border text-foreground focus-visible:ring-ring mt-2"
                                             />
                                         </div>
                                         <div>
-                                            <Label htmlFor="description" className="text-white">Description</Label>
+                                            <Label htmlFor="description" className="text-foreground">Description</Label>
                                             <Input
                                                 id="description"
                                                 value={newBrand.description}
                                                 onChange={(e) => setNewBrand({ ...newBrand, description: e.target.value })}
-                                                className="bg-white/5 border border-white/10 backdrop-blur-sm text-white focus:ring-orange-500 mt-2"
+                                                className="bg-muted border border-border text-foreground focus-visible:ring-ring mt-2"
                                             />
                                         </div>
                                         <div className="flex items-center justify-between pt-2">
-                                            <Label htmlFor="sub-status" className="text-white">Status</Label>
-                                            <Label htmlFor="sub-status" className="text-white">Status</Label>
+                                            <Label htmlFor="sub-status" className="text-foreground">Status</Label>
+                                            <Label htmlFor="sub-status" className="text-foreground">Status</Label>
                                             <Switch
                                                 id="sub-status"
                                                 checked={newBrand.isActive}
                                                 onCheckedChange={(checked) => setNewBrand({ ...newBrand, isActive: checked })}
-                                                className="bg-white/5 border border-white/10 backdrop-blur-sm data-[state=checked]:bg-emerald-500 data-[state=unchecked]:bg-white/5"
+                                                className="bg-muted border border-border data-[state=checked]:bg-emerald-500 data-[state=unchecked]:bg-muted"
                                             />
                                         </div>
                                     </div>
                                 </div>
                             </div>
                             <DialogFooter>
-                                <Button variant="outline" className="bg-slate-800 border-white/10 text-white hover:bg-slate-700 hover:text-white" onClick={() => setIsAddOpen(false)}>
+                                <Button variant="outline" className="bg-background border-border text-foreground hover:bg-primary/10 hover:text-primary" onClick={() => setIsAddOpen(false)}>
                                     {t('common.cancel', 'Cancel')}
                                 </Button>
-                                <Button className="bg-orange-500 hover:bg-orange-600 text-white" onClick={handleAddBrand}>
+                                <Button className="bg-primary hover:bg-primary/90 text-white" onClick={handleAddBrand}>
                                     {t('brands.add_brand', 'Add Brand')}
                                 </Button>
                             </DialogFooter>
@@ -310,7 +310,7 @@ const Brand = () => {
 
                 {/* Edit Brand Dialog */}
                 <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
-                    <DialogContent className="bg-slate-900 border-white/10 text-white sm:max-w-[425px]">
+                    <DialogContent className="bg-background border-border text-foreground sm:max-w-[425px]">
                         <DialogHeader>
                             <DialogTitle>{t('brands.edit_brand', 'Edit Brand')}</DialogTitle>
                             <DialogDescription>
@@ -331,13 +331,13 @@ const Brand = () => {
                                         />
                                         <div
                                             onClick={() => fileInputRef.current?.click()}
-                                            className="h-24 w-24 rounded-lg border border-dashed border-white/20 hover:border-orange-500/50 hover:bg-white/5 flex flex-col items-center justify-center cursor-pointer transition-all group"
+                                            className="h-24 w-24 rounded-lg border border-dashed border-border hover:border-primary/50 hover:bg-muted flex flex-col items-center justify-center cursor-pointer transition-all group"
                                         >
-                                            <CirclePlus className="h-4 w-4 text-slate-400 group-hover:text-orange-500 transition-colors" />
-                                            <span className="text-[10px] font-semibold text-slate-500 group-hover:text-orange-500 mt-2">{t('brands.change_image', 'Change Image')}</span>
+                                            <CirclePlus className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
+                                            <span className="text-[10px] font-semibold text-muted-foreground group-hover:text-primary mt-2">{t('brands.change_image', 'Change Image')}</span>
                                         </div>
                                         {images.length > 0 && images.map((image, index) => (
-                                            <div key={index} className="h-24 w-24 rounded-lg border border-white/10 p-1 relative group bg-white/5 flex items-center justify-center">
+                                            <div key={index} className="h-24 w-24 rounded-lg border border-border p-1 relative group bg-muted flex items-center justify-center">
                                                 <img src={image} alt={`Brand ${index + 1}`} className="h-full w-full object-contain rounded-md" />
                                                 <Button
                                                     variant="destructive"
@@ -355,30 +355,30 @@ const Brand = () => {
                                     </div>
                                     <div className="grid gap-4">
                                         <div>
-                                            <Label htmlFor="edit-name" className="text-white">{t('brands.name', 'Name')} <span className="text-rose-500">*</span></Label>
+                                            <Label htmlFor="edit-name" className="text-foreground">{t('brands.name', 'Name')} <span className="text-rose-500">*</span></Label>
                                             <Input
                                                 id="edit-name"
                                                 value={editingBrand.name}
                                                 onChange={(e) => setEditingBrand({ ...editingBrand, name: e.target.value })}
-                                                className="bg-white/5 border border-white/10 backdrop-blur-sm text-white focus:ring-orange-500 mt-2"
+                                                className="bg-muted border border-border text-foreground focus-visible:ring-ring mt-2"
                                             />
                                         </div>
                                         <div>
-                                            <Label htmlFor="edit-description" className="text-white">{t('brands.description', 'Description')}</Label>
+                                            <Label htmlFor="edit-description" className="text-foreground">{t('brands.description', 'Description')}</Label>
                                             <Input
                                                 id="edit-description"
                                                 value={editingBrand.description}
                                                 onChange={(e) => setEditingBrand({ ...editingBrand, description: e.target.value })}
-                                                className="bg-white/5 border border-white/10 backdrop-blur-sm text-white focus:ring-orange-500 mt-2"
+                                                className="bg-muted border border-border text-foreground focus-visible:ring-ring mt-2"
                                             />
                                         </div>
                                         <div className="flex items-center justify-between pt-2">
-                                            <Label htmlFor="edit-status" className="text-white">{t('brands.status', 'Status')}</Label>
+                                            <Label htmlFor="edit-status" className="text-foreground">{t('brands.status', 'Status')}</Label>
                                             <Switch
                                                 id="edit-status"
                                                 checked={editingBrand.isActive}
                                                 onCheckedChange={(checked) => setEditingBrand({ ...editingBrand, isActive: checked })}
-                                                className="bg-white/5 border border-white/10 backdrop-blur-sm data-[state=checked]:bg-emerald-500 data-[state=unchecked]:bg-white/5"
+                                                className="bg-muted border border-border data-[state=checked]:bg-emerald-500 data-[state=unchecked]:bg-muted"
                                             />
                                         </div>
                                     </div>
@@ -386,7 +386,7 @@ const Brand = () => {
                             )}
                         </div>
                         <DialogFooter>
-                            <Button variant="outline" className="bg-slate-800 border-white/10 text-white hover:bg-slate-700 hover:text-white" onClick={() => setIsEditOpen(false)}>
+                            <Button variant="outline" className="bg-background border-border text-foreground hover:bg-primary/10 hover:text-primary" onClick={() => setIsEditOpen(false)}>
                                 {t('common.cancel', 'Cancel')}
                             </Button>
                             <Button className="bg-emerald-500 hover:bg-emerald-600 text-white" onClick={handleUpdateBrand}>
@@ -398,34 +398,34 @@ const Brand = () => {
             </div>
 
             {/*Main conten Card  */}
-            <Card className="flex-1 bg-white/5 backdrop-blur-sm border border-white/10 text-white overflow-hidden flex flex-col">
+            <Card className="flex-1 bg-muted border border-border text-foreground overflow-hidden flex flex-col">
                 <CardContent className="p-0 flex flex-col h-full">
                     {/* Toolbar / Filters */}
-                    <div className="p-4 flex flex-col sm:flex-row items-center justify-between gap-4 border-b border-white/10">
+                    <div className="p-4 flex flex-col sm:flex-row items-center justify-between gap-4 border-b border-border">
                         <div className="relative w-full sm:w-72">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                             <Input
                                 placeholder={t('common.search', 'Search...')}
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
-                                className="pl-9 bg-white/5 border-white/10 text-white placeholder:text-slate-500 focus-visible:ring-orange-500/50 focus-visible:border-orange-500"
+                                className="pl-9 bg-muted border-border text-foreground placeholder:text-muted-foreground focus-visible:ring-ring focus-visible:border-primary"
                             />
                         </div>
 
                         <div className="flex items-center gap-2 w-full sm:w-auto">
                             <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
-                                    <Button variant="outline" className="bg-white/5 border-white/10 text-slate-300 hover:bg-white/10 hover:text-white w-full sm:w-32 justify-between">
+                                    <Button variant="outline" className="bg-muted border-border text-foreground hover:bg-primary/10 hover:text-primary w-full sm:w-32 justify-between">
                                         {selectedStatus === 'All' ? t('common.status', 'Status') : (selectedStatus === 'Active' ? t('category.active', 'Active') : t('category.inactive', 'Inactive'))}
                                         <ChevronDown className="h-4 w-4 opacity-50" />
                                     </Button>
                                 </DropdownMenuTrigger>
-                                <DropdownMenuContent className="bg-slate-900 border-white/10 text-white">
+                                <DropdownMenuContent className="bg-background border-border text-foreground">
                                     {brandStatus.map((status) => (
                                         <DropdownMenuItem
                                             key={status}
                                             onClick={() => setSelectedStatus(status)}
-                                            className="focus:bg-white/10 focus:text-white cursor-pointer"
+                                            className="focus:bg-primary/10 focus:text-foreground cursor-pointer"
                                         >
                                             {status === 'All' ? 'All' : (status === 'Active' ? t('category.active', 'Active') : t('category.inactive', 'Inactive'))}
                                         </DropdownMenuItem>
@@ -435,40 +435,40 @@ const Brand = () => {
                         </div>
                     </div>
                     {/* Table */}
-                    <div className="flex-1 overflow-auto rounded-lg border border-white/10 bg-slate-900/50">
+                    <div className="flex-1 overflow-auto rounded-lg border border-border bg-background">
                         <Table>
-                            <TableHeader className="bg-slate-900 border-b border-white/10">
-                                <TableRow className="hover:bg-transparent border-white/10">
-                                    <TableHead className="text-white">{t('brands.table_brand', 'Brand')}</TableHead>
-                                    <TableHead className="text-white">{t('brands.table_created', 'Created Date')}</TableHead>
-                                    <TableHead className="text-white">{t('brands.table_status', 'Status')}</TableHead>
-                                    <TableHead className="text-right text-white">{t('brands.table_action', 'Action')}</TableHead>
+                            <TableHeader className="bg-background border-b border-border">
+                                <TableRow className="hover:bg-transparent border-border">
+                                    <TableHead className="text-foreground">{t('brands.table_brand', 'Brand')}</TableHead>
+                                    <TableHead className="text-foreground">{t('brands.table_created', 'Created Date')}</TableHead>
+                                    <TableHead className="text-foreground">{t('brands.table_status', 'Status')}</TableHead>
+                                    <TableHead className="text-right text-foreground">{t('brands.table_action', 'Action')}</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
                                 {isLoading ? (
                                     <TableRow>
-                                        <TableCell colSpan={4} className="text-center py-8 text-slate-400">Loading...</TableCell>
+                                        <TableCell colSpan={4} className="text-center py-8 text-muted-foreground">Loading...</TableCell>
                                     </TableRow>
                                 ) : currentBrand.length > 0 ? (
                                     currentBrand.map((brand: any) => (
-                                        <TableRow key={brand.id} className="hover:bg-white/10 border-white/10">
+                                        <TableRow key={brand.id} className="hover:bg-primary/10 border-border">
                                             <TableCell>
                                                 <div className="flex items-center gap-3">
-                                                    <div className="h-10 w-10 rounded-lg overflow-hidden border border-white/10 flex items-center justify-center bg-white/5">
+                                                    <div className="h-10 w-10 rounded-lg overflow-hidden border border-border flex items-center justify-center bg-muted">
                                                         {brand.logoUrl ? (
                                                             <img src={brand.logoUrl} alt={brand.name} className="h-full w-full object-cover" />
                                                         ) : (
-                                                            <span className="text-slate-400 font-bold">{brand.name.charAt(0).toUpperCase()}</span>
+                                                            <span className="text-muted-foreground font-bold">{brand.name.charAt(0).toUpperCase()}</span>
                                                         )}
                                                     </div>
-                                                    <span className="font-medium text-white group-hover:text-orange-400 transition-colors">{brand.name}</span>
+                                                    <span className="font-medium text-foreground group-hover:text-primary transition-colors">{brand.name}</span>
                                                 </div>
                                             </TableCell>
-                                            <TableCell className="text-white">
+                                            <TableCell className="text-foreground">
                                                 {brand.createdAt ? new Date(brand.createdAt).toLocaleDateString() : '-'}
                                             </TableCell>
-                                            <TableCell className='font-medium text-slate-300'>
+                                            <TableCell className='font-medium text-foreground'>
                                                 <span className={`px-2 py-1 rounded-md text-xs font-medium border ${brand.isActive
                                                     ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20'
                                                     : 'bg-orange-500/10 text-orange-500 border-orange-500/20'
@@ -478,24 +478,24 @@ const Brand = () => {
                                             </TableCell>
                                             <TableCell className="text-right">
                                                 <div className="flex items-center justify-end gap-1">
-                                                    <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-emerald-400 hover:bg-emerald-500/10" onClick={() => handleEditClick(brand)}>
+                                                    <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-emerald-400 hover:bg-emerald-500/10" onClick={() => handleEditClick(brand)}>
                                                         <Edit className="h-4 w-4" />
                                                     </Button>
                                                     <AlertDialog>
                                                         <AlertDialogTrigger asChild>
-                                                            <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-rose-400 hover:bg-rose-500/10">
+                                                            <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-rose-400 hover:bg-rose-500/10">
                                                                 <Trash2 className="h-4 w-4" />
                                                             </Button>
                                                         </AlertDialogTrigger>
-                                                        <AlertDialogContent className="bg-slate-900 border-white/10">
+                                                        <AlertDialogContent className="bg-background border-border">
                                                             <AlertDialogHeader>
-                                                                <AlertDialogTitle className="text-white">{t('brands.delete_confirm_title', 'Are you absolutely sure?')}</AlertDialogTitle>
-                                                                <AlertDialogDescription className="text-slate-400 whitespace-pre-line">
+                                                                <AlertDialogTitle className="text-foreground">{t('brands.delete_confirm_title', 'Are you absolutely sure?')}</AlertDialogTitle>
+                                                                <AlertDialogDescription className="text-muted-foreground whitespace-pre-line">
                                                                     {t('brands.delete_confirm_desc', 'This action cannot be undone. This will permanently delete the brand "{{name}}" and remove it from our servers.', { name: brand.name })}
                                                                 </AlertDialogDescription>
                                                             </AlertDialogHeader>
                                                             <AlertDialogFooter>
-                                                                <AlertDialogCancel className="bg-transparent border-white/10 text-white hover:bg-white/10 hover:text-white">
+                                                                <AlertDialogCancel className="bg-transparent border-border text-foreground hover:bg-primary/10 hover:text-primary">
                                                                     {t('common.cancel', 'Cancel')}
                                                                 </AlertDialogCancel>
                                                                 <AlertDialogAction className="bg-rose-500 hover:bg-rose-600 text-white border-0" onClick={() => handleDeleteBrand(brand.id)}>
@@ -511,7 +511,7 @@ const Brand = () => {
                                     ))
                                 ) : (
                                     <TableRow>
-                                        <TableCell colSpan={10} className="text-center py-8 text-slate-400">
+                                        <TableCell colSpan={10} className="text-center py-8 text-muted-foreground">
                                             {t('brands.no_brands_found', 'No brand found matching your filters.')}
                                         </TableCell>
                                     </TableRow>
@@ -520,18 +520,18 @@ const Brand = () => {
                         </Table>
                     </div>
                     {/* Pagination */}
-                    <div className="p-4 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-slate-400">
+                    <div className="p-4 border-t border-border flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-muted-foreground">
                         <div className="flex items-center gap-2">
                             <span>{t('category.row_per_page', 'Row Per Page')}</span>
                             <Select defaultValue="10" onValueChange={(value) => { setItemsPerPage(Number(value)); setCurrentPage(1); }}>
-                                <SelectTrigger className="w-[70px] h-8 bg-white/5 border-white/10 text-white focus:ring-orange-500/50">
+                                <SelectTrigger className="w-[70px] h-8 bg-muted border-border text-foreground focus-visible:ring-ring">
                                     <SelectValue placeholder="10" />
                                 </SelectTrigger>
-                                <SelectContent className="bg-slate-900 border-white/10 text-white">
-                                    <SelectItem value="5" className="focus:bg-white/10 focus:text-white">5</SelectItem>
-                                    <SelectItem value="10" className="focus:bg-white/10 focus:text-white">10</SelectItem>
-                                    <SelectItem value="25" className="focus:bg-white/10 focus:text-white">25</SelectItem>
-                                    <SelectItem value="50" className="focus:bg-white/10 focus:text-white">50</SelectItem>
+                                <SelectContent className="bg-background border-border text-foreground">
+                                    <SelectItem value="5" className="focus:bg-primary/10 focus:text-foreground">5</SelectItem>
+                                    <SelectItem value="10" className="focus:bg-primary/10 focus:text-foreground">10</SelectItem>
+                                    <SelectItem value="25" className="focus:bg-primary/10 focus:text-foreground">25</SelectItem>
+                                    <SelectItem value="50" className="focus:bg-primary/10 focus:text-foreground">50</SelectItem>
                                 </SelectContent>
                             </Select>
                             <span>{t('category.entries', 'Entries')}</span>
@@ -547,7 +547,7 @@ const Brand = () => {
                                         <PaginationPrevious
                                             href="#"
                                             onClick={(e) => { e.preventDefault(); handlePageChange(currentPage - 1); }}
-                                            className={`text-slate-400 hover:text-white hover:bg-white/10 ${currentPage === 1 ? 'pointer-events-none opacity-50' : ''}`}
+                                            className={`text-muted-foreground hover:text-primary hover:bg-primary/10 ${currentPage === 1 ? 'pointer-events-none opacity-50' : ''}`}
                                         />
                                     </PaginationItem>
 
@@ -557,7 +557,7 @@ const Brand = () => {
                                                 href="#"
                                                 isActive={currentPage === page}
                                                 onClick={(e) => { e.preventDefault(); handlePageChange(page); }}
-                                                className={currentPage === page ? "text-white bg-orange-500 hover:bg-orange-600 border-none" : "text-slate-400 hover:text-white hover:bg-white/10"}
+                                                className={currentPage === page ? "text-white bg-primary hover:bg-primary/90 border-none" : "text-muted-foreground hover:text-primary hover:bg-primary/10"}
                                             >
                                                 {page}
                                             </PaginationLink>
@@ -568,7 +568,7 @@ const Brand = () => {
                                         <PaginationNext
                                             href="#"
                                             onClick={(e) => { e.preventDefault(); handlePageChange(currentPage + 1); }}
-                                            className={`text-slate-400 hover:text-white hover:bg-white/10 ${currentPage === totalPages ? 'pointer-events-none opacity-50' : ''}`}
+                                            className={`text-muted-foreground hover:text-primary hover:bg-primary/10 ${currentPage === totalPages ? 'pointer-events-none opacity-50' : ''}`}
                                         />
                                     </PaginationItem>
                                 </PaginationContent>

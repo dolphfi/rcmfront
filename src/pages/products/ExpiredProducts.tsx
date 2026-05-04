@@ -155,58 +155,58 @@ const ExpiredProducts: React.FC = () => {
         <div className="flex flex-col h-full gap-6">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div>
-                    <h1 className="text-2xl font-bold text-white tracking-tight">{t('expired.title')}</h1>
-                    <p className="text-sm text-slate-400">{t('expired.subtitle')}</p>
+                    <h1 className="text-2xl font-bold text-foreground tracking-tight">{t('expired.title')}</h1>
+                    <p className="text-sm text-muted-foreground">{t('expired.subtitle')}</p>
                 </div>
 
                 <div className="flex items-center gap-2">
-                    <div className="flex items-center gap-1 bg-white/5 p-1 rounded-lg border border-white/10 mr-2">
-                        <Button variant="ghost" size="icon" className="h-8 w-8 text-rose-500 hover:bg-white/10 hover:text-rose-400" title="PDF">
+                    <div className="flex items-center gap-1 bg-muted p-1 rounded-lg border border-border mr-2">
+                        <Button variant="ghost" size="icon" className="h-8 w-8 text-rose-500 hover:bg-muted hover:text-rose-400" title="PDF">
                             <FileText className="h-4 w-4" />
                         </Button>
-                        <Button variant="ghost" size="icon" className="h-8 w-8 text-emerald-500 hover:bg-white/10 hover:text-emerald-400" title="Excel">
+                        <Button variant="ghost" size="icon" className="h-8 w-8 text-emerald-500 hover:bg-muted hover:text-emerald-400" title="Excel">
                             <FileSpreadsheet className="h-4 w-4" />
                         </Button>
-                        <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:bg-white/10 hover:text-white" title="Print">
+                        <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:bg-muted hover:text-primary" title="Print">
                             <Printer className="h-4 w-4" />
                         </Button>
-                        <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:bg-white/10 hover:text-white" title="Refresh" onClick={fetchExpiredProducts}>
+                        <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:bg-muted hover:text-primary" title="Refresh" onClick={fetchExpiredProducts}>
                             <RotateCw className={cn("h-4 w-4", isLoading && "animate-spin")} />
                         </Button>
-                        <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:bg-white/10 hover:text-white" title="Toggle">
+                        <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:bg-muted hover:text-primary" title="Toggle">
                             <ChevronDown className="h-4 w-4" />
                         </Button>
                     </div>
                 </div>
             </div>
 
-            <Card className="flex-1 bg-white/5 backdrop-blur-sm border border-white/10 text-white overflow-hidden flex flex-col">
+            <Card className="flex-1 bg-muted border border-border text-foreground overflow-hidden flex flex-col">
                 <CardContent className="p-0 flex flex-col h-full">
-                    <div className="p-4 flex flex-col sm:flex-row items-center justify-between gap-4 border-b border-white/10">
+                    <div className="p-4 flex flex-col sm:flex-row items-center justify-between gap-4 border-b border-border">
                         <div className="relative w-full sm:w-72">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                             <Input
                                 placeholder={t('common.search')}
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
-                                className="pl-9 bg-white/5 border-white/10 text-white placeholder:text-slate-500 focus-visible:ring-0 focus-visible:border-orange-500 focus-visible:ring-offset-0"
+                                className="pl-9 bg-muted border-border text-foreground placeholder:text-muted-foreground focus-visible:ring-0 focus-visible:border-primary focus-visible:ring-offset-0"
                             />
                         </div>
 
                         <div className="flex items-center gap-2 w-full sm:w-auto">
                             <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
-                                    <Button variant="outline" className="bg-white/5 border-white/10 text-slate-300 hover:bg-white/10 hover:text-white w-full sm:w-auto justify-between gap-2">
+                                    <Button variant="outline" className="bg-muted border-border text-foreground hover:bg-muted hover:text-primary w-full sm:w-auto justify-between gap-2">
                                         {selectedProduct === 'All' ? t('expired.filter_product') : selectedProduct}
                                         <ChevronDown className="h-4 w-4 opacity-50" />
                                     </Button>
                                 </DropdownMenuTrigger>
-                                <DropdownMenuContent className="bg-slate-900 border-white/10 text-white max-h-60 overflow-y-auto">
-                                    <DropdownMenuItem onClick={() => setSelectedProduct('All')} className="focus:bg-white/10 focus:text-white cursor-pointer">
+                                <DropdownMenuContent className="bg-background border-border text-foreground max-h-60 overflow-y-auto">
+                                    <DropdownMenuItem onClick={() => setSelectedProduct('All')} className="focus:bg-muted focus:text-foreground cursor-pointer">
                                         {t('common.all')}
                                     </DropdownMenuItem>
                                     {uniqueProductNames.map((name) => (
-                                        <DropdownMenuItem key={name} onClick={() => setSelectedProduct(name)} className="focus:bg-white/10 focus:text-white cursor-pointer">
+                                        <DropdownMenuItem key={name} onClick={() => setSelectedProduct(name)} className="focus:bg-muted focus:text-foreground cursor-pointer">
                                             {name}
                                         </DropdownMenuItem>
                                     ))}
@@ -215,82 +215,82 @@ const ExpiredProducts: React.FC = () => {
 
                             <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
-                                    <Button variant="outline" className="bg-white/5 border-white/10 text-slate-300 hover:bg-white/10 hover:text-white w-full sm:w-auto justify-between gap-2">
+                                    <Button variant="outline" className="bg-muted border-border text-foreground hover:bg-muted hover:text-primary w-full sm:w-auto justify-between gap-2">
                                         {t('common.sort_by')}: {sortOption === 'date-desc' ? t('common.newest') : sortOption === 'date-asc' ? t('common.oldest') : sortOption === 'name-asc' ? 'A-Z' : 'Z-A'}
                                         <ChevronDown className="h-4 w-4 opacity-50" />
                                     </Button>
                                 </DropdownMenuTrigger>
-                                <DropdownMenuContent className="bg-slate-900 border-white/10 text-white">
-                                    <DropdownMenuItem onClick={() => setSortOption('date-desc')} className="focus:bg-white/10 focus:text-white cursor-pointer">{t('common.newest')}</DropdownMenuItem>
-                                    <DropdownMenuItem onClick={() => setSortOption('date-asc')} className="focus:bg-white/10 focus:text-white cursor-pointer">{t('common.oldest')}</DropdownMenuItem>
-                                    <DropdownMenuItem onClick={() => setSortOption('name-asc')} className="focus:bg-white/10 focus:text-white cursor-pointer">A-Z</DropdownMenuItem>
-                                    <DropdownMenuItem onClick={() => setSortOption('name-desc')} className="focus:bg-white/10 focus:text-white cursor-pointer">Z-A</DropdownMenuItem>
+                                <DropdownMenuContent className="bg-background border-border text-foreground">
+                                    <DropdownMenuItem onClick={() => setSortOption('date-desc')} className="focus:bg-muted focus:text-foreground cursor-pointer">{t('common.newest')}</DropdownMenuItem>
+                                    <DropdownMenuItem onClick={() => setSortOption('date-asc')} className="focus:bg-muted focus:text-foreground cursor-pointer">{t('common.oldest')}</DropdownMenuItem>
+                                    <DropdownMenuItem onClick={() => setSortOption('name-asc')} className="focus:bg-muted focus:text-foreground cursor-pointer">A-Z</DropdownMenuItem>
+                                    <DropdownMenuItem onClick={() => setSortOption('name-desc')} className="focus:bg-muted focus:text-foreground cursor-pointer">Z-A</DropdownMenuItem>
                                 </DropdownMenuContent>
                             </DropdownMenu>
                         </div>
                     </div>
 
-                    <div className="flex-1 overflow-auto rounded-lg border border-white/10 bg-slate-900/50">
+                    <div className="flex-1 overflow-auto rounded-lg border border-border bg-background">
                         <Table>
-                            <TableHeader className="bg-slate-900 border-b border-white/10">
-                                <TableRow className="hover:bg-transparent border-white/10">
-                                    <TableHead className="text-white">{t('products.sku')}</TableHead>
-                                    <TableHead className="text-white">{t('products.name')}</TableHead>
-                                    <TableHead className="text-white">{t('products.manufactured_date')}</TableHead>
-                                    <TableHead className="text-white">{t('products.expiry_on')}</TableHead>
-                                    <TableHead className="text-right text-white">{t('common.actions')}</TableHead>
+                            <TableHeader className="bg-background border-b border-border">
+                                <TableRow className="hover:bg-transparent border-border">
+                                    <TableHead className="text-foreground">{t('products.sku')}</TableHead>
+                                    <TableHead className="text-foreground">{t('products.name')}</TableHead>
+                                    <TableHead className="text-foreground">{t('products.manufactured_date')}</TableHead>
+                                    <TableHead className="text-foreground">{t('products.expiry_on')}</TableHead>
+                                    <TableHead className="text-right text-foreground">{t('common.actions')}</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
                                 {isLoading ? (
                                     <TableRow>
                                         <TableCell colSpan={5} className="text-center py-12">
-                                            <RotateCw className="h-8 w-8 animate-spin text-orange-500 mx-auto" />
+                                            <RotateCw className="h-8 w-8 animate-spin text-primary mx-auto" />
                                         </TableCell>
                                     </TableRow>
                                 ) : currentProducts.length > 0 ? (
                                     currentProducts.map((product) => (
-                                        <TableRow key={product.id} className="hover:bg-white/5 transition-colors border-white/5 group">
-                                            <TableCell className="font-medium text-slate-300">{product.pricingStocks?.[0]?.sku || 'N/A'}</TableCell>
+                                        <TableRow key={product.id} className="hover:bg-muted transition-colors border-border group">
+                                            <TableCell className="font-medium text-foreground">{product.pricingStocks?.[0]?.sku || 'N/A'}</TableCell>
                                             <TableCell>
                                                 <div className="flex items-center gap-3">
-                                                    <div className="h-9 w-9 rounded-lg border border-white/10 flex items-center justify-center p-1 shrink-0 overflow-hidden bg-white">
+                                                    <div className="h-9 w-9 rounded-lg border border-border flex items-center justify-center p-1 shrink-0 overflow-hidden bg-white">
                                                         {product.images?.[0] ? (
                                                             <img src={product.images[0].url} alt={product.name} className="h-full w-full object-contain" />
                                                         ) : (
-                                                            <span className="text-[10px] text-slate-400">N/A</span>
+                                                            <span className="text-[10px] text-muted-foreground">N/A</span>
                                                         )}
                                                     </div>
-                                                    <span className="font-medium text-white group-hover:text-orange-400 transition-colors">{product.name}</span>
+                                                    <span className="font-medium text-foreground group-hover:text-primary transition-colors">{product.name}</span>
                                                 </div>
                                             </TableCell>
-                                            <TableCell className="text-slate-300">{formatDateStr(product.manufacturedDate)}</TableCell>
+                                            <TableCell className="text-foreground">{formatDateStr(product.manufacturedDate)}</TableCell>
                                             <TableCell className="text-rose-400 font-medium">{formatDateStr(product.expiryDate)}</TableCell>
                                             <TableCell className="text-right">
                                                 <div className="flex items-center justify-end gap-1">
                                                     <Button
                                                         variant="ghost"
                                                         size="icon"
-                                                        className="h-8 w-8 text-slate-400 hover:text-emerald-400 hover:bg-emerald-500/10"
+                                                        className="h-8 w-8 text-muted-foreground hover:text-emerald-400 hover:bg-emerald-500/10"
                                                         onClick={() => handleEditClick(product)}
                                                     >
                                                         <Edit className="h-4 w-4" />
                                                     </Button>
                                                     <AlertDialog>
                                                         <AlertDialogTrigger asChild>
-                                                            <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-rose-400 hover:bg-rose-500/10">
+                                                            <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-rose-400 hover:bg-rose-500/10">
                                                                 <Trash2 className="h-4 w-4" />
                                                             </Button>
                                                         </AlertDialogTrigger>
-                                                        <AlertDialogContent className="bg-slate-900 border-white/10">
+                                                        <AlertDialogContent className="bg-background border-border">
                                                             <AlertDialogHeader>
-                                                                <AlertDialogTitle className="text-white">{t('common.are_you_sure')}</AlertDialogTitle>
-                                                                <AlertDialogDescription className="text-slate-400">
+                                                                <AlertDialogTitle className="text-foreground">{t('common.are_you_sure')}</AlertDialogTitle>
+                                                                <AlertDialogDescription className="text-muted-foreground">
                                                                     {t('expired.delete_warning', { name: product.name })}
                                                                 </AlertDialogDescription>
                                                             </AlertDialogHeader>
                                                             <AlertDialogFooter>
-                                                                <AlertDialogCancel className="bg-transparent border-white/10 text-white hover:bg-white/10 hover:text-white">{t('common.cancel')}</AlertDialogCancel>
+                                                                <AlertDialogCancel className="bg-transparent border-border text-foreground hover:bg-muted hover:text-primary">{t('common.cancel')}</AlertDialogCancel>
                                                                 <AlertDialogAction
                                                                     className="bg-rose-500 hover:bg-rose-600 text-white border-0"
                                                                     onClick={() => handleDelete(product.id)}
@@ -306,7 +306,7 @@ const ExpiredProducts: React.FC = () => {
                                     ))
                                 ) : (
                                     <TableRow>
-                                        <TableCell colSpan={5} className="text-center py-12 text-slate-400">
+                                        <TableCell colSpan={5} className="text-center py-12 text-muted-foreground">
                                             {t('expired.no_products_found')}
                                         </TableCell>
                                     </TableRow>
@@ -315,18 +315,18 @@ const ExpiredProducts: React.FC = () => {
                         </Table>
                     </div>
 
-                    <div className="p-4 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-slate-400">
+                    <div className="p-4 border-t border-border flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-muted-foreground">
                         <div className="flex items-center gap-2">
                             <span>{t('common.rows_per_page')}</span>
                             <Select value={itemsPerPage.toString()} onValueChange={(value) => { setItemsPerPage(Number(value)); setCurrentPage(1); }}>
-                                <SelectTrigger className="w-[70px] h-8 bg-white/5 border-white/10 text-white focus:ring-orange-500/50">
+                                <SelectTrigger className="w-[70px] h-8 bg-muted border-border text-foreground focus:ring-ring/50">
                                     <SelectValue placeholder="10" />
                                 </SelectTrigger>
-                                <SelectContent className="bg-slate-900 border-white/10 text-white">
-                                    <SelectItem value="5" className="focus:bg-white/10 focus:text-white">5</SelectItem>
-                                    <SelectItem value="10" className="focus:bg-white/10 focus:text-white">10</SelectItem>
-                                    <SelectItem value="25" className="focus:bg-white/10 focus:text-white">25</SelectItem>
-                                    <SelectItem value="50" className="focus:bg-white/10 focus:text-white">50</SelectItem>
+                                <SelectContent className="bg-background border-border text-foreground">
+                                    <SelectItem value="5" className="focus:bg-muted focus:text-foreground">5</SelectItem>
+                                    <SelectItem value="10" className="focus:bg-muted focus:text-foreground">10</SelectItem>
+                                    <SelectItem value="25" className="focus:bg-muted focus:text-foreground">25</SelectItem>
+                                    <SelectItem value="50" className="focus:bg-muted focus:text-foreground">50</SelectItem>
                                 </SelectContent>
                             </Select>
                         </div>
@@ -341,7 +341,7 @@ const ExpiredProducts: React.FC = () => {
                                     size="sm"
                                     onClick={() => handlePageChange(currentPage - 1)}
                                     disabled={currentPage === 1}
-                                    className="h-8 w-8 p-0 text-slate-400 hover:text-white hover:bg-white/10 disabled:opacity-50"
+                                    className="h-8 w-8 p-0 text-muted-foreground hover:text-primary hover:bg-muted disabled:opacity-50"
                                 >
                                     <PaginationPrevious className="h-4 w-4" />
                                 </Button>
@@ -355,8 +355,8 @@ const ExpiredProducts: React.FC = () => {
                                             className={cn(
                                                 "h-8 w-8 p-0",
                                                 currentPage === page
-                                                    ? "bg-orange-500 text-white hover:bg-orange-600"
-                                                    : "text-slate-400 hover:text-white hover:bg-white/10"
+                                                    ? "bg-primary text-white hover:bg-primary"
+                                                    : "text-muted-foreground hover:text-primary hover:bg-muted"
                                             )}
                                         >
                                             {page}
@@ -368,7 +368,7 @@ const ExpiredProducts: React.FC = () => {
                                     size="sm"
                                     onClick={() => handlePageChange(currentPage + 1)}
                                     disabled={currentPage === totalPages || totalPages === 0}
-                                    className="h-8 w-8 p-0 text-slate-400 hover:text-white hover:bg-white/10 disabled:opacity-50"
+                                    className="h-8 w-8 p-0 text-muted-foreground hover:text-primary hover:bg-muted disabled:opacity-50"
                                 >
                                     <PaginationNext className="h-4 w-4" />
                                 </Button>
@@ -380,20 +380,20 @@ const ExpiredProducts: React.FC = () => {
 
             {/* Edit Dialog */}
             <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
-                <DialogContent className="bg-slate-900 border-white/10 text-white sm:max-w-[425px]">
+                <DialogContent className="bg-background border-border text-foreground sm:max-w-[425px]">
                     <DialogHeader>
                         <DialogTitle>{t('expired.edit_title')}</DialogTitle>
-                        <DialogDescription className="text-slate-400">
+                        <DialogDescription className="text-muted-foreground">
                             {t('expired.edit_subtitle')}
                         </DialogDescription>
                     </DialogHeader>
                     <div className="grid gap-4 py-4">
                         <div className="flex flex-col gap-2">
-                            <Label className="text-white">{t('products.name')}</Label>
+                            <Label className="text-foreground">{t('products.name')}</Label>
                             <Input
                                 value={editingProduct?.name || ''}
                                 readOnly
-                                className="bg-slate-800 border-white/10 text-slate-400 cursor-not-allowed"
+                                className="bg-muted border-border text-muted-foreground cursor-not-allowed"
                             />
                         </div>
                         <DatePickerInput
@@ -410,10 +410,10 @@ const ExpiredProducts: React.FC = () => {
                         />
                     </div>
                     <DialogFooter>
-                        <Button variant="outline" onClick={() => setIsEditOpen(false)} className="bg-transparent border-white/10 text-white hover:bg-white/10 hover:text-white">
+                        <Button variant="outline" onClick={() => setIsEditOpen(false)} className="bg-transparent border-border text-foreground hover:bg-muted hover:text-primary">
                             {t('common.cancel')}
                         </Button>
-                        <Button onClick={handleSave} className="bg-orange-500 hover:bg-orange-600 text-white">
+                        <Button onClick={handleSave} className="bg-primary hover:bg-primary/90 text-white">
                             {t('common.save_changes')}
                         </Button>
                     </DialogFooter>

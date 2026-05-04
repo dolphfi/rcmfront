@@ -80,7 +80,7 @@ export default function NavbarPos({ sellType, setSellType }: NavbarPosProps) {
         }, 1000);
 
         return () => clearInterval(timer);
-    }, []);
+    }, [user?.posId]);
 
     // Auto-switch logic
     useEffect(() => {

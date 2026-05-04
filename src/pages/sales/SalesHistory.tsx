@@ -127,91 +127,91 @@ const SalesHistory: React.FC = () => {
         <div className="space-y-6">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
-                    <h2 className="text-3xl font-bold tracking-tight text-white flex items-center gap-2">
+                    <h2 className="text-3xl font-bold tracking-tight text-foreground flex items-center gap-2">
                         <History className="h-8 w-8 text-emerald-500" />
                         Istorik Lavant
                     </h2>
-                    <p className="text-slate-400">
+                    <p className="text-muted-foreground">
                         Wè tout lavant ki fèt nan sistèm nan
                     </p>
                 </div>
                 <div className="flex items-center gap-2">
-                    <Button variant="outline" className="bg-slate-800 border-white/10 text-white hover:bg-slate-700">
+                    <Button variant="outline" className="bg-background border-border text-foreground hover:bg-primary/10">
                         <Download className="mr-2 h-4 w-4" /> Export
                     </Button>
                 </div>
             </div>
 
-            <Card className="bg-slate-900/50 border-white/10 backdrop-blur-xl">
+            <Card className="bg-background border-border">
                 <CardHeader>
                     <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                        <CardTitle className="text-white text-lg font-medium">Lavant Resan</CardTitle>
+                        <CardTitle className="text-foreground text-lg font-medium">Lavant Resan</CardTitle>
                         <div className="flex items-center gap-2 w-full md:w-auto">
                             <div className="relative w-full md:w-64">
-                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                                 <Input
                                     placeholder="Chache reçu, kesye..."
-                                    className="pl-9 bg-slate-800/50 border-white/10 text-white"
+                                    className="pl-9 bg-muted border-border text-foreground"
                                     value={searchTerm}
                                     onChange={(e) => setSearchTerm(e.target.value)}
                                 />
                             </div>
-                            <Button variant="outline" size="icon" className="bg-slate-800 border-white/10 text-white">
+                            <Button variant="outline" size="icon" className="bg-background border-border text-foreground">
                                 <Filter className="h-4 w-4" />
                             </Button>
                         </div>
                     </div>
                 </CardHeader>
                 <CardContent>
-                    <div className="rounded-md border border-white/10 overflow-hidden">
+                    <div className="rounded-md border border-border overflow-hidden">
                         <Table>
-                            <TableHeader className="bg-slate-800/50">
-                                <TableRow className="border-white/10 hover:bg-transparent">
-                                    <TableHead className="text-slate-300">Reçu #</TableHead>
-                                    <TableHead className="text-slate-300">Dat</TableHead>
-                                    <TableHead className="text-slate-300">Kesye</TableHead>
-                                    <TableHead className="text-slate-300">Kliyan</TableHead>
-                                    <TableHead className="text-slate-300">Peman</TableHead>
-                                    <TableHead className="text-right text-slate-300">Total</TableHead>
-                                    <TableHead className="text-center text-slate-300">Status</TableHead>
-                                    <TableHead className="text-right text-slate-300">Aksyon</TableHead>
+                            <TableHeader className="bg-muted">
+                                <TableRow className="border-border hover:bg-transparent">
+                                    <TableHead className="text-foreground">Reçu #</TableHead>
+                                    <TableHead className="text-foreground">Dat</TableHead>
+                                    <TableHead className="text-foreground">Kesye</TableHead>
+                                    <TableHead className="text-foreground">Kliyan</TableHead>
+                                    <TableHead className="text-foreground">Peman</TableHead>
+                                    <TableHead className="text-right text-foreground">Total</TableHead>
+                                    <TableHead className="text-center text-foreground">Status</TableHead>
+                                    <TableHead className="text-right text-foreground">Aksyon</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
                                 {isLoading ? (
-                                    <TableRow className="border-white/10">
-                                        <TableCell colSpan={8} className="h-24 text-center text-slate-400">
+                                    <TableRow className="border-border">
+                                        <TableCell colSpan={8} className="h-24 text-center text-muted-foreground">
                                             Ap chaje...
                                         </TableCell>
                                     </TableRow>
                                 ) : filteredSales.length === 0 ? (
-                                    <TableRow className="border-white/10">
-                                        <TableCell colSpan={8} className="h-24 text-center text-slate-400">
+                                    <TableRow className="border-border">
+                                        <TableCell colSpan={8} className="h-24 text-center text-muted-foreground">
                                             Okenn lavant pa jwenn.
                                         </TableCell>
                                     </TableRow>
                                 ) : (
                                     filteredSales.map((sale) => (
-                                        <TableRow key={sale.id} className="border-white/10 hover:bg-white/5 transition-colors">
-                                            <TableCell className="font-medium text-white">
+                                        <TableRow key={sale.id} className="border-border hover:bg-primary/10 transition-colors">
+                                            <TableCell className="font-medium text-foreground">
                                                 {sale.receiptNumber}
                                             </TableCell>
-                                            <TableCell className="text-slate-300">
+                                            <TableCell className="text-foreground">
                                                 {format(new Date(sale.createdAt), 'dd/MM/yyyy HH:mm')}
                                             </TableCell>
-                                            <TableCell className="text-slate-300">
+                                            <TableCell className="text-foreground">
                                                 {sale.cashier ? `${sale.cashier.firstName} ${sale.cashier.lastName}` : 'N/A'}
                                             </TableCell>
-                                            <TableCell className="text-slate-300">
+                                            <TableCell className="text-foreground">
                                                 {sale.customer ? `${sale.customer.firstName} ${sale.customer.lastName}` : 'Walk-in'}
                                             </TableCell>
                                             <TableCell>
-                                                <Badge 
-                                                    variant="outline" 
+                                                <Badge
+                                                    variant="outline"
                                                     className={cn(
                                                         "uppercase text-[10px] border-0",
-                                                        sale.paymentMethod === 'CREDIT' 
-                                                            ? "bg-amber-500/20 text-amber-500" 
+                                                        sale.paymentMethod === 'CREDIT'
+                                                            ? "bg-amber-500/20 text-amber-500"
                                                             : "bg-blue-500/10 text-blue-400"
                                                     )}
                                                 >
@@ -230,7 +230,7 @@ const SalesHistory: React.FC = () => {
                                                 <Button
                                                     variant="ghost"
                                                     size="icon"
-                                                    className="text-slate-400 hover:text-white hover:bg-white/10"
+                                                    className="text-muted-foreground hover:text-primary hover:bg-primary/10"
                                                     onClick={() => handleViewDetails(sale)}
                                                 >
                                                     <Eye className="h-4 w-4" />
@@ -247,16 +247,16 @@ const SalesHistory: React.FC = () => {
 
             {/* Sale Details Dialog */}
             <Dialog open={isDetailsOpen} onOpenChange={setIsDetailsOpen}>
-                <DialogContent className="bg-slate-900 border-white/10 text-white max-w-2xl max-h-[90vh] flex flex-col p-0">
-                    <DialogHeader className="p-6 pb-4 border-b border-white/5 shrink-0">
+                <DialogContent className="bg-background border-border text-foreground max-w-2xl max-h-[90vh] flex flex-col p-0">
+                    <DialogHeader className="p-6 pb-4 border-b border-border shrink-0">
                         <DialogTitle className="text-xl font-bold flex items-center justify-between">
                             <span>Détails de la Vente</span>
                             <Badge variant="outline" className="bg-emerald-500/10 text-emerald-400 border-emerald-500/20 text-sm px-3 py-1">
                                 {selectedSale?.status}
                             </Badge>
                         </DialogTitle>
-                        <DialogDescription className="text-slate-400">
-                            Reçu: <span className="text-white font-mono">{selectedSale?.receiptNumber}</span>
+                        <DialogDescription className="text-muted-foreground">
+                            Reçu: <span className="text-foreground font-mono">{selectedSale?.receiptNumber}</span>
                         </DialogDescription>
                     </DialogHeader>
 
@@ -265,27 +265,27 @@ const SalesHistory: React.FC = () => {
                             <div className="p-6 space-y-6">
                                 {/* Informational Grid */}
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <div className="bg-slate-800/50 p-4 rounded-lg border border-white/5">
-                                        <div className="flex items-center gap-2 mb-3 text-slate-400">
-                                            <Store className="h-4 w-4 text-orange-400" />
+                                    <div className="bg-muted p-4 rounded-lg border border-border">
+                                        <div className="flex items-center gap-2 mb-3 text-muted-foreground">
+                                            <Store className="h-4 w-4 text-primary" />
                                             <span className="font-medium text-sm">Point de Vente</span>
                                         </div>
-                                        <p className="text-white font-medium">{selectedSale.pos?.name || 'N/A'}</p>
-                                        <p className="text-slate-400 text-sm mt-1">{format(new Date(selectedSale.createdAt), 'dd MMMM yyyy HH:mm')}</p>
+                                        <p className="text-foreground font-medium">{selectedSale.pos?.name || 'N/A'}</p>
+                                        <p className="text-muted-foreground text-sm mt-1">{format(new Date(selectedSale.createdAt), 'dd MMMM yyyy HH:mm')}</p>
                                     </div>
-                                    <div className="bg-slate-800/50 p-4 rounded-lg border border-white/5">
-                                        <div className="flex items-center gap-2 mb-3 text-slate-400">
+                                    <div className="bg-muted p-4 rounded-lg border border-border">
+                                        <div className="flex items-center gap-2 mb-3 text-muted-foreground">
                                             <User className="h-4 w-4 text-blue-400" />
                                             <span className="font-medium text-sm">Personnel & Client</span>
                                         </div>
                                         <div className="space-y-2">
                                             <div className="flex justify-between text-sm">
-                                                <span className="text-slate-400">Caissier:</span>
-                                                <span className="text-white">{selectedSale.cashier ? `${selectedSale.cashier.firstName} ${selectedSale.cashier.lastName}` : 'N/A'}</span>
+                                                <span className="text-muted-foreground">Caissier:</span>
+                                                <span className="text-foreground">{selectedSale.cashier ? `${selectedSale.cashier.firstName} ${selectedSale.cashier.lastName}` : 'N/A'}</span>
                                             </div>
                                             <div className="flex justify-between text-sm">
-                                                <span className="text-slate-400">Client:</span>
-                                                <span className="text-white">{selectedSale.customer ? `${selectedSale.customer.firstName} ${selectedSale.customer.lastName}` : 'Walk-in'}</span>
+                                                <span className="text-muted-foreground">Client:</span>
+                                                <span className="text-foreground">{selectedSale.customer ? `${selectedSale.customer.firstName} ${selectedSale.customer.lastName}` : 'Walk-in'}</span>
                                             </div>
                                         </div>
                                     </div>
@@ -295,28 +295,28 @@ const SalesHistory: React.FC = () => {
                                 <div>
                                     <div className="flex items-center gap-2 mb-3">
                                         <ShoppingBag className="h-4 w-4 text-emerald-400" />
-                                        <h3 className="font-medium text-white">Articles ({selectedSale.items?.length || 0})</h3>
+                                        <h3 className="font-medium text-foreground">Articles ({selectedSale.items?.length || 0})</h3>
                                     </div>
-                                    <div className="bg-slate-800/30 rounded-lg border border-white/5 overflow-hidden">
+                                    <div className="bg-muted rounded-lg border border-border overflow-hidden">
                                         <Table>
-                                            <TableHeader className="bg-slate-800/50">
-                                                <TableRow className="border-white/5 hover:bg-transparent">
-                                                    <TableHead className="text-slate-400 h-9">Article</TableHead>
-                                                    <TableHead className="text-slate-400 h-9 text-center">Qté</TableHead>
-                                                    <TableHead className="text-slate-400 h-9 text-right">Prix</TableHead>
-                                                    <TableHead className="text-slate-400 h-9 text-right">Total</TableHead>
+                                            <TableHeader className="bg-muted">
+                                                <TableRow className="border-border hover:bg-transparent">
+                                                    <TableHead className="text-muted-foreground h-9">Article</TableHead>
+                                                    <TableHead className="text-muted-foreground h-9 text-center">Qté</TableHead>
+                                                    <TableHead className="text-muted-foreground h-9 text-right">Prix</TableHead>
+                                                    <TableHead className="text-muted-foreground h-9 text-right">Total</TableHead>
                                                 </TableRow>
                                             </TableHeader>
                                             <TableBody>
                                                 {selectedSale.items?.map((item: any, index: number) => (
-                                                    <TableRow key={index} className="border-white/5 hover:bg-white/5">
-                                                        <TableCell className="font-medium text-slate-200">
+                                                    <TableRow key={index} className="border-border hover:bg-primary/10">
+                                                        <TableCell className="font-medium text-foreground">
                                                             {item.name}
                                                         </TableCell>
-                                                        <TableCell className="text-center text-slate-300">
+                                                        <TableCell className="text-center text-foreground">
                                                             x{item.qty}
                                                         </TableCell>
-                                                        <TableCell className="text-right text-slate-300">
+                                                        <TableCell className="text-right text-foreground">
                                                             {Number(item.price).toLocaleString()} {currency}
                                                         </TableCell>
                                                         <TableCell className="text-right text-emerald-400 font-medium">
@@ -330,27 +330,27 @@ const SalesHistory: React.FC = () => {
                                 </div>
 
                                 {/* Totals */}
-                                <div className="flex justify-end pt-4 border-t border-white/5">
+                                <div className="flex justify-end pt-4 border-t border-border">
                                     <div className="w-full md:w-1/2 space-y-2">
-                                        <div className="flex justify-between text-sm text-slate-400">
+                                        <div className="flex justify-between text-sm text-muted-foreground">
                                             <span>Sous-total:</span>
                                             <span>{Number(selectedSale.subtotal).toLocaleString()} {currency}</span>
                                         </div>
-                                        <div className="flex justify-between text-sm text-slate-400">
+                                        <div className="flex justify-between text-sm text-muted-foreground">
                                             <span>Taxes:</span>
                                             <span>{Number(selectedSale.tax).toLocaleString()} {currency}</span>
                                         </div>
-                                        <div className="flex justify-between text-sm text-orange-400">
+                                        <div className="flex justify-between text-sm text-primary">
                                             <span>Rabais:</span>
                                             <span>-{Number(selectedSale.discount).toLocaleString()} {currency}</span>
                                         </div>
-                                        <div className="flex justify-between items-center text-lg font-bold text-white pt-2 border-t border-white/10 mt-2">
+                                        <div className="flex justify-between items-center text-lg font-bold text-foreground pt-2 border-t border-border mt-2">
                                             <span>Total Payé:</span>
                                             <span className="text-emerald-400">{Number(selectedSale.total).toLocaleString()} {currency}</span>
                                         </div>
                                         <div className="flex justify-between items-center text-sm mt-1">
-                                            <span className="text-slate-400">Méthode de Paiement:</span>
-                                            <Badge variant="outline" className="bg-slate-800 text-slate-300 mt-1 flex items-center gap-1">
+                                            <span className="text-muted-foreground">Méthode de Paiement:</span>
+                                            <Badge variant="outline" className="bg-background text-foreground mt-1 flex items-center gap-1">
                                                 <CreditCard className="h-3 w-3" />
                                                 {selectedSale.paymentMethod}
                                             </Badge>
@@ -360,7 +360,7 @@ const SalesHistory: React.FC = () => {
                             </div>
                         </ScrollArea>
                     )}
-                    <div className="p-4 border-t border-white/5 bg-slate-900/50 shrink-0 flex justify-between">
+                    <div className="p-4 border-t border-border bg-background shrink-0 flex justify-between">
                         <Button
                             variant="default"
                             onClick={handleReprintReceipt}
@@ -377,7 +377,7 @@ const SalesHistory: React.FC = () => {
                         <Button
                             variant="outline"
                             onClick={() => setIsDetailsOpen(false)}
-                            className="bg-slate-800 border-white/10 text-white hover:bg-slate-700"
+                            className="bg-background border-border text-foreground hover:bg-primary/10"
                         >
                             Fermer
                         </Button>

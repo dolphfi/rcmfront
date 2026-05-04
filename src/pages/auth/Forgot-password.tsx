@@ -36,18 +36,18 @@ const ForgotPassword: React.FC = () => {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-slate-950 p-4">
-            <Card className="w-full max-w-md bg-slate-900 border-slate-800 shadow-xl">
+        <div className="min-h-screen flex items-center justify-center bg-background p-4">
+            <Card className="w-full max-w-md bg-background border-border shadow-xl">
                 <CardHeader className="space-y-3 pb-6">
                     <div className="flex justify-center mb-4">
                         <div className="w-16 h-16 rounded-2xl bg-blue-500/10 flex items-center justify-center">
                             <Mail className="w-8 h-8 text-blue-500" />
                         </div>
                     </div>
-                    <CardTitle className="text-2xl font-bold text-center text-white">
+                    <CardTitle className="text-2xl font-bold text-center text-foreground">
                         {t('auth.forgot_password_title', 'Forgot Password?')}
                     </CardTitle>
-                    <CardDescription className="text-center text-slate-400">
+                    <CardDescription className="text-center text-muted-foreground">
                         {isSubmitted
                             ? t('auth.forgot_password_success_desc', 'We have sent password reset instructions to your email address.')
                             : t('auth.forgot_password_desc', 'Enter your email address and we will send you a link to reset your password.')}
@@ -58,7 +58,7 @@ const ForgotPassword: React.FC = () => {
                     {!isSubmitted ? (
                         <form onSubmit={handleSubmit} className="space-y-4">
                             <div className="space-y-2">
-                                <label className="text-sm font-medium text-slate-300">
+                                <label className="text-sm font-medium text-foreground">
                                     {t('auth.email_label', 'Email Address')}
                                 </label>
                                 <Input
@@ -66,7 +66,7 @@ const ForgotPassword: React.FC = () => {
                                     placeholder="name@example.com"
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
-                                    className="bg-slate-950 border-slate-800 text-white placeholder:text-slate-500"
+                                    className="bg-background border-border text-foreground placeholder:text-muted-foreground"
                                     required
                                     disabled={isLoading}
                                 />
@@ -90,7 +90,7 @@ const ForgotPassword: React.FC = () => {
                         <div className="text-center space-y-4">
                             <Button
                                 variant="outline"
-                                className="w-full border-slate-700 bg-slate-800 text-slate-300 hover:bg-slate-800"
+                                className="w-full border-border bg-background text-foreground hover:bg-primary/10"
                                 onClick={() => setIsSubmitted(false)}
                             >
                                 {t('auth.try_another_email', 'Try another email')}
@@ -102,7 +102,7 @@ const ForgotPassword: React.FC = () => {
                 <CardFooter>
                     <Button
                         variant="ghost"
-                        className="w-full text-slate-400 hover:text-white hover:bg-slate-800"
+                        className="w-full text-muted-foreground hover:text-primary hover:bg-primary/10"
                         onClick={() => navigate('/')}
                     >
                         <ArrowLeft className="mr-2 h-4 w-4" />
