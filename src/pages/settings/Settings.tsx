@@ -123,7 +123,7 @@ const Settings: React.FC = () => {
             const rawData = settingsResponse?.data || settingsResponse;
             const data = Array.isArray(rawData) ? rawData : (Array.isArray(rawData?.data) ? rawData.data : []);
             setSettings(data);
-            
+
             const rawHistory = historyResponse?.data || historyResponse;
             const historyData = Array.isArray(rawHistory) ? rawHistory : (Array.isArray(rawHistory?.data) ? rawHistory.data : []);
             setBackupHistory(historyData);
@@ -140,7 +140,7 @@ const Settings: React.FC = () => {
             setBusinessPhone(data.find((s: any) => s.key === 'BUSINESS_PHONE')?.value || "");
             const email = data.find((s: any) => s.key === 'BUSINESS_EMAIL')?.value || "";
             setBusinessEmail(email);
-            
+
             const bankInfoRaw = data.find((s: any) => s.key === 'BUSINESS_BANK_INFO')?.value || "[]";
             try {
                 const parsed = JSON.parse(bankInfoRaw);
@@ -148,7 +148,7 @@ const Settings: React.FC = () => {
             } catch {
                 setBankAccounts([]);
             }
-            
+
             setExchangeRate(data.find((s: any) => s.key === 'EXCHANGE_RATE')?.value || "1");
 
             // Auto-detect mode
@@ -475,7 +475,7 @@ const Settings: React.FC = () => {
                                                     <CirclePlus className="h-3.5 w-3.5 mr-1" /> Ajoute yon kont
                                                 </Button>
                                             </div>
-                                            
+
                                             <div className="space-y-3">
                                                 {bankAccounts.map((account, index) => (
                                                     <div key={index} className="grid grid-cols-1 md:grid-cols-3 gap-3 p-4 bg-slate-800/30 border border-white/5 rounded-lg relative group">
@@ -619,7 +619,7 @@ const Settings: React.FC = () => {
                                     <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-y-4 gap-x-12">
                                         <div className="space-y-1">
                                             <p className="text-[10px] uppercase tracking-widest text-slate-500 font-bold">{t('settings.business_name')}</p>
-                                            <p className="text-xl font-bold text-white">{businessName || '---'}</p>
+                                            <p className="text-slate-300 italic">{businessName || '---'}</p>
                                         </div>
                                         <div className="space-y-1">
                                             <p className="text-[10px] uppercase tracking-widest text-slate-500 font-bold">{t('settings.business_slogan')}</p>
