@@ -925,31 +925,23 @@ const AddProduct: React.FC = () => {
                                             />
                                         </div>
                                         <div className="space-y-2">
-                                            <Label className="text-foreground">{t('products.price')} <span className="text-red-500">*</span></Label>
-                                            <Input
-                                                type="text"
-                                                value={formData.price}
-                                                onChange={(e) => setFormData(prev => ({ ...prev, price: Number(e.target.value) }))}
-                                                className="bg-background border-border text-foreground"
-                                                placeholder="Détail"
-                                            />
-                                        </div>
-                                        <div className="space-y-2">
-                                            <Label className="text-foreground">Prix en Gros</Label>
+                                            <Label className="text-foreground">Prix Gran Dealer <span className="text-red-500">*</span></Label>
                                             <Input
                                                 type="text"
                                                 value={formData.wholesalePrice}
                                                 onChange={(e) => setFormData(prev => ({ ...prev, wholesalePrice: Number(e.target.value) }))}
                                                 className="bg-background border-border text-foreground"
+                                                placeholder="0"
                                             />
                                         </div>
                                         <div className="space-y-2">
-                                            <Label className="text-foreground">Prix Grand Dealer</Label>
+                                            <Label className="text-foreground">Prix Petit Dealer <span className="text-red-500">*</span></Label>
                                             <Input
                                                 type="text"
                                                 value={formData.grandDealerPrice}
                                                 onChange={(e) => setFormData(prev => ({ ...prev, grandDealerPrice: Number(e.target.value) }))}
                                                 className="bg-background border-border text-foreground"
+                                                placeholder="0"
                                             />
                                         </div>
                                         <div className="space-y-2">
@@ -1324,33 +1316,25 @@ const AddProduct: React.FC = () => {
 
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="grid gap-2">
-                                    <Label htmlFor="v-price" className="text-foreground">Pri Vann ($) (Détail) <span className="text-rose-500">*</span></Label>
-                                    <Input
-                                        id="v-price"
-                                        type="number"
-                                        value={variantFormData.price}
-                                        onChange={(e) => setVariantFormData({ ...variantFormData, price: Number(e.target.value) })}
-                                        className="bg-muted border-border text-emerald-400 font-medium focus-visible:ring-emerald-500/50"
-                                    />
-                                </div>
-                                <div className="grid gap-2">
-                                    <Label htmlFor="v-wholesale-price" className="text-foreground">Prix en Gros</Label>
+                                    <Label htmlFor="v-wholesale-price" className="text-foreground">Prix Gran Dealer <span className="text-rose-500">*</span></Label>
                                     <Input
                                         id="v-wholesale-price"
                                         type="number"
                                         value={variantFormData.wholesalePrice}
                                         onChange={(e) => setVariantFormData({ ...variantFormData, wholesalePrice: Number(e.target.value) })}
                                         className="bg-muted border-border text-foreground focus-visible:ring-ring"
+                                        placeholder="0"
                                     />
                                 </div>
                                 <div className="grid gap-2">
-                                    <Label htmlFor="v-grand-dealer-price" className="text-foreground">Prix Grand Dealer</Label>
+                                    <Label htmlFor="v-grand-dealer-price" className="text-foreground">Prix Petit Dealer <span className="text-rose-500">*</span></Label>
                                     <Input
                                         id="v-grand-dealer-price"
                                         type="number"
                                         value={variantFormData.grandDealerPrice}
                                         onChange={(e) => setVariantFormData({ ...variantFormData, grandDealerPrice: Number(e.target.value) })}
                                         className="bg-muted border-border text-foreground focus-visible:ring-ring"
+                                        placeholder="0"
                                     />
                                 </div>
                                 <div className="grid gap-2">
