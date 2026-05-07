@@ -293,7 +293,7 @@ const AddProduct: React.FC = () => {
         const isSingle = formData.productType === 'single';
         const isNameValid = !!formData.name;
         const isSkuValid = !isSingle || !!formData.sku;
-        const isPriceValid = !isSingle || !!formData.price;
+        const isPriceValid = !isSingle || (!!formData.wholesalePrice || !!formData.grandDealerPrice);
         const isCategoryValid = !!formData.categoryId;
 
         if (!isNameValid || !isSkuValid || !isPriceValid || !isCategoryValid) {
