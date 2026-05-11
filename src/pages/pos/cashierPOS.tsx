@@ -623,12 +623,7 @@ const CashierPOS: React.FC = () => {
     const cartItemCount = cart.reduce((acc, item) => acc + item.qty, 0);
 
     // Payment calculations
-    const subtotal = cart.reduce((acc, item) => {
-        let currentPrice = item.retailPrice;
-        if (item.priceType === 'wholesale') currentPrice = item.wholesalePrice;
-        else if (item.priceType === 'grand') currentPrice = item.grandDealerPrice;
-        return acc + (currentPrice * item.qty);
-    }, 0);
+    const subtotal = cart.reduce((acc, item) => acc + (item.price * item.qty), 0);
     const tax = subtotal * 0.10; // 10% tax
     // const discount = 0; // Can be updated based on loyalty/promotions
     // fake discount
