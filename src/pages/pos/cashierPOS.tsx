@@ -456,7 +456,7 @@ const CashierPOS: React.FC = () => {
     const updatePriceType = (itemId: string | number, priceType: CartItem['priceType']) => {
         setCart(prevCart => prevCart.map(item => {
             if (item.id === itemId) {
-                let newPrice = item.retailPrice;
+                let newPrice = priceType === 'retail' ? 0 : item.retailPrice;
                 if (priceType === 'wholesale') newPrice = item.wholesalePrice;
                 else if (priceType === 'grand') newPrice = item.grandDealerPrice;
 
@@ -464,6 +464,12 @@ const CashierPOS: React.FC = () => {
             }
             return item;
         }));
+    };
+
+    const updateItemPrice = (itemId: string | number, newPrice: number) => {
+        setCart(prevCart => prevCart.map(item =>
+            item.id === itemId ? { ...item, price: newPrice } : item
+        ));
     };
 
     const clearCart = () => {
@@ -941,7 +947,7 @@ const CashierPOS: React.FC = () => {
                                                     <span className="text-sm font-medium text-foreground truncate group-hover:text-emerald-400 transition-colors">
                                                         {item.name}
                                                     </span>
-                                                    <div className="mt-1">
+                                                    <div className="mt-1 flex flex-col gap-1">
                                                         <Select
                                                             value={item.priceType}
                                                             onValueChange={(val: any) => updatePriceType(item.id, val)}
@@ -950,11 +956,21 @@ const CashierPOS: React.FC = () => {
                                                                 <SelectValue />
                                                             </SelectTrigger>
                                                             <SelectContent className="bg-background border-border text-foreground min-w-[120px]">
-                                                                <SelectItem value="retail" className="text-xs">{t('pos.price_tiers.retail')} (${(item.retailPrice || 0).toLocaleString()})</SelectItem>
+                                                                <SelectItem value="retail" className="text-xs">{t('pos.price_tiers.retail')}</SelectItem>
                                                                 <SelectItem value="wholesale" className="text-xs">{t('pos.price_tiers.wholesale')} (${(item.wholesalePrice || 0).toLocaleString()})</SelectItem>
                                                                 <SelectItem value="grand" className="text-xs">{t('pos.price_tiers.grand_dealer')} (${(item.grandDealerPrice || 0).toLocaleString()})</SelectItem>
                                                             </SelectContent>
                                                         </Select>
+                                                        {item.priceType === 'retail' && (
+                                                            <input
+                                                                type="number"
+                                                                min="0"
+                                                                value={item.price || ''}
+                                                                onChange={(e) => updateItemPrice(item.id, Number(e.target.value))}
+                                                                placeholder="Pri Detail..."
+                                                                className="h-6 w-24 rounded border border-primary/40 bg-primary/5 px-2 text-[10px] text-primary font-medium focus:outline-none focus:border-primary focus:ring-0"
+                                                            />
+                                                        )}
                                                     </div>
                                                 </div>
                                             </div>
