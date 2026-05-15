@@ -5,7 +5,7 @@ import {
     ArrowLeft, RefreshCw, ChevronUp, Info, List, Bold, Italic, Underline,
     Link as LinkIcon, ListOrdered, Type, ChevronsUpDown,
     CirclePlus,
-    RotateCw, Check, ChevronDown, LifeBuoy, Box, SquarePercent
+    RotateCw, Check, ChevronDown, LifeBuoy, Box
 } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Input } from '../../components/ui/input';
@@ -139,7 +139,7 @@ const EditProduct: React.FC = () => {
 
     const handleSubmit = async () => {
         if (!id) return;
-        if (!formData.name || !formData.sku || !formData.price) {
+        if (!formData.name || !formData.sku || (!formData.wholesalePrice && !formData.grandDealerPrice)) {
             toast.error('Tanpri ranpli tout chan ki obligatwa yo');
             return;
         }
@@ -165,7 +165,7 @@ const EditProduct: React.FC = () => {
                 pricingStocks: [
                     {
                         sku: formData.sku,
-                        price: Number(formData.price),
+                        price: 0,
                         wholesalePrice: Number(formData.wholesalePrice),
                         grandDealerPrice: Number(formData.grandDealerPrice),
                         costPrice: Number(formData.costPrice),
@@ -544,30 +544,23 @@ const EditProduct: React.FC = () => {
                                 {/* Pricing Details */}
                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 animate-in fade-in slide-in-from-top-2 duration-300">
                                     <div className="space-y-2">
-                                        <Label className="text-foreground">{t('products.price')} (Détail) <span className="text-red-500">*</span></Label>
-                                        <Input
-                                            type="number"
-                                            value={formData.price}
-                                            onChange={(e) => setFormData(prev => ({ ...prev, price: Number(e.target.value) }))}
-                                            className="bg-background border-border text-emerald-400 font-medium"
-                                        />
-                                    </div>
-                                    <div className="space-y-2">
-                                        <Label className="text-foreground">Prix en Gros</Label>
+                                        <Label className="text-foreground">Prix Gran Dealer <span className="text-red-500">*</span></Label>
                                         <Input
                                             type="number"
                                             value={formData.wholesalePrice}
                                             onChange={(e) => setFormData(prev => ({ ...prev, wholesalePrice: Number(e.target.value) }))}
                                             className="bg-background border-border text-foreground"
+                                            placeholder="0"
                                         />
                                     </div>
                                     <div className="space-y-2">
-                                        <Label className="text-foreground">Prix Grand Dealer</Label>
+                                        <Label className="text-foreground">Prix Petit Dealer <span className="text-red-500">*</span></Label>
                                         <Input
                                             type="number"
                                             value={formData.grandDealerPrice}
                                             onChange={(e) => setFormData(prev => ({ ...prev, grandDealerPrice: Number(e.target.value) }))}
                                             className="bg-background border-border text-foreground"
+                                            placeholder="0"
                                         />
                                     </div>
                                     <div className="space-y-2">
