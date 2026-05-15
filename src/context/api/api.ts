@@ -53,8 +53,9 @@ api.interceptors.response.use(
         // If error is 401 and we haven't retried yet
         if (error.response && error.response.status === 401 && !originalRequest._retry) {
 
-            // If we are already on the login page or /auth paths, don't try to refresh
-            if (window.location.pathname === '/' || originalRequest.url.includes('/auth/')) {
+            // If we are on a public page or /auth paths, don't try to refresh
+            const publicPaths = ['/', '/reset-password', '/forgot-password'];
+            if (publicPaths.includes(window.location.pathname) || originalRequest.url.includes('/auth/')) {
                 localStorage.removeItem('access_token');
                 localStorage.removeItem('refresh_token');
                 localStorage.removeItem('user');
