@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "../../components/ui/card"
 import { Input } from '../../components/ui/input';
 import { Eye, EyeOff } from 'lucide-react';
@@ -15,8 +15,18 @@ const Login: React.FC = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const navigate = useNavigate();
-    const { login, isLoading } = useAuth();
+    const { login, isLoading, isAuthenticated, user } = useAuth();
     const { logoUrl } = useSettings();
+
+    useEffect(() => {
+        if (!isLoading && isAuthenticated) {
+            if (user?.role?.name === 'ADMIN' || user?.role?.name === 'SUPER_ADMIN') {
+                navigate('/dashboard');
+            } else {
+                navigate('/pos');
+            }
+        }
+    }, [isAuthenticated, isLoading, user, navigate]);
 
     const onLoginSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
